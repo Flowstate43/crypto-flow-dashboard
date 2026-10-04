@@ -234,8 +234,9 @@
 
 <script>
 // ─── Utilities ────────────────────────────────────────────────────────────────
-const BINANCE_WS = 'wss://stream.binance.com:9443/ws/btcusdt@ticker';
-const BINANCE_REST = 'https://api.binance.com/api/v3';
+// Binance.com blocks US users (HTTP 451), so use Binance.US (same API format)
+const BINANCE_WS = 'wss://stream.binance.us:9443/ws/btcusdt@ticker';
+const BINANCE_REST = 'https://api.binance.us/api/v3';
 const FNG_API = 'https://api.alternative.me/fng/?limit=1';
 
 let btcPrice = 0;
@@ -245,20 +246,38 @@ let candleSeries = null;
 let tickerSocket = null;
 
 // ─── Price Ticker ───────────────────────────────────────────────────────────
+function showPrice(price, pct) {
+  btcPrevPrice = btcPrice;
+  btcPrice = price;
+  document.getElementById('btc-price').textContent = '$' + btcPrice.toLocaleString('en', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  const changeEl = document.getElementById('btc-change');
+  changeEl.textContent = (pct >= 0 ? '▲' : '▼') + ' ' + Math.abs(pct).toFixed(2) + '% 24h';
+  changeEl.className = 'btc-change ' + (pct >= 0 ? 'up' : 'down');
+  document.getElementById('updated-at').textContent = new Date().toLocaleTimeString();
+}
+
+// REST fallback, used until the WebSocket connects and whenever it drops
+let pollTimer = null;
+async function pollPrice() {
+  try {
+    const r = await fetch(`${BINANCE_REST}/ticker/24hr?symbol=BTCUSDT`);
+    const d = await r.json();
+    showPrice(parseFloat(d.lastPrice), parseFloat(d.priceChangePercent));
+  } catch (e) { /* keep last price */ }
+}
+function startPolling() { if (!pollTimer) { pollPrice(); pollTimer = setInterval(pollPrice, 5000); } }
+function stopPolling() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
+
 function startTicker() {
-  tickerSocket = new WebSocket(BINANCE_WS);
+  startPolling();
+  try { tickerSocket = new WebSocket(BINANCE_WS); } catch (e) { setTimeout(startTicker, 10000); return; }
+  tickerSocket.onopen = () => stopPolling();
   tickerSocket.onmessage = (e) => {
     const d = JSON.parse(e.data);
-    btcPrevPrice = btcPrice;
-    btcPrice = parseFloat(d.c);
-    const pct = ((btcPrice - btcPrevPrice) / btcPrevPrice * 100) || 0;
-    document.getElementById('btc-price').textContent = '$' + btcPrice.toLocaleString('en', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    const changeEl = document.getElementById('btc-change');
-    changeEl.textContent = (pct >= 0 ? '▲' : '▼') + ' ' + Math.abs(pct).toFixed(2) + '%';
-    changeEl.className = 'btc-change ' + (pct >= 0 ? 'up' : 'down');
-    document.getElementById('updated-at').textContent = new Date().toLocaleTimeString();
+    showPrice(parseFloat(d.c), parseFloat(d.P));
   };
-  tickerSocket.onerror = () => { document.getElementById('btc-price').textContent = 'WS Error'; };
+  tickerSocket.onerror = () => { startPolling(); };
+  tickerSocket.onclose = () => { startPolling(); setTimeout(startTicker, 10000); };
 }
 
 // ─── EMA helper ────────────────────────────────────────────────────────────
