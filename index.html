@@ -117,7 +117,7 @@
   <div class="logo">CRYPTO<span>FLOW</span></div>
   <div class="header-right">
     <div class="btc-price-block">
-      <div class="btc-label">BTC/USDT — Binance</div>
+      <div class="btc-label">BTC/USD — CoinGecko</div>
       <div class="btc-price" id="btc-price">—</div>
       <div class="btc-change up" id="btc-change">—</div>
     </div>
@@ -229,13 +229,12 @@
 </div>
 
 <div class="footer">
-  Data from <span>Binance</span> · <span>Alternative.me</span> · <span>CoinGlass</span> · <span>TradingView</span> &nbsp;|&nbsp; Experimental signals only — not financial advice &nbsp;|&nbsp; CryptoFlow Dashboard
+  Data from <span>CoinGecko</span> · <span>Binance.US</span> · <span>Alternative.me</span> · <span>CoinGlass</span> · <span>TradingView</span> &nbsp;|&nbsp; Experimental signals only — not financial advice &nbsp;|&nbsp; CryptoFlow Dashboard
 </div>
 
 <script>
 // ─── Utilities ────────────────────────────────────────────────────────────────
-// Binance.com blocks US users (HTTP 451), so use Binance.US (same API format)
-const BINANCE_WS = 'wss://stream.binance.us:9443/ws/btcusdt@ticker';
+// Candles for the chart/scanner: Binance.US (Binance.com blocks US users)
 const BINANCE_REST = 'https://api.binance.us/api/v3';
 const FNG_API = 'https://api.alternative.me/fng/?limit=1';
 
@@ -243,7 +242,6 @@ let btcPrice = 0;
 let btcPrevPrice = 0;
 let chart = null;
 let candleSeries = null;
-let tickerSocket = null;
 
 // ─── Price Ticker ───────────────────────────────────────────────────────────
 function showPrice(price, pct) {
@@ -256,29 +254,17 @@ function showPrice(price, pct) {
   document.getElementById('updated-at').textContent = new Date().toLocaleTimeString();
 }
 
-// REST fallback, used until the WebSocket connects and whenever it drops
-let pollTimer = null;
+// Live price from CoinGecko (plain HTTPS polling, no WebSocket needed)
+const COINGECKO_PRICE = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true';
 async function pollPrice() {
   try {
-    const r = await fetch(`${BINANCE_REST}/ticker/24hr?symbol=BTCUSDT`);
+    const r = await fetch(COINGECKO_PRICE);
+    if (!r.ok) return;
     const d = await r.json();
-    showPrice(parseFloat(d.lastPrice), parseFloat(d.priceChangePercent));
+    if (d.bitcoin && d.bitcoin.usd) showPrice(d.bitcoin.usd, d.bitcoin.usd_24h_change || 0);
   } catch (e) { /* keep last price */ }
 }
-function startPolling() { if (!pollTimer) { pollPrice(); pollTimer = setInterval(pollPrice, 5000); } }
-function stopPolling() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
-
-function startTicker() {
-  startPolling();
-  try { tickerSocket = new WebSocket(BINANCE_WS); } catch (e) { setTimeout(startTicker, 10000); return; }
-  tickerSocket.onopen = () => stopPolling();
-  tickerSocket.onmessage = (e) => {
-    const d = JSON.parse(e.data);
-    showPrice(parseFloat(d.c), parseFloat(d.P));
-  };
-  tickerSocket.onerror = () => { startPolling(); };
-  tickerSocket.onclose = () => { startPolling(); setTimeout(startTicker, 10000); };
-}
+function startTicker() { pollPrice(); setInterval(pollPrice, 15000); }
 
 // ─── EMA helper ────────────────────────────────────────────────────────────
 function calcEMA(closes, period) {
