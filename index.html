@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryptoFlow Dashboard — BTC</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+  :root {
+    --bg: #050505;
+    --card-bg: #0d0d0d;
+    --card-border: #1a1a1a;
+    --cyan: #00ffe5;
+    --green: #00ff88;
+    --red: #ff3366;
+    --yellow: #ffe066;
+    --text: #e0e0e0;
+    --text-dim: #666;
+    --font-header: 'Orbitron', monospace;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; padding: 16px; }
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--card-border); margin-bottom: 20px; }
+  .logo { font-family: var(--font-header); font-size: 1.2rem; font-weight: 900; color: var(--cyan); letter-spacing: 2px; }
+  .logo span { color: var(--text-dim); font-weight: 400; }
+  .header-right { display: flex; align-items: center; gap: 20px; }
+  .btc-price-block { text-align: right; }
+  .btc-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+  .btc-price { font-family: var(--font-mono); font-size: 1.8rem; font-weight: 600; color: var(--text); }
+  .btc-change { font-size: 0.75rem; font-family: var(--font-mono); }
+  .btc-change.up { color: var(--green); }
+  .btc-change.down { color: var(--red); }
+  .updated-at { font-size: 0.6rem; color: var(--text-dim); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; max-width: 1600px; margin: 0 auto; }
+  .grid.full { grid-template-columns: 1fr; }
+  .grid.half { grid-template-columns: 1fr 1fr; }
+
+  .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), transparent); opacity: 0.3; }
+  .card-title { font-family: var(--font-header); font-size: 0.65rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+  .card-subtitle { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+  /* Scanner cards */
+  .scan-card { border-top: 2px solid var(--card-border); }
+  .scan-card.bullish { border-top-color: var(--green); }
+  .scan-card.bearish { border-top-color: var(--red); }
+  .scan-card.neutral { border-top-color: var(--yellow); }
+  .scan-card.experimental { border-top-color: var(--text-dim); border-style: dashed; }
+
+  .scan-direction { font-family: var(--font-header); font-size: 1.1rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 8px; }
+  .scan-direction.long { color: var(--green); }
+  .scan-direction.short { color: var(--red); }
+  .scan-direction.neutral { color: var(--yellow); }
+  .scan-experimental-tag { display: inline-block; font-size: 0.5rem; background: #222; color: var(--text-dim); border: 1px dashed var(--text-dim); border-radius: 3px; padding: 1px 5px; margin-left: 8px; vertical-align: middle; text-transform: uppercase; letter-spacing: 1px; }
+
+  .scan-detail { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 4px; font-family: var(--font-mono); }
+  .scan-detail span { color: var(--text); }
+  .scan-detail .res { color: var(--red); }
+  .scan-detail .sup { color: var(--green); }
+
+  .scan-status { font-size: 0.65rem; color: var(--text-dim); margin-top: 6px; }
+  .scan-status.firing { color: var(--cyan); font-weight: 600; }
+
+  /* F&G gauge */
+  .fg-value { font-family: var(--font-mono); font-size: 2.2rem; font-weight: 600; color: var(--text); text-align: center; }
+  .fg-label { text-align: center; font-size: 0.75rem; font-weight: 500; margin-top: 4px; }
+  .fg-bar-wrap { margin-top: 10px; height: 6px; background: #1a1a1a; border-radius: 3px; overflow: hidden; }
+  .fg-bar { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+  .fg-scale { display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-dim); margin-top: 4px; font-family: var(--font-mono); }
+  .fg-extreme-fear { color: var(--red); }
+  .fg-extreme-greed { color: var(--green); }
+
+  /* Chart */
+  #chart { width: 100%; height: 300px; border-radius: 6px; overflow: hidden; }
+  .chart-loading { height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 0.8rem; }
+  .chart-error { height: 300px; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 0.75rem; text-align: center; padding: 20px; }
+
+  /* Heatmap */
+  .heatmap-embed { width: 100%; height: 220px; border: none; border-radius: 6px; background: #0a0a0a; }
+  .heatmap-fallback { height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-dim); font-size: 0.75rem; text-align: center; }
+  .heatmap-link { color: var(--cyan); text-decoration: none; font-size: 0.7rem; }
+
+  /* TradingView widget */
+  .tv-widget { height: 320px; border-radius: 6px; overflow: hidden; background: #0a0a0a; }
+
+  /* Liquidation stats */
+  .liq-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  .liq-stat { background: #111; border-radius: 6px; padding: 10px; text-align: center; }
+  .liq-stat-label { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .liq-stat-val { font-family: var(--font-mono); font-size: 0.9rem; font-weight: 600; }
+  .liq-stat-val.green { color: var(--green); }
+  .liq-stat-val.red { color: var(--red); }
+
+  /* Scanner row */
+  .scanner-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+
+  /* Footer */
+  .footer { text-align: center; color: var(--text-dim); font-size: 0.6rem; padding: 20px; font-family: var(--font-mono); }
+  .footer span { color: var(--cyan); }
+
+  .error-msg { color: var(--red); font-size: 0.7rem; padding: 8px; background: #1a0008; border: 1px solid #330011; border-radius: 4px; margin-top: 8px; }
+  .ok-msg { color: var(--green); font-size: 0.7rem; padding: 8px; background: #001a08; border: 1px solid #003311; border-radius: 4px; margin-top: 8px; }
+
+  @media (max-width: 768px) {
+    .grid.half { grid-template-columns: 1fr; }
+    .header { flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">CRYPTO<span>FLOW</span></div>
+  <div class="header-right">
+    <div class="btc-price-block">
+      <div class="btc-label">BTC/USDT — Binance</div>
+      <div class="btc-price" id="btc-price">—</div>
+      <div class="btc-change up" id="btc-change">—</div>
+    </div>
+    <div class="updated-at" id="updated-at"></div>
+  </div>
+</div>
+
+<!-- Scanner Cards -->
+<div class="grid" style="margin-bottom:14px">
+  <div class="card scan-card" id="card-swing">
+    <div class="card-title">Swing — 4H + 1D</div>
+    <div class="scan-direction neutral" id="swing-dir">CALCULATING</div>
+    <div class="scan-detail">4H EMA21: <span id="swing-4h-ema21">—</span> &nbsp; EMA200: <span id="swing-4h-ema200">—</span></div>
+    <div class="scan-detail">1D EMA21: <span id="swing-1d-ema21">—</span> &nbsp; EMA200: <span id="swing-1d-ema200">—</span></div>
+    <div class="scan-detail">Res: <span class="res" id="swing-res">—</span> &nbsp; Sup: <span class="sup" id="swing-sup">—</span></div>
+    <div class="scan-status" id="swing-status"></div>
+  </div>
+
+  <div class="card scan-card" id="card-intraday">
+    <div class="card-title">Intraday — 1H</div>
+    <div class="scan-direction neutral" id="intraday-dir">CALCULATING</div>
+    <div class="scan-detail">1H EMA9: <span id="intraday-ema9">—</span> &nbsp; EMA21: <span id="intraday-ema21">—</span></div>
+    <div class="scan-detail">Res: <span class="res" id="intraday-res">—</span> &nbsp; Sup: <span class="sup" id="intraday-sup">—</span></div>
+    <div class="scan-status" id="intraday-status"></div>
+  </div>
+
+  <div class="card scan-card experimental" id="card-15m">
+    <div class="card-title">15m <span class="scan-experimental-tag">Experimental</span></div>
+    <div class="scan-direction neutral" id="m15-dir">CALCULATING</div>
+    <div class="scan-detail">EMA9: <span id="m15-ema9">—</span> &nbsp; EMA21: <span id="m15-ema21">—</span></div>
+    <div class="scan-detail">Res: <span class="res" id="m15-res">—</span> &nbsp; Sup: <span class="sup" id="m15-sup">—</span></div>
+    <div class="scan-status" id="m15-status"></div>
+  </div>
+
+  <div class="card scan-card experimental" id="card-1m">
+    <div class="card-title">1m <span class="scan-experimental-tag">Experimental</span></div>
+    <div class="scan-direction neutral" id="m1-dir">CALCULATING</div>
+    <div class="scan-detail">EMA9: <span id="m1-ema9">—</span> &nbsp; EMA21: <span id="m1-ema21">—</span></div>
+    <div class="scan-detail">Res: <span class="res" id="m1-res">—</span> &nbsp; Sup: <span class="sup" id="m1-sup">—</span></div>
+    <div class="scan-status" id="m1-status"></div>
+  </div>
+</div>
+
+<!-- F&G + Liquidation + TV row -->
+<div class="grid half" style="margin-bottom:14px">
+  <div class="card">
+    <div class="card-title">Fear &amp; Greed Index</div>
+    <div class="fg-value" id="fg-value">—</div>
+    <div class="fg-label" id="fg-label">Loading...</div>
+    <div class="fg-bar-wrap">
+      <div class="fg-bar" id="fg-bar" style="width:50%;background:var(--yellow)"></div>
+    </div>
+    <div class="fg-scale">
+      <span class="fg-extreme-fear">Extreme Fear</span>
+      <span>Neutral</span>
+      <span class="fg-extreme-greed">Extreme Greed</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">24h Liquidation Snapshot</div>
+    <div class="liq-stats">
+      <div class="liq-stat">
+        <div class="liq-stat-label">Long Liqs</div>
+        <div class="liq-stat-val green" id="liq-long">—</div>
+      </div>
+      <div class="liq-stat">
+        <div class="liq-stat-label">Short Liqs</div>
+        <div class="liq-stat-val red" id="liq-short">—</div>
+      </div>
+      <div class="liq-stat">
+        <div class="liq-stat-label">Total Liquidated</div>
+        <div class="liq-stat-val" id="liq-total">—</div>
+      </div>
+      <div class="liq-stat">
+        <div class="liq-stat-label">Largest Single</div>
+        <div class="liq-stat-val" id="liq-largest">—</div>
+      </div>
+    </div>
+    <div id="liq-error"></div>
+  </div>
+</div>
+
+<!-- Chart + Heatmap -->
+<div class="grid half" style="margin-bottom:14px">
+  <div class="card">
+    <div class="card-title">BTC/USDT — 1H Chart</div>
+    <div id="chart"><div class="chart-loading">Loading chart...</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Liquidation Heatmap</div>
+    <div id="heatmap-container">
+      <iframe src="https://coinglass.com/LiquidationHeatmap/" class="heatmap-embed" id="heatmap-iframe" loading="lazy"></iframe>
+    </div>
+    <div id="heatmap-error" class="heatmap-fallback" style="display:none">
+      <span>CoinGlass embed blocked by browser</span>
+      <a class="heatmap-link" href="https://coinglass.com/LiquidationHeatmap/" target="_blank">Open Heatmap on CoinGlass →</a>
+    </div>
+  </div>
+</div>
+
+<!-- TradingView Widget -->
+<div class="card" style="margin-bottom:14px">
+  <div class="card-title">BTC/USDT — TradingView</div>
+  <div class="tv-widget">
+    <div class="tv-widget" id="tv-widget-container"></div>
+  </div>
+</div>
+
+<div class="footer">
+  Data from <span>Binance</span> · <span>Alternative.me</span> · <span>CoinGlass</span> · <span>TradingView</span> &nbsp;|&nbsp; Experimental signals only — not financial advice &nbsp;|&nbsp; CryptoFlow Dashboard
+</div>
+
+<script>
+// ─── Utilities ────────────────────────────────────────────────────────────────
+const BINANCE_WS = 'wss://stream.binance.com:9443/ws/btcusdt@ticker';
+const BINANCE_REST = 'https://api.binance.com/api/v3';
+const FNG_API = 'https://api.alternative.me/fng/?limit=1';
+
+let btcPrice = 0;
+let btcPrevPrice = 0;
+let chart = null;
+let candleSeries = null;
+let tickerSocket = null;
+
+// ─── Price Ticker ───────────────────────────────────────────────────────────
+function startTicker() {
+  tickerSocket = new WebSocket(BINANCE_WS);
+  tickerSocket.onmessage = (e) => {
+    const d = JSON.parse(e.data);
+    btcPrevPrice = btcPrice;
+    btcPrice = parseFloat(d.c);
+    const pct = ((btcPrice - btcPrevPrice) / btcPrevPrice * 100) || 0;
+    document.getElementById('btc-price').textContent = '$' + btcPrice.toLocaleString('en', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    const changeEl = document.getElementById('btc-change');
+    changeEl.textContent = (pct >= 0 ? '▲' : '▼') + ' ' + Math.abs(pct).toFixed(2) + '%';
+    changeEl.className = 'btc-change ' + (pct >= 0 ? 'up' : 'down');
+    document.getElementById('updated-at').textContent = new Date().toLocaleTimeString();
+  };
+  tickerSocket.onerror = () => { document.getElementById('btc-price').textContent = 'WS Error'; };
+}
+
+// ─── EMA helper ────────────────────────────────────────────────────────────
+function calcEMA(closes, period) {
+  if (closes.length < period) return null;
+  const k = 2 / (period + 1);
+  let ema = closes.slice(0, period).reduce((a, b) => a + b, 0) / period;
+  for (let i = period; i < closes.length; i++) {
+    ema = closes[i] * k + ema * (1 - k);
+  }
+  return ema;
+}
+
+function recentHigh(closes, lookback = 20) {
+  return Math.max(...closes.slice(-lookback));
+}
+function recentLow(closes, lookback = 20) {
+  return Math.min(...closes.slice(-lookback));
+}
+
+// ─── Scanner Logic ──────────────────────────────────────────────────────────
+function detectCross(emaFast, emaSlow) {
+  // emaFast and emaSlow are arrays of [time, value] pairs, newest last
+  if (emaFast.length < 2 || emaSlow.length < 2) return null;
+  const [t1, f1] = emaFast[emaFast.length - 2];
+  const [t2, f2] = emaFast[emaFast.length - 1];
+  const [s1] = emaSlow[emaSlow.length - 2];
+  const [s2] = emaSlow[emaSlow.length - 1];
+  const prevAbove = f1 > s1;
+  const nowAbove = f2 > s2;
+  if (!prevAbove && nowAbove) return 'LONG';
+  if (prevAbove && !nowAbove) return 'SHORT';
+  return f2 > s2 ? 'LONG' : 'SHORT';
+}
+
+function scanEMA(closes, fastP, slowP) {
+  if (closes.length < slowP + 2) return null;
+  let emaF = closes.slice(0, fastP).reduce((a, b) => a + b, 0) / fastP;
+  let emaS = closes.slice(0, slowP).reduce((a, b) => a + b, 0) / slowP;
+  const kf = 2 / (fastP + 1), ks = 2 / (slowP + 1);
+  let prevF = null, prevS = null;
+  let crossType = null;
+  for (let i = fastP; i < closes.length; i++) {
+    const newF = closes[i] * kf + emaF * (1 - kf);
+    const newS = closes[i] * ks + emaS * (1 - ks);
+    if (i > fastP) {
+      const wasAbove = emaF > emaS;
+      const isAbove = newF > newS;
+      if (!wasAbove && isAbove) crossType = 'LONG';
+      else if (wasAbove && !isAbove) crossType = 'SHORT';
+    }
+    prevF = emaF; prevS = emaS;
+    emaF = newF; emaS = newS;
+  }
+  const dir = crossType || (emaF > emaS ? 'LONG' : 'SHORT');
+  const res = recentHigh(closes);
+  const sup = recentLow(closes);
+  return { dir, emaF: emaF.toFixed(2), emaS: emaS.toFixed(2), res, sup };
+}
+
+function updateScannerCard(id, dir, emaF, emaS, res, sup, status) {
+  const card = document.getElementById('card-' + id);
+  const dirEl = document.getElementById(id + '-dir');
+  dirEl.textContent = dir;
+  dirEl.className = 'scan-direction ' + (dir === 'LONG' ? 'long' : dir === 'SHORT' ? 'short' : 'neutral');
+  card.className = 'card scan-card ' + (dir === 'LONG' ? 'bullish' : dir === 'SHORT' ? 'bearish' : 'neutral') + (id === 'm1' || id === 'm15' ? ' experimental' : '');
+  document.getElementById(id + '-ema9').textContent = emaF;
+  document.getElementById(id + '-ema21').textContent = emaS;
+  document.getElementById(id + '-res').textContent = res ? '$' + res.toLocaleString('en-US', {maximumFractionDigits: 0}) : '—';
+  document.getElementById(id + '-sup').textContent = sup ? '$' + sup.toLocaleString('en-US', {maximumFractionDigits: 0}) : '—';
+  const stEl = document.getElementById(id + '-status');
+  if (status) {
+    stEl.textContent = status;
+    stEl.className = 'scan-status firing';
+  }
+}
+
+// ─── Load Klines & Run Scanners ──────────────────────────────────────────
+async function loadAndScan() {
+  try {
+    // Fetch all needed intervals in parallel
+    const [r1m, r5m, r15m, r1h, r4h, r1d] = await Promise.all([
+      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1m&limit=300`).then(r => r.json()),
+      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=5m&limit=300`).then(r => r.json()),
+      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=15m&limit=300`).then(r => r.json()),
+      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1h&limit=500`).then(r => r.json()),
+      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=4h&limit=500`).then(r => r.json()),
+      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1d&limit=500`).then(r => r.json()),
+    ]);
+
+    const closes1m = r1m.map(c => parseFloat(c[4]));
+    const closes5m = r5m.map(c => parseFloat(c[4]));
+    const closes15m = r15m.map(c => parseFloat(c[4]));
+    const closes1h = r1h.map(c => parseFloat(c[4]));
+    const closes4h = r4h.map(c => parseFloat(c[4]));
+    const closes1d = r1d.map(c => parseFloat(c[4]));
+
+    // 1m
+    const s1m = scanEMA(closes1m, 9, 21);
+    if (s1m) updateScannerCard('m1', s1m.dir, s1m.emaF, s1m.emaS, s1m.res, s1m.sup, null);
+
+    // 15m
+    const s15m = scanEMA(closes15m, 9, 21);
+    if (s15m) updateScannerCard('m15', s15m.dir, s15m.emaF, s15m.emaS, s15m.res, s15m.sup, null);
+
+    // Intraday (1H)
+    const s1h = scanEMA(closes1h, 9, 21);
+    if (s1h) updateScannerCard('intraday', s1h.dir, s1h.emaF, s1h.emaS, s1h.res, s1h.sup, null);
+
+    // Swing (4H + 1D)
+    const s4h = scanEMA(closes4h, 21, 200);
+    const s1d = scanEMA(closes1d, 21, 200);
+    const swingDir = (s4h && s1d) ? (s4h.dir === 'LONG' && s1d.dir === 'LONG' ? 'LONG' : s4h.dir === 'SHORT' && s1d.dir === 'SHORT' ? 'SHORT' : 'NEUTRAL') : 'NEUTRAL';
+    if (s4h) {
+      document.getElementById('swing-4h-ema21').textContent = s4h.emaF;
+      document.getElementById('swing-4h-ema200').textContent = s4h.emaS;
+    }
+    if (s1d) {
+      document.getElementById('swing-1d-ema21').textContent = s1d.emaF;
+      document.getElementById('swing-1d-ema200').textContent = s1d.emaS;
+    }
+    const swingRes = s4h ? s4h.res : null;
+    const swingSup = s4h ? s4h.sup : null;
+    if (swingRes) document.getElementById('swing-res').textContent = '$' + swingRes.toLocaleString('en-US', {maximumFractionDigits: 0});
+    if (swingSup) document.getElementById('swing-sup').textContent = '$' + swingSup.toLocaleString('en-US', {maximumFractionDigits: 0});
+    const swingDirEl = document.getElementById('swing-dir');
+    swingDirEl.textContent = swingDir;
+    swingDirEl.className = 'scan-direction ' + (swingDir === 'LONG' ? 'long' : swingDir === 'SHORT' ? 'short' : 'neutral');
+    const swingCard = document.getElementById('card-swing');
+    swingCard.className = 'card scan-card ' + (swingDir === 'LONG' ? 'bullish' : swingDir === 'SHORT' ? 'bearish' : 'neutral');
+    if (s4h && s4h.dir === 'LONG') document.getElementById('swing-status').textContent = '↑ 4H EMA Golden Cross';
+    if (s4h && s4h.dir === 'SHORT') document.getElementById('swing-status').textContent = '↓ 4H EMA Death Cross';
+
+    // Draw chart
+    drawChart(r1h);
+
+  } catch(err) {
+    console.error('Scanner error:', err);
+    document.getElementById('chart').innerHTML = '<div class="chart-error">Chart data unavailable: ' + err.message + '</div>';
+  }
+}
+
+// ─── Chart ────────────────────────────────────────────────────────────────
+function drawChart(klines) {
+  const container = document.getElementById('chart');
+  container.innerHTML = '';
+  if (!chart) {
+    chart = LightweightCharts.createChart(container, { width: container.clientWidth, height: 300, layout: { background: { color: '#0d0d0d' }, textColor: '#888' }, grid: { vertLines: { color: '#1a1a1a' }, horzLines: { color: '#1a1a1a' } }, crosshair: { mode: 0 }, rightPriceScale: { borderColor: '#1a1a1a' }, timeScale: { borderColor: '#1a1a1a', timeVisible: true } });
+    candleSeries = chart.addCandlestickSeries({ upColor: '#00ff88', downColor: '#ff3366', borderVisible: false, wickUpColor: '#00ff88', wickDownColor: '#ff3366' });
+    window.addEventListener('resize', () => { chart.resize(container.clientWidth, 300); });
+  }
+  const data = klines.map(c => ({ time: Math.floor(c[0] / 1000), open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4]) }));
+  candleSeries.setData(data);
+  chart.timeScale().fitContent();
+}
+
+// ─── Fear & Greed ─────────────────────────────────────────────────────────
+async function loadFG() {
+  try {
+    const r = await fetch(FNG_API);
+    const d = await r.json();
+    const v = parseInt(d.data[0].value);
+    const cls = d.data[0].value_classification;
+    document.getElementById('fg-value').textContent = v;
+    document.getElementById('fg-label').textContent = cls;
+    document.getElementById('fg-label').style.color = v < 30 ? 'var(--red)' : v > 70 ? 'var(--green)' : v < 50 ? 'var(--yellow)' : 'var(--cyan)';
+    document.getElementById('fg-bar').style.width = v + '%';
+    const barColor = v < 20 ? 'var(--red)' : v < 40 ? '#ff6644' : v < 60 ? 'var(--yellow)' : v < 80 ? '#88ff44' : 'var(--green)';
+    document.getElementById('fg-bar').style.background = barColor;
+  } catch(e) {
+    document.getElementById('fg-value').textContent = '—';
+    document.getElementById('fg-label').textContent = 'Unavailable';
+  }
+}
+
+// ─── Liquidation Stats ────────────────────────────────────────────────────
+async function loadLiqStats() {
+  try {
+    const r = await fetch('https://api.alternative.me/liq/?limit=1');
+    const d = await r.json();
+    if (d.data && d.data.length > 0) {
+      const o = d.data[0];
+      document.getElementById('liq-long').textContent = o.long_liquidations ? '$' + parseFloat(o.long_liquidations).toFixed(0) + 'K' : '—';
+      document.getElementById('liq-short').textContent = o.short_liquidations ? '$' + parseFloat(o.short_liquidations).toFixed(0) + 'K' : '—';
+      document.getElementById('liq-total').textContent = o.total_liquidations ? '$' + parseFloat(o.total_liquidations).toFixed(0) + 'K' : '—';
+      document.getElementById('liq-largest').textContent = o.largest_single_liquidation ? '$' + parseFloat(o.largest_single_liquidation).toFixed(0) + 'K' : '—';
+    }
+  } catch(e) {
+    document.getElementById('liq-error').innerHTML = '<div class="error-msg">Liquidation data unavailable from this source</div>';
+  }
+}
+
+// ─── Heatmap iframe fallback ──────────────────────────────────────────────
+function checkHeatmap() {
+  const iframe = document.getElementById('heatmap-iframe');
+  iframe.onload = () => {
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      if (!doc || doc.body.innerText.length < 10) {
+        document.getElementById('heatmap-container').style.display = 'none';
+        document.getElementById('heatmap-error').style.display = 'flex';
+      }
+    } catch(e) {
+      document.getElementById('heatmap-container').style.display = 'none';
+      document.getElementById('heatmap-error').style.display = 'flex';
+    }
+  };
+  setTimeout(() => {
+    const errEl = document.getElementById('heatmap-error');
+    if (errEl && errEl.style.display !== 'flex') {
+      // Check if iframe loaded meaningful content
+    }
+  }, 5000);
+}
+
+// ─── TradingView Widget ───────────────────────────────────────────────────
+function loadTVWidget() {
+  const container = document.getElementById('tv-widget-container');
+  container.innerHTML = `
+    <iframe src="https://www.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=60&hidesidetoolbar=0&symboledit=1&savechanges=0&studies=[]&theme=dark&style=1&timezone=Etc%2FUTC&locale=en" 
+      width="100%" height="320" frameborder="0" scrolling="yes" allowtransparency="true" allowfullscreen="true"></iframe>
+  `;
+}
+
+// ─── Boot ────────────────────────────────────────────────────────────────
+startTicker();
+loadFG();
+loadLiqStats();
+loadAndScan();
+checkHeatmap();
+loadTVWidget();
+
+// Refresh scanners every 60s
+setInterval(() => { loadAndScan(); }, 60000);
+setInterval(() => { loadFG(); }, 120000);
+</script>
+</body>
+</html>
