@@ -178,7 +178,7 @@
   </div>
 
   <div class="card">
-    <div class="card-title">24h Liquidation Snapshot</div>
+    <div class="card-title">Recent Liquidations</div>
     <div class="liq-stats">
       <div class="liq-stat">
         <div class="liq-stat-label">Long Liqs</div>
@@ -210,11 +210,8 @@
 
   <div class="card">
     <div class="card-title">Liquidation Heatmap</div>
-    <div id="heatmap-container">
-      <iframe src="https://coinglass.com/LiquidationHeatmap/" class="heatmap-embed" id="heatmap-iframe" loading="lazy"></iframe>
-    </div>
-    <div id="heatmap-error" class="heatmap-fallback" style="display:none">
-      <span>CoinGlass embed blocked by browser</span>
+    <div id="heatmap-error" class="heatmap-fallback" style="display:flex">
+      <span>CoinGlass doesn't allow its heatmap to be embedded on other sites</span>
       <a class="heatmap-link" href="https://coinglass.com/LiquidationHeatmap/" target="_blank">Open Heatmap on CoinGlass →</a>
     </div>
   </div>
@@ -229,7 +226,7 @@
 </div>
 
 <div class="footer">
-  Data from <span>CoinGecko</span> · <span>Binance.US</span> · <span>Alternative.me</span> · <span>CoinGlass</span> · <span>TradingView</span> &nbsp;|&nbsp; Experimental signals only — not financial advice &nbsp;|&nbsp; CryptoFlow Dashboard
+  Data from <span>CoinGecko</span> · <span>Binance.US</span> · <span>Alternative.me</span> · <span>OKX</span> · <span>CoinGlass</span> · <span>TradingView</span> &nbsp;|&nbsp; Experimental signals only — not financial advice &nbsp;|&nbsp; CryptoFlow Dashboard
 </div>
 
 <script>
@@ -325,7 +322,7 @@ function scanEMA(closes, fastP, slowP) {
 }
 
 function updateScannerCard(id, dir, emaF, emaS, res, sup, status) {
-  const card = document.getElementById('card-' + id);
+  const card = document.getElementById('card-' + ({m1: '1m', m15: '15m'}[id] || id));
   const dirEl = document.getElementById(id + '-dir');
   dirEl.textContent = dir;
   dirEl.className = 'scan-direction ' + (dir === 'LONG' ? 'long' : dir === 'SHORT' ? 'short' : 'neutral');
@@ -442,17 +439,26 @@ async function loadFG() {
 // ─── Liquidation Stats ────────────────────────────────────────────────────
 async function loadLiqStats() {
   try {
-    const r = await fetch('https://api.alternative.me/liq/?limit=1');
+    const r = await fetch('https://www.okx.com/api/v5/public/liquidation-orders?instType=SWAP&uly=BTC-USDT&state=filled&limit=100');
     const d = await r.json();
-    if (d.data && d.data.length > 0) {
-      const o = d.data[0];
-      document.getElementById('liq-long').textContent = o.long_liquidations ? '$' + parseFloat(o.long_liquidations).toFixed(0) + 'K' : '—';
-      document.getElementById('liq-short').textContent = o.short_liquidations ? '$' + parseFloat(o.short_liquidations).toFixed(0) + 'K' : '—';
-      document.getElementById('liq-total').textContent = o.total_liquidations ? '$' + parseFloat(o.total_liquidations).toFixed(0) + 'K' : '—';
-      document.getElementById('liq-largest').textContent = o.largest_single_liquidation ? '$' + parseFloat(o.largest_single_liquidation).toFixed(0) + 'K' : '—';
-    }
+    const rows = (d.data && d.data[0] && d.data[0].details) || [];
+    if (!rows.length) throw new Error('no data');
+    let longUsd = 0, shortUsd = 0, largest = 0;
+    rows.forEach(x => {
+      const usd = parseFloat(x.sz) * 0.01 * parseFloat(x.bkPx); // 1 contract = 0.01 BTC
+      if (x.posSide === 'long') longUsd += usd; else shortUsd += usd;
+      if (usd > largest) largest = usd;
+    });
+    const fmt = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : '$' + (v / 1e3).toFixed(0) + 'K';
+    const ts = rows.map(x => parseInt(x.ts));
+    const hrs = ((Date.now() - Math.min(...ts)) / 3600000).toFixed(1);
+    document.getElementById('liq-long').textContent = fmt(longUsd);
+    document.getElementById('liq-short').textContent = fmt(shortUsd);
+    document.getElementById('liq-total').textContent = fmt(longUsd + shortUsd);
+    document.getElementById('liq-largest').textContent = fmt(largest);
+    document.getElementById('liq-error').innerHTML = '<div class="liq-stat-label" style="margin-top:8px;text-align:center">Last ' + rows.length + ' BTC liquidations on OKX (~' + hrs + 'h)</div>';
   } catch(e) {
-    document.getElementById('liq-error').innerHTML = '<div class="error-msg">Liquidation data unavailable from this source</div>';
+    document.getElementById('liq-error').innerHTML = '<div class="error-msg">Liquidation data unavailable right now</div>';
   }
 }
 
@@ -493,12 +499,12 @@ startTicker();
 loadFG();
 loadLiqStats();
 loadAndScan();
-checkHeatmap();
 loadTVWidget();
 
 // Refresh scanners every 60s
 setInterval(() => { loadAndScan(); }, 60000);
 setInterval(() => { loadFG(); }, 120000);
+setInterval(() => { loadLiqStats(); }, 120000);
 </script>
 </body>
 </html>
