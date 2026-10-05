@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-05T14:01-05:00",
+ "generated": "2026-10-05T14:55-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "scanners": [
@@ -7,17 +7,6 @@
    "key": "swing",
    "emoji": "🌊",
    "label": "Swing",
-   "paused": false,
-   "closed": 0,
-   "wins": 0,
-   "win_rate": 0.0,
-   "total_r": 0,
-   "open": 0
-  },
-  {
-   "key": "flush",
-   "emoji": "⚡",
-   "label": "Flush",
    "paused": false,
    "closed": 0,
    "wins": 0,
@@ -35,17 +24,6 @@
    "win_rate": 0.0,
    "total_r": 0,
    "open": 1
-  },
-  {
-   "key": "1h",
-   "emoji": "₿",
-   "label": "1H",
-   "paused": true,
-   "closed": 0,
-   "wins": 0,
-   "win_rate": 0.0,
-   "total_r": 0,
-   "open": 0
   }
  ],
  "open": [
@@ -55,7 +33,7 @@
    "armed_time": "2026-10-04T16:00-05:00",
    "entry": 85791.1,
    "stop": 84455.6,
-   "target1": 89797.5,
+   "target1": 86624.7,
    "target2": null,
    "expiry": "96 x 1H",
    "tp1_time": ""
@@ -69,7 +47,7 @@
    "time": "2026-10-04T16:00-05:00",
    "entry": 85791.1,
    "stop": 84455.6,
-   "target": 89797.5,
+   "target": 86624.7,
    "max_bars": 96,
    "box_high": 85550.8,
    "box_low": 84476.9,
@@ -80,19 +58,18 @@
    "risk_pct": 1.56,
    "bars": 22,
    "risk": 1335.5,
-   "trail_B": {
-    "status": "watching",
-    "stop": 84455.6,
-    "activated_be": false,
-    "sma21_4h": 85261.5,
-    "label": "box→+1.5R"
-   }
+   "exit_plan": "measured_move",
+   "tp1_hit": false,
+   "banked": 0.0,
+   "trail_status": "watching",
+   "sma21_4h": 85261.5,
+   "label": "box→TP1"
   },
   "last": null,
   "trail_last": null,
   "scanner_runs": "hourly at :12 CT",
   "source": "compression_scanner/state.json + signals.csv",
-  "books": "official 3R + quiet trail_B (+1.5R BE → 4H SMA21)"
+  "books": "measured move: half at TP1 (box height past break) → BE → 4H SMA21 trail · no 3R cap"
  },
  "totals": {
   "closed": 0,

@@ -368,22 +368,25 @@ function renderMortCompression() {
   if (o) {
     const s = o.side === 'long' || o.side === 'LONG' ? 1 : -1;
     const risk = o.risk || (o.entry != null && o.stop != null ? Math.abs(o.entry - o.stop) : null);
-    const curR = (live != null && risk) ? (live - o.entry) * s / risk : null;
-    dir = 'ARMED ' + String(o.side).toUpperCase();
+    const legR = (live != null && risk) ? (live - o.entry) * s / risk : null;
+    const banked = Number(o.banked || 0);
+    const curR = legR == null ? null : (o.tp1_hit ? banked + 0.5 * legR : legR);
+    const fullR = legR;
+    dir = 'ARMED ' + String(o.side).toUpperCase() + (o.tp1_hit ? ' · HALF' : '');
     cls = s === 1 ? 'bullish' : 'bearish';
     dcls = s === 1 ? 'long' : 'short';
     const armedSec = o.time ? Date.parse(o.time) / 1000 : null;
     trigTxt = armedSec ? ('Mort · armed ' + cmpRel(armedSec)) : 'Mort paper';
-    html = (curR == null ? '' : '<div class="cmp-r ' + (curR >= 0 ? 'pos' : 'neg') + '">' + (curR >= 0 ? '+' : '') + curR.toFixed(2) + 'R<small>now ' + $(live) + '</small></div>') +
-      '<div class="cmp-levels">' + lv('Entry', $(o.entry)) + lv('Stop 3R book', $(o.stop), 'neg') + lv('Target 3R', $(o.target), 'pos') + '</div>';
-    const tb = o.trail_B;
-    if (tb) {
-      html += '<div class="cmp-levels" style="margin-top:6px">' +
-        lv('trail_B', tb.label || tb.status || '—', 'cy') +
-        lv('Trail stop', $(tb.stop), 'neg') +
-        lv(tb.activated_be ? 'BE armed' : 'Wait +1.5R', tb.sma21_4h != null ? ('SMA ' + $(tb.sma21_4h)) : '—') +
-        '</div>';
-    }
+    html = (curR == null ? '' : '<div class="cmp-r ' + (curR >= 0 ? 'pos' : 'neg') + '">' + (curR >= 0 ? '+' : '') + curR.toFixed(2) + 'R<small>' +
+      (o.tp1_hit ? ('half book · full MTM ' + ((fullR >= 0 ? '+' : '') + fullR.toFixed(2)) + 'R') : 'full book') +
+      ' · now ' + $(live) + '</small></div>') +
+      '<div class="cmp-levels">' + lv('Entry', $(o.entry)) + lv('Stop', $(o.stop), 'neg') + lv('TP1 measured', $(o.target), 'pos') + '</div>';
+    html += '<div class="cmp-levels" style="margin-top:6px">' +
+      lv('Exit', o.label || o.trail_status || 'box→TP1', 'cy') +
+      lv(o.tp1_hit ? 'BE / trail' : 'Box stop', $(o.stop), 'neg') +
+      lv(o.tp1_hit ? ('Banked ' + (banked >= 0 ? '+' : '') + banked.toFixed(2) + 'R') : 'Await TP1 half',
+         o.sma21_4h != null ? ('SMA ' + $(o.sma21_4h)) : '—') +
+      '</div>';
     const bars = o.bars != null ? (o.bars + '/' + (o.max_bars || 96) + ' candles') : '';
     const box = (o.box_low != null && o.box_high != null) ? ('box ' + $(o.box_low) + '–' + $(o.box_high)) : '';
     html += '<div class="cmp-sub">' + [bars, o.risk_pct != null ? ('risk ' + Number(o.risk_pct).toFixed(2) + '%') : '', box].filter(Boolean).join(' · ') + '</div>';
@@ -398,18 +401,12 @@ function renderMortCompression() {
   } else {
     html = '<div class="cmp-sub">No open Mort compression trade. Scanner runs hourly at :12 CT.</div>';
   }
-  if (cmp.trail_last && !o) {
-    const T = cmp.trail_last;
-    html += '<div class="cmp-sub">trail_B last: ' + (T.result || '') + ' ' +
-      ((T.r_net || 0) >= 0 ? '+' : '') + Number(T.r_net || 0).toFixed(2) + 'R</div>';
-  }
-
   dirEl.textContent = dir; dirEl.className = 'scan-direction cmp-dir ' + dcls;
   card.className = 'card scan-card cmp-card' + (cls ? ' ' + cls : '');
   trig.textContent = trigTxt;
   body.innerHTML = html;
-  extra.push('Source: Mort paper_trades.json (same book as Paper Trades) · official 3R + quiet trail_B');
-  extra.push('Rules: box stop / 3R / 96-candle expiry · trail: +1.5R → BE, then under 4H SMA21');
+  extra.push('Source: Mort paper_trades.json · measured-move book (half at TP1 → BE → 4H SMA21)');
+  extra.push('Rules: TP1 = one box height past broken edge · half off · stop→BE · trail SMA21 · dead at 96 bars · no 3R cap');
   if (cmp.scanner_runs) extra.push(cmp.scanner_runs);
   info.innerHTML = extra.join('<br>');
   st.textContent = 'PAPER · Mort · ' + (d.generated ? ('log ' + d.generated) : 'updated ' + new Date().toLocaleTimeString());
@@ -427,10 +424,9 @@ function renderMortCompression() {
       if (o.box_high != null) add(o.box_high, '#00ffe5', 'Box H', 2);
       if (o.box_low != null) add(o.box_low, '#00ffe5', 'Box L', 2);
       add(o.stop, '#ff3366', 'Stop', 1);
-      add(o.target, '#00ff88', '3R', 1);
-      if (o.trail_B && o.trail_B.stop != null && Math.abs(o.trail_B.stop - o.stop) > 0.5)
-        add(o.trail_B.stop, '#ffaa00', 'Trail', 2);
+      add(o.target, '#00ff88', 'TP1', 1);
       add(o.entry, '#8899aa', 'Entry', 2);
+      if (o.sma21_4h != null) add(o.sma21_4h, '#ffaa00', 'SMA21', 2);
     }
   }
 }
@@ -552,17 +548,21 @@ function renderPaper() {
   if (!d.open.length) h += '<div class="pp-empty">No open paper trades</div>';
   d.open.forEach(o => {
     const s = o.side === 'long' ? 1 : -1, risk = Math.abs(o.entry - o.stop);
-    const R = (typeof btcPrice === 'number' && btcPrice > 0 && risk) ? (btcPrice - o.entry) * s / risk : null;
-    const tb = (o.scanner === 'compression' && d.compression && d.compression.open) ? d.compression.open.trail_B : null;
-    h += '<div class="pp-open"><b class="' + (s === 1 ? 'pos' : 'neg') + '">' + emo(o.scanner) + ' ' + o.side.toUpperCase() + '</b>' +
-      '<span>' + m(o.entry) + '</span><span class="neg">SL ' + m(o.stop) + '</span><span class="pos">TP ' + m(o.target1) + (o.target2 ? ' / ' + m(o.target2) : '') + '</span>' +
-      (R === null ? '' : '<b class="' + rc(R) + '">' + sr(R) + '</b>') + (o.tp1_time ? '<small>TP1 hit, stop at BE</small>' : '') +
-      '<small>' + lab(o.scanner) + ' · 3R book · ' + ts(o.armed_time) + '</small></div>';
-    if (tb) {
-      h += '<div class="pp-open" style="opacity:.85"><b class="cy">trail_B</b>' +
-        '<span class="neg">SL ' + m(tb.stop) + '</span><span>' + (tb.label || tb.status || '') + '</span>' +
-        '<small>' + (tb.activated_be ? 'BE armed' : 'wait +1.5R') +
-        (tb.sma21_4h != null ? (' · SMA21 ' + m(tb.sma21_4h)) : '') + '</small></div>';
+    const cmpo = (o.scanner === 'compression' && d.compression && d.compression.open) ? d.compression.open : null;
+    const legR = (typeof btcPrice === 'number' && btcPrice > 0 && risk) ? (btcPrice - o.entry) * s / risk : null;
+    const banked = cmpo ? Number(cmpo.banked || 0) : 0;
+    const half = !!(o.tp1_time || (cmpo && cmpo.tp1_hit));
+    const R = legR == null ? null : (half ? banked + 0.5 * legR : legR);
+    const book = o.scanner === 'compression' ? 'measured move' : (o.scanner === 'swing' ? 'swing' : 'paper');
+    h += '<div class="pp-open"><b class="' + (s === 1 ? 'pos' : 'neg') + '">' + emo(o.scanner) + ' ' + o.side.toUpperCase() + (half ? ' · HALF' : '') + '</b>' +
+      '<span>' + m(o.entry) + '</span><span class="neg">SL ' + m(cmpo && cmpo.stop != null ? cmpo.stop : o.stop) + '</span><span class="pos">TP1 ' + m(o.target1) + (o.target2 ? ' / ' + m(o.target2) : '') + '</span>' +
+      (R === null ? '' : '<b class="' + rc(R) + '">' + sr(R) + '</b>') + (half ? '<small>TP1 hit · stop BE · trail SMA21</small>' : '') +
+      '<small>' + lab(o.scanner) + ' · ' + book + ' · ' + ts(o.armed_time) + '</small></div>';
+    if (cmpo) {
+      h += '<div class="pp-open" style="opacity:.85"><b class="cy">exit</b>' +
+        '<span class="neg">SL ' + m(cmpo.stop) + '</span><span>' + (cmpo.label || cmpo.trail_status || '') + '</span>' +
+        '<small>' + (cmpo.tp1_hit ? ('banked ' + sr(banked)) : 'await TP1') +
+        (cmpo.sma21_4h != null ? (' · SMA21 ' + m(cmpo.sma21_4h)) : '') + '</small></div>';
     }
   });
   h += '<div class="pp-sec">Last closed</div>';
