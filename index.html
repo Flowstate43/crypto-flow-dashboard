@@ -436,6 +436,87 @@ function renderMortCompression() {
 }
 // <<< CMP
 
+// ─── Fear & Greed ─────────────────────────────────────────────────────────
+async function loadFG() {
+  try {
+    const r = await fetch(FNG_API);
+    const d = await r.json();
+    const v = parseInt(d.data[0].value);
+    const cls = d.data[0].value_classification;
+    document.getElementById('fg-value').textContent = v;
+    document.getElementById('fg-label').textContent = cls;
+    document.getElementById('fg-label').style.color = v < 30 ? 'var(--red)' : v > 70 ? 'var(--green)' : v < 50 ? 'var(--yellow)' : 'var(--cyan)';
+    document.getElementById('fg-bar').style.width = v + '%';
+    const barColor = v < 20 ? 'var(--red)' : v < 40 ? '#ff6644' : v < 60 ? 'var(--yellow)' : v < 80 ? '#88ff44' : 'var(--green)';
+    document.getElementById('fg-bar').style.background = barColor;
+  } catch(e) {
+    document.getElementById('fg-value').textContent = '—';
+    document.getElementById('fg-label').textContent = 'Unavailable';
+  }
+}
+
+// ─── Liquidation Stats ────────────────────────────────────────────────────
+async function loadLiqStats() {
+  try {
+    const r = await fetch('https://www.okx.com/api/v5/public/liquidation-orders?instType=SWAP&uly=BTC-USDT&state=filled&limit=100');
+    const d = await r.json();
+    const rows = (d.data && d.data[0] && d.data[0].details) || [];
+    if (!rows.length) throw new Error('no data');
+    let longUsd = 0, shortUsd = 0, largest = 0;
+    rows.forEach(x => {
+      const usd = parseFloat(x.sz) * 0.01 * parseFloat(x.bkPx); // 1 contract = 0.01 BTC
+      if (x.posSide === 'long') longUsd += usd; else shortUsd += usd;
+      if (usd > largest) largest = usd;
+    });
+    const fmt = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : '$' + (v / 1e3).toFixed(0) + 'K';
+    const ts = rows.map(x => parseInt(x.ts));
+    const hrs = ((Date.now() - Math.min(...ts)) / 3600000).toFixed(1);
+    document.getElementById('liq-long').textContent = fmt(longUsd);
+    document.getElementById('liq-short').textContent = fmt(shortUsd);
+    document.getElementById('liq-total').textContent = fmt(longUsd + shortUsd);
+    document.getElementById('liq-largest').textContent = fmt(largest);
+    document.getElementById('liq-error').innerHTML = '<div class="liq-stat-label" style="margin-top:8px;text-align:center">Last ' + rows.length + ' BTC liquidations on OKX (~' + hrs + 'h)</div>';
+  } catch(e) {
+    document.getElementById('liq-error').innerHTML = '<div class="error-msg">Liquidation data unavailable right now</div>';
+  }
+}
+
+// ─── Heatmap iframe fallback ──────────────────────────────────────────────
+function checkHeatmap() {
+  const iframe = document.getElementById('heatmap-iframe');
+  iframe.onload = () => {
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      if (!doc || doc.body.innerText.length < 10) {
+        document.getElementById('heatmap-container').style.display = 'none';
+        document.getElementById('heatmap-error').style.display = 'flex';
+      }
+    } catch(e) {
+      document.getElementById('heatmap-container').style.display = 'none';
+      document.getElementById('heatmap-error').style.display = 'flex';
+    }
+  };
+  setTimeout(() => {
+    const errEl = document.getElementById('heatmap-error');
+    if (errEl && errEl.style.display !== 'flex') {
+      // Check if iframe loaded meaningful content
+    }
+  }, 5000);
+}
+
+// ─── TradingView Widget ───────────────────────────────────────────────────
+function openTV() {
+  const c = document.getElementById('tv-widget-container');
+  if (!c.innerHTML.trim()) {
+    const tz = encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Etc/UTC');
+    c.innerHTML = '<iframe src="https://www.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=60&hidesidetoolbar=0&symboledit=1&savechanges=0&studies=[]&theme=dark&style=1&timezone=' + tz + '&locale=en" width="100%" height="100%" frameborder="0" allowtransparency="true" allowfullscreen="true"></iframe>';
+  }
+  document.getElementById('tv-modal').classList.add('open');
+}
+function closeTV() { document.getElementById('tv-modal').classList.remove('open'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTV(); });
+
+// ─── Boot ────────────────────────────────────────────────────────────────
 // Paper trades card: Mort's real PAPER log, exported hourly to paper_trades.json by mort/paper_log/publish_dashboard.sh
 let paperData = null;
 async function loadPaper() {
@@ -505,7 +586,7 @@ loadAndScan();
 setInterval(() => { loadAndScan(); }, 60000);
 loadPaper();
 setInterval(() => { loadPaper(); }, 60000);
-setInterval(() => { renderPaper(); }, 15000);
+setInterval(() => { renderPaper(); renderMortCompression(); }, 15000);
 setInterval(() => { loadFG(); }, 120000);
 setInterval(() => { loadLiqStats(); }, 120000);
 </script>
