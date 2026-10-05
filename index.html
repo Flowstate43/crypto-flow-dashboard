@@ -215,6 +215,39 @@
     #chart { height: 300px; }
   }
 
+
+  /* ===== Agent selector (Mort / Trend / All) ===== */
+  .agent-nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .agent-nav button {
+    font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase;
+    background: transparent; border: 1px solid var(--card-border); color: var(--text-dim);
+    border-radius: 5px; padding: 5px 10px; cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+  }
+  .agent-nav button:hover { color: var(--cyan); border-color: rgba(0,255,229,0.35); }
+  .agent-nav button.active { color: var(--cyan); border-color: rgba(0,255,229,0.55); background: rgba(0,255,229,0.06); }
+  .agent-view { display: none; }
+  .agent-view.active { display: block; }
+  .overview-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .ov-card .ov-name { font-family: var(--font-header); font-size: 0.7rem; letter-spacing: 1.5px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 10px; }
+  .ov-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .ov-grid > div { background: #111; border-radius: 6px; padding: 9px 11px; }
+  .ov-grid label { display: block; font-size: 0.5rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+  .ov-grid b { font-family: var(--font-mono); font-size: 1rem; font-weight: 600; color: var(--text); }
+  .ov-status { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-dim); margin-top: 10px; }
+  .trend-status-pill {
+    display: inline-block; font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 1px; text-transform: uppercase;
+    border: 1px solid rgba(255,204,0,0.4); color: var(--yellow); border-radius: 3px; padding: 1px 6px; margin-left: 6px;
+  }
+  .trend-hero { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(0, 1.7fr); grid-template-areas: "price status" "paper status"; gap: 14px; }
+  .trend-hero .hero-price { grid-area: price; }
+  .trend-hero .trend-status-card { grid-area: status; }
+  .trend-hero .trend-paper-card { grid-area: paper; }
+  @media (max-width: 768px) {
+    .overview-row, .trend-hero { grid-template-columns: 1fr; }
+    .trend-hero { grid-template-areas: "price" "status" "paper"; }
+    .agent-nav { width: 100%; justify-content: flex-start; }
+  }
+
   @media (max-width: 768px) {
     .grid.half { grid-template-columns: 1fr; }
     .header { flex-direction: column; gap: 12px; }
@@ -225,11 +258,18 @@
 
 <div class="header">
   <div class="logo">Flow<span>BOT</span></div>
+  <div class="agent-nav" id="agent-nav" role="tablist" aria-label="Agent">
+    <button type="button" data-agent="mort" class="active" role="tab" aria-selected="true">Mort · compression + swing</button>
+    <button type="button" data-agent="trend" role="tab" aria-selected="false">Trend 📈</button>
+    <button type="button" data-agent="all" role="tab" aria-selected="false">All agents</button>
+  </div>
   <div class="updated-at" id="updated-at"></div>
 </div>
 
 <div class="wrap">
 <!-- Hero: price + compression breakout -->
+<!-- Agent views: Mort (default) / Trend / All -->
+<div id="view-mort" class="agent-view active" data-agent="mort">
 <div class="hero">
   <div class="card hero-price">
     <div class="card-title" style="margin-bottom:0">BTC / USD</div>
@@ -252,6 +292,56 @@
   <div class="card paper-card" id="card-paper">
     <div class="cmp-head"><div class="card-title" style="margin:0">Paper Trades &middot; Mort</div><div class="pp-upd" id="pp-upd"></div></div>
     <div id="pp-body"><div class="pp-empty" style="margin-top:8px">Loading paper log&hellip;</div></div>
+  </div>
+</div>
+</div>
+
+<div id="view-trend" class="agent-view" data-agent="trend">
+<div class="trend-hero">
+  <div class="card hero-price">
+    <div class="card-title" style="margin-bottom:0">BTC / USD</div>
+    <div class="btc-price" id="btc-price-trend">&mdash;</div>
+    <div class="btc-change up" id="btc-change-trend">&mdash;</div>
+    <div class="hero-src">CoinGecko &middot; refreshes every 15s</div>
+  </div>
+  <div class="card scan-card cmp-card trend-status-card" id="card-trend-status">
+    <div class="cmp-head">
+      <div class="card-title" style="margin:0">Trend following &middot; Trend <span class="cmp-tag">Paper</span><span class="trend-status-pill" id="trend-status-pill">Backtesting</span></div>
+      <div class="cmp-trig" id="trend-trig">paper only</div>
+    </div>
+    <div class="scan-direction neutral cmp-dir" id="trend-dir">BACKTESTING</div>
+    <div id="trend-body"><div class="cmp-sub">Loading Trend paper log&hellip;</div></div>
+    <details class="cmp-details"><summary>Details</summary>
+      <div class="cmp-info" id="trend-info"></div>
+    </details>
+  </div>
+  <div class="card paper-card trend-paper-card" id="card-trend-paper">
+    <div class="cmp-head"><div class="card-title" style="margin:0">Paper Trades &middot; Trend</div><div class="pp-upd" id="trend-pp-upd"></div></div>
+    <div id="trend-pp-body"><div class="pp-empty" style="margin-top:8px">Loading paper log&hellip;</div></div>
+  </div>
+</div>
+</div>
+
+<div id="view-all" class="agent-view" data-agent="all">
+  <div class="overview-row" id="overview-row">
+    <div class="card ov-card" id="ov-mort">
+      <div class="ov-name">Mort · compression + swing</div>
+      <div class="ov-grid">
+        <div><label>Equity</label><b id="ov-mort-eq">&mdash;</b></div>
+        <div><label>Net R</label><b id="ov-mort-r">&mdash;</b></div>
+        <div><label>Net $</label><b id="ov-mort-usd">&mdash;</b></div>
+      </div>
+      <div class="ov-status" id="ov-mort-st">Loading&hellip;</div>
+    </div>
+    <div class="card ov-card" id="ov-trend">
+      <div class="ov-name">Trend 📈 · trend-following</div>
+      <div class="ov-grid">
+        <div><label>Equity</label><b id="ov-trend-eq">&mdash;</b></div>
+        <div><label>Net R</label><b id="ov-trend-r">&mdash;</b></div>
+        <div><label>Net $</label><b id="ov-trend-usd">&mdash;</b></div>
+      </div>
+      <div class="ov-status" id="ov-trend-st">Loading&hellip;</div>
+    </div>
   </div>
 </div>
 
@@ -762,16 +852,202 @@ function renderPaper() {
   document.getElementById('pp-upd').textContent = d.generated ? 'log ' + ts(d.generated).split(' \u00b7 ')[1] : '';
 }
 
+// ─── Agent selector (Mort / Trend / All) ───────────────────────────────────
+const AGENT_LS_KEY = 'flowbot_agent';
+let trendData = null;
+let currentAgent = 'mort';
+
+function setAgent(id) {
+  if (!['mort', 'trend', 'all'].includes(id)) id = 'mort';
+  currentAgent = id;
+  try { localStorage.setItem(AGENT_LS_KEY, id); } catch (e) {}
+  document.querySelectorAll('.agent-view').forEach(el => {
+    el.classList.toggle('active', el.dataset.agent === id);
+  });
+  document.querySelectorAll('#agent-nav button').forEach(btn => {
+    const on = btn.dataset.agent === id;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  // Sync BTC price mirrors when switching
+  syncTrendPrice();
+  if (id === 'trend') { renderTrend(); }
+  if (id === 'all') { renderOverview(); }
+}
+
+function syncTrendPrice() {
+  const p = document.getElementById('btc-price');
+  const c = document.getElementById('btc-change');
+  const pt = document.getElementById('btc-price-trend');
+  const ct = document.getElementById('btc-change-trend');
+  if (p && pt) pt.textContent = p.textContent;
+  if (c && ct) { ct.textContent = c.textContent; ct.className = c.className; }
+}
+
+function initAgentNav() {
+  let saved = 'mort';
+  try { saved = localStorage.getItem(AGENT_LS_KEY) || 'mort'; } catch (e) {}
+  document.querySelectorAll('#agent-nav button').forEach(btn => {
+    btn.addEventListener('click', () => setAgent(btn.dataset.agent));
+  });
+  setAgent(saved);
+}
+
+async function loadTrendPaper() {
+  try {
+    const r = await fetch('paper_trades_trend.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    trendData = await r.json();
+    renderTrend();
+    renderOverview();
+  } catch (e) {
+    console.warn('Trend paper:', e.message);
+    const body = document.getElementById('trend-pp-body');
+    if (body && !trendData) body.innerHTML = '<div class="pp-empty" style="margin-top:8px">Trend paper log unavailable right now</div>';
+  }
+}
+
+function renderTrend() {
+  const d = trendData;
+  const dirEl = document.getElementById('trend-dir');
+  const pill = document.getElementById('trend-status-pill');
+  const trig = document.getElementById('trend-trig');
+  const body = document.getElementById('trend-body');
+  const info = document.getElementById('trend-info');
+  const ppBody = document.getElementById('trend-pp-body');
+  const ppUpd = document.getElementById('trend-pp-upd');
+  if (!d) {
+    if (dirEl) { dirEl.textContent = 'LOADING'; dirEl.className = 'scan-direction cmp-dir neutral'; }
+    return;
+  }
+  const status = (d.status || 'idle').toLowerCase();
+  const usd = v => v == null ? '—' : '$' + Number(v).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  const sr = v => (v >= 0 ? '+' : '') + Number(v).toFixed(2) + 'R';
+  const rc = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+  if (pill) {
+    pill.textContent = status;
+    pill.style.color = status === 'backtesting' ? 'var(--yellow)' : status === 'live' ? 'var(--green)' : 'var(--text-dim)';
+    pill.style.borderColor = status === 'backtesting' ? 'rgba(255,204,0,0.4)' : 'rgba(0,255,229,0.35)';
+  }
+  if (dirEl) {
+    dirEl.textContent = status === 'backtesting' ? 'BACKTESTING' : (d.open && d.open.length ? String(d.open[0].side).toUpperCase() : 'FLAT');
+    dirEl.className = 'scan-direction cmp-dir ' + (status === 'backtesting' ? 'neutral' : 'neutral');
+  }
+  if (trig) trig.textContent = d.source ? String(d.source).slice(0, 48) : 'paper only';
+  const book = (d.account && d.account.books && d.account.books[0]) || null;
+  const eq = book ? book.equity : (d.account && d.account.equity_total) || 1000;
+  const netR = book ? book.total_r : 0;
+  const netUsd = book ? book.realized_usd : 0;
+  let html = '<div class="cmp-shared">' +
+    '<div><label>Equity</label><b>' + usd(eq) + '</b></div>' +
+    '<div><label>Net R</label><b class="' + rc(netR) + '">' + (book && book.closed ? sr(netR) : '—') + '</b></div>' +
+    '<div><label>Net $</label><b class="' + rc(netUsd) + '">' + (book && book.closed ? usd(netUsd) : '—') + '</b></div>' +
+    '</div>';
+  html += '<div class="cmp-sub">' + (d.note || 'Paper only. No live orders.') + '</div>';
+  if (body) body.innerHTML = html;
+  if (info) info.innerHTML = 'Start ' + usd(d.account && d.account.start) + ' · risk ' + (d.account && d.account.risk_pct) + '% · ' + (d.costs || '');
+
+  // Paper card: open + collapsed trade log
+  let h = '';
+  if (d.account && d.account.books) {
+    h += '<div class="pp-tbl"><span class="h">Book</span><span class="h n">Trades</span><span class="h n">Win</span><span class="h n">Net R</span><span class="h n">Net $</span><span class="h n">Equity</span>';
+    d.account.books.forEach(x => {
+      h += '<span>📈 ' + (x.label || x.key) + '</span>' +
+        '<span class="n">' + x.closed + (x.open ? ' <small class="cy">+1 open</small>' : '') + '</span>' +
+        '<span class="n' + (x.closed ? '' : ' dim') + '">' + (x.closed ? Math.round(x.win_rate) + '%' : '&mdash;') + '</span>' +
+        '<span class="n ' + (x.closed ? rc(x.total_r) : 'dim') + '">' + (x.closed ? sr(x.total_r) : '&mdash;') + '</span>' +
+        '<span class="n ' + (x.closed ? rc(x.realized_usd) : 'dim') + '">' + (x.closed ? usd(x.realized_usd) : '&mdash;') + '</span>' +
+        '<span class="n">' + usd(x.equity) + '</span>';
+    });
+    h += '</div>';
+    h += '<div class="pp-eq"><span>Paper equity</span><b>' + usd(d.account.equity_total) + '</b></div>';
+  }
+  h += '<div class="pp-sec">Status</div>';
+  h += '<div class="pp-empty">' + (status === 'backtesting' ? 'Backtest running — no paper entries yet.' : 'Idle.') + '</div>';
+  h += '<div class="pp-sec">Open</div>';
+  if (!d.open || !d.open.length) h += '<div class="pp-empty">No open paper trades</div>';
+  else {
+    d.open.forEach(o => {
+      h += '<div class="pp-open"><b class="' + (o.side === 'long' ? 'pos' : 'neg') + '">📈 ' + String(o.side).toUpperCase() + '</b>' +
+        '<span>' + Math.round(o.entry).toLocaleString('en-US') + '</span>' +
+        '<span class="neg">SL ' + Math.round(o.stop).toLocaleString('en-US') + '</span></div>';
+    });
+  }
+  const tl = d.trade_log || d.closed || [];
+  h += '<details class="pp-log" id="trend-pp-log"' + (window.trendLogOpen ? ' open' : '') + ' ontoggle="window.trendLogOpen=this.open"><summary>Trade log &middot; ' + tl.length + ' closed</summary>';
+  if (!tl.length) h += '<div class="pp-empty" style="margin-top:5px">No closed trades yet.</div>';
+  tl.forEach(c => {
+    h += '<div class="pp-log-row"><div class="t"><span>📈 ' + String(c.side).toUpperCase() + ' &middot; ' + String(c.result || '').replace('_', ' ') + '</span>' +
+      '<span><b class="' + rc(c.r_net) + '">' + sr(c.r_net) + '</b></span></div></div>';
+  });
+  h += '</details>';
+  if (ppBody) ppBody.innerHTML = h;
+  if (ppUpd) {
+    const ts = d.generated ? cmpRel(Date.parse(d.generated) / 1000).split(' · ')[1] : '';
+    ppUpd.textContent = ts ? ('log ' + ts) : '';
+  }
+}
+
+function renderOverview() {
+  const usd = v => v == null ? '—' : '$' + Number(v).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  const sr = v => (v >= 0 ? '+' : '') + Number(v).toFixed(2) + 'R';
+  const rcCls = (el, v) => { if (!el) return; el.className = v > 0 ? 'pos' : v < 0 ? 'neg' : ''; };
+
+  // Mort
+  const md = paperData;
+  if (md && md.account) {
+    const books = md.account.books || [];
+    const eq = md.account.equity_total;
+    const netR = books.reduce((s, b) => s + (Number(b.total_r) || 0), 0);
+    const netUsd = books.reduce((s, b) => s + (Number(b.realized_usd) || 0), 0);
+    const closed = books.reduce((s, b) => s + (Number(b.closed) || 0), 0);
+    const openN = (md.open || []).length;
+    const eqEl = document.getElementById('ov-mort-eq');
+    const rEl = document.getElementById('ov-mort-r');
+    const uEl = document.getElementById('ov-mort-usd');
+    if (eqEl) eqEl.textContent = usd(eq);
+    if (rEl) { rEl.textContent = closed ? sr(netR) : '—'; rcCls(rEl, netR); }
+    if (uEl) { uEl.textContent = closed ? usd(netUsd) : '—'; rcCls(uEl, netUsd); }
+    const st = document.getElementById('ov-mort-st');
+    if (st) st.textContent = closed + ' closed · ' + openN + ' open · paper';
+  }
+  // Trend
+  const td = trendData;
+  if (td && td.account) {
+    const book = (td.account.books || [])[0] || {};
+    const eqEl = document.getElementById('ov-trend-eq');
+    const rEl = document.getElementById('ov-trend-r');
+    const uEl = document.getElementById('ov-trend-usd');
+    if (eqEl) eqEl.textContent = usd(td.account.equity_total);
+    if (rEl) { rEl.textContent = book.closed ? sr(book.total_r) : '—'; rcCls(rEl, book.total_r || 0); }
+    if (uEl) { uEl.textContent = book.closed ? usd(book.realized_usd) : '—'; rcCls(uEl, book.realized_usd || 0); }
+    const st = document.getElementById('ov-trend-st');
+    if (st) st.textContent = (td.status || 'idle') + ' · paper only · no live orders';
+  }
+}
+
+// Hook price updates into Trend mirror + overview refresh
+(function patchShowPrice() {
+  const _show = showPrice;
+  showPrice = function(price, pct) {
+    _show(price, pct);
+    syncTrendPrice();
+    if (currentAgent === 'all') renderOverview();
+  };
+})();
+
 startTicker();
 loadFG();
 loadLiqStats();
 loadAndScan();
+loadPaper();
+loadTrendPaper();
+initAgentNav();
 
 // Refresh scanners every 60s
 setInterval(() => { loadAndScan(); }, 60000);
-loadPaper();
-setInterval(() => { loadPaper(); }, 60000);
-setInterval(() => { renderPaper(); renderMortCompression(); }, 15000);
+setInterval(() => { loadPaper(); loadTrendPaper(); }, 60000);
+setInterval(() => { renderPaper(); renderMortCompression(); if (currentAgent === 'trend') renderTrend(); if (currentAgent === 'all') renderOverview(); }, 15000);
 setInterval(() => { loadFG(); }, 120000);
 setInterval(() => { loadLiqStats(); }, 120000);
 </script>
