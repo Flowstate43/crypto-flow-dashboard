@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-05T17:05-05:00",
+ "generated": "2026-10-05T18:05-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -183,7 +183,7 @@
    "oi_chg_pct": 0.071,
    "oi_src": "OKX proxy",
    "risk_pct": 1.56,
-   "bars": 25,
+   "bars": 26,
    "risk": 1335.5,
    "book_b": {
     "status": "closed",
