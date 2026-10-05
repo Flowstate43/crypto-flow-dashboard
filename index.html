@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CryptoFlow Dashboard — BTC</title>
+<title>FlowBOT — BTC</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
 <style>
@@ -121,39 +121,7 @@
   .error-msg { color: var(--red); font-size: 0.7rem; padding: 8px; background: #1a0008; border: 1px solid #330011; border-radius: 4px; margin-top: 8px; }
   .ok-msg { color: var(--green); font-size: 0.7rem; padding: 8px; background: #001a08; border: 1px solid #003311; border-radius: 4px; margin-top: 8px; }
 
-  /* Candlestick pattern library */
-  .pat-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-  .pat-head-right { display: flex; align-items: center; gap: 10px; }
-  .pat-meta { font-size: 0.6rem; color: var(--text-dim); font-family: var(--font-mono); }
-  .pat-btn { background: #111; color: var(--cyan); border: 1px solid #1f3b38; border-radius: 4px; padding: 4px 12px; font-family: var(--font-mono); font-size: 0.65rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-  .pat-btn:hover { border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,255,229,0.25); }
-  .pat-info { font-size: 0.72rem; color: var(--text); background: #111; border-left: 2px solid var(--cyan); border-radius: 4px; padding: 8px 10px; margin-bottom: 10px; min-height: 34px; line-height: 1.4; }
-  .pat-info b { font-family: var(--font-mono); font-weight: 600; }
-  .pat-body { display: grid; grid-template-columns: 290px 1fr; gap: 12px; }
-  .pat-types, .pat-list { max-height: 330px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #222 transparent; }
-  .pat-type { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 0.72rem; border: 1px solid transparent; }
-  .pat-type .cnt { margin-left: auto; font-family: var(--font-mono); color: var(--text); }
-  .pat-type.zero { opacity: 0.35; }
-  .pat-type:hover, .pat-row:hover { background: #141414; }
-  .pat-type.active, .pat-row.active { border-color: var(--cyan); background: #06201d; }
-  .pat-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
-  .pat-dot.bullish { background: var(--green); box-shadow: 0 0 6px var(--green); }
-  .pat-dot.bearish { background: var(--red); box-shadow: 0 0 6px var(--red); }
-  .pat-dot.neutral { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
-  .pat-dot.all { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
-  .pat-tag { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; padding: 1px 5px; border-radius: 3px; border: 1px solid; font-family: var(--font-mono); }
-  .pat-tag.bullish { color: var(--green); border-color: rgba(0,255,136,0.35); }
-  .pat-tag.bearish { color: var(--red); border-color: rgba(255,51,102,0.35); }
-  .pat-tag.neutral { color: var(--yellow); border-color: rgba(255,224,102,0.35); }
-  .pat-row { padding: 7px 8px; border-radius: 4px; cursor: pointer; border: 1px solid transparent; border-bottom-color: #151515; }
-  .pat-row-top { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; }
-  .pat-row-name { font-weight: 600; }
-  .pat-row-meta { margin-left: auto; font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-dim); white-space: nowrap; }
-  .pat-row-meta span { color: var(--text); }
-  .pat-row-info { font-size: 0.65rem; color: var(--text-dim); margin-top: 3px; }
-  .pat-empty { color: var(--text-dim); font-size: 0.72rem; padding: 10px; }
-
-  /* ===== Decluttered layout (hero / EMA strip / small row / chart + tabs) ===== */
+  /* ===== Decluttered layout (hero / EMA strip / small row / chart + heatmap link) ===== */
   .header { max-width: 1400px; margin: 0 auto 14px; padding: 6px 4px 12px; }
   .wrap { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
   .hero { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(0, 1.7fr); grid-template-areas: "price cmp" "paper cmp"; gap: 14px; }
@@ -210,10 +178,8 @@
   .mini .liq-stats { grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 0; }
   .mini .liq-stat { padding: 7px 6px; } .mini .liq-stat-val { font-size: 0.82rem; }
   #chart { height: 420px; }
-  .tabs { display: flex; gap: 6px; margin: 14px 0 12px; border-bottom: 1px solid var(--card-border); }
-  .tab { background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-dim); font-family: var(--font-header); font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; padding: 8px 12px; cursor: pointer; }
-  .tab:hover { color: var(--text); } .tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
-  .tab-pane[hidden] { display: none; }
+  .heatmap-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--card-border); font-size: 0.72rem; color: var(--text-dim); }
+  .heatmap-row .card-title { margin: 0; }
 
   @media (max-width: 768px) {
     body { padding: 10px; }
@@ -237,7 +203,6 @@
 
   @media (max-width: 768px) {
     .grid.half { grid-template-columns: 1fr; }
-    .pat-body { grid-template-columns: 1fr; }
     .header { flex-direction: column; gap: 12px; }
   }
 </style>
@@ -245,7 +210,7 @@
 <body>
 
 <div class="header">
-  <div class="logo">CRYPTO<span>FLOW</span></div>
+  <div class="logo">Flow<span>BOT</span></div>
   <div class="updated-at" id="updated-at"></div>
 </div>
 
@@ -333,33 +298,13 @@
   </div>
 </div>
 
-<!-- Chart + tabs (Patterns / Heatmap) -->
+<!-- Chart + heatmap link -->
 <div class="card chart-card">
   <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">BTC/USDT &mdash; 1H Chart <button class="tv-btn" onclick="openTV()">&#128200; TradingView</button></div>
   <div id="chart"><div class="chart-loading">Loading chart...</div></div>
-  <div class="tabs" role="tablist">
-    <button class="tab active" data-tab="patterns" type="button">Patterns</button>
-    <button class="tab" data-tab="heatmap" type="button">Heatmap</button>
-  </div>
-  <div class="tab-pane" id="tab-patterns">
-    <div class="pat-head">
-      <div class="card-title" style="margin-bottom:0">Candlestick Pattern Library &mdash; 1H (last 100 candles)</div>
-      <div class="pat-head-right">
-        <span class="pat-meta" id="pat-meta">Waiting for candles&hellip;</span>
-        <button class="pat-btn" id="pat-clear" type="button">Clear</button>
-      </div>
-    </div>
-    <div class="pat-info" id="pat-info">Click a pattern type to mark every hit on the 1H chart, or click a detection to jump to that candle.</div>
-    <div class="pat-body">
-      <div class="pat-types" id="pat-types"></div>
-      <div class="pat-list" id="pat-list"><div class="pat-empty">Loading 1H candles&hellip;</div></div>
-    </div>
-  </div>
-  <div class="tab-pane" id="tab-heatmap" hidden>
-    <div id="heatmap-error" class="heatmap-fallback" style="display:flex">
-      <span>CoinGlass doesn't allow its liquidation heatmap to be embedded on other sites</span>
-      <a class="heatmap-link" href="https://coinglass.com/LiquidationHeatmap/" target="_blank" rel="noopener">Open Heatmap on CoinGlass &rarr;</a>
-    </div>
+  <div class="heatmap-row" id="heatmap-error">
+    <span class="card-title">Liquidation Heatmap</span>
+    <span>CoinGlass doesn't allow its heatmap to be embedded &middot; <a class="heatmap-link" href="https://coinglass.com/LiquidationHeatmap/" target="_blank" rel="noopener">Open Heatmap on CoinGlass &rarr;</a></span>
   </div>
 </div>
 </div>
@@ -373,7 +318,7 @@
 </div>
 
 <div class="footer">
-  Data from <span>CoinGecko</span> · <span>Binance.US</span> · <span>Alternative.me</span> · <span>OKX</span> · <span>CoinGlass</span> · <span>TradingView</span> &nbsp;|&nbsp; Experimental signals only — not financial advice &nbsp;|&nbsp; CryptoFlow Dashboard
+  Data from <span>CoinGecko</span> · <span>Binance.US</span> · <span>Alternative.me</span> · <span>OKX</span> · <span>CoinGlass</span> · <span>TradingView</span> &nbsp;|&nbsp; Experimental signals only — not financial advice &nbsp;|&nbsp; FlowBOT
 </div>
 
 <script>
@@ -499,7 +444,7 @@ async function loadAndScan() {
       fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1d&limit=500`).then(r => r.json()),
     ]);
 
-    const r1h = r1hAll.slice(-500);   // chart / patterns / intraday use the last 500; compression needs 1000 for the 30-day rank
+    const r1h = r1hAll.slice(-500);   // chart / intraday use the last 500; compression needs 1000 for the 30-day rank
     const closes1m = r1m.map(c => parseFloat(c[4]));
     const closes5m = r5m.map(c => parseFloat(c[4]));
     const closes15m = r15m.map(c => parseFloat(c[4]));
@@ -545,7 +490,6 @@ async function loadAndScan() {
 
     // Draw chart
     drawChart(r1h);
-    try { updatePatterns(r1h); } catch (e) { console.error('Pattern error:', e); }
     try { updateCompression(r1hAll); } catch (e) { console.error('Compression error:', e); }
 
   } catch(err) {
@@ -572,239 +516,6 @@ function drawChart(klines) {
   candleSeries.setData(data);
   if (first) chart.timeScale().fitContent();
 }
-
-// ─── Candlestick Pattern Library ─────────────────────────────────────────
-// Runs on closed 1H candles; highlights hits on our Lightweight Charts 1H chart
-// (the TradingView iframe can't be drawn on from outside).
-const PATTERN_DEFS = {
-  doji:                 { name: 'Doji',                 bias: 'neutral', info: 'Open ≈ close: buyers and sellers ended even — indecision, watch the next candle.' },
-  dragonfly_doji:       { name: 'Dragonfly Doji',       bias: 'bullish', info: 'Sellers pushed price down, buyers drove it all the way back to the open — possible bottom.' },
-  gravestone_doji:      { name: 'Gravestone Doji',      bias: 'bearish', info: 'Buyers pushed price up, sellers drove it all the way back to the open — possible top.' },
-  hammer:               { name: 'Hammer',               bias: 'bullish', info: 'After a drop, a long lower wick shows buyers rejected lower prices — possible turn up.' },
-  inverted_hammer:      { name: 'Inverted Hammer',      bias: 'bullish', info: 'After a drop, buyers tried to push higher (long upper wick) — early turn-up signal, needs confirmation.' },
-  hanging_man:          { name: 'Hanging Man',          bias: 'bearish', info: 'Hammer shape after a rally: heavy selling showed up inside the candle — the uptrend may stall.' },
-  shooting_star:        { name: 'Shooting Star',        bias: 'bearish', info: 'After a rally, a long upper wick shows buyers got rejected at the highs — possible turn down.' },
-  spinning_top:         { name: 'Spinning Top',         bias: 'neutral', info: 'Small body with wicks on both sides — indecision; the current move may be losing steam.' },
-  bullish_marubozu:     { name: 'Bullish Marubozu',     bias: 'bullish', info: 'Big green candle with almost no wicks — buyers in control from open to close.' },
-  bearish_marubozu:     { name: 'Bearish Marubozu',     bias: 'bearish', info: 'Big red candle with almost no wicks — sellers in control from open to close.' },
-  bullish_engulfing:    { name: 'Bullish Engulfing',    bias: 'bullish', info: 'After a drop, a green body swallows the prior red body — buyers took over.' },
-  bearish_engulfing:    { name: 'Bearish Engulfing',    bias: 'bearish', info: 'After a rally, a red body swallows the prior green body — sellers took over.' },
-  bullish_harami:       { name: 'Bullish Harami',       bias: 'bullish', info: 'After a drop, a small green body sits inside a big red one — selling is fading.' },
-  bearish_harami:       { name: 'Bearish Harami',       bias: 'bearish', info: 'After a rally, a small red body sits inside a big green one — buying is fading.' },
-  piercing_line:        { name: 'Piercing Line',        bias: 'bullish', info: 'After a big red candle, a green candle closes above the red body’s midpoint — buyers stepping in.' },
-  dark_cloud_cover:     { name: 'Dark Cloud Cover',     bias: 'bearish', info: 'After a big green candle, a red candle closes below the green body’s midpoint — sellers stepping in.' },
-  morning_star:         { name: 'Morning Star',         bias: 'bullish', info: 'Big red, small pause candle, then strong green — classic 3-candle bottom reversal.' },
-  evening_star:         { name: 'Evening Star',         bias: 'bearish', info: 'Big green, small pause candle, then strong red — classic 3-candle top reversal.' },
-  three_white_soldiers: { name: 'Three White Soldiers', bias: 'bullish', info: 'Three strong green candles, each closing higher — steady buying momentum.' },
-  three_black_crows:    { name: 'Three Black Crows',    bias: 'bearish', info: 'Three strong red candles, each closing lower — steady selling momentum.' },
-  tweezer_top:          { name: 'Tweezer Top',          bias: 'bearish', info: 'Green then red candle with matching highs after a rally — resistance held, possible top.' },
-  tweezer_bottom:       { name: 'Tweezer Bottom',       bias: 'bullish', info: 'Red then green candle with matching lows after a drop — support held, possible bottom.' },
-};
-const PAT_COLORS = { bullish: '#00ff88', bearish: '#ff3366', neutral: '#ffe066' };
-const PAT_LOOKBACK = 100;   // candles shown in the panel
-
-// candles: [{time, open, high, low, close}] oldest first. Returns [{key, idx, span, times, price, time, id}]
-function detectPatterns(candles) {
-  const n = candles.length, out = [];
-  const body = x => Math.abs(x.close - x.open);
-  const range = x => x.high - x.low;
-  const upper = x => x.high - Math.max(x.open, x.close);
-  const lower = x => Math.min(x.open, x.close) - x.low;
-  const isBull = x => x.close > x.open, isBear = x => x.close < x.open;
-  const mid = x => (x.open + x.close) / 2;
-  // average body / range of the 14 candles before i (scale reference for "big" / "small")
-  const pb = [0], pr = [0];
-  candles.forEach((x, i) => { pb.push(pb[i] + body(x)); pr.push(pr[i] + range(x)); });
-  const avgB = i => { const a = Math.max(0, i - 14); return i > a ? (pb[i] - pb[a]) / (i - a) : body(candles[i]); };
-  const avgR = i => { const a = Math.max(0, i - 14); return i > a ? (pr[i] - pr[a]) / (i - a) : range(candles[i]); };
-  // prior trend before candle k: close[k-1] vs close 5 bars earlier, with a small dead-band
-  const trend = k => {
-    if (k < 6) return 0;
-    const d = candles[k - 1].close - candles[k - 6].close, th = 0.3 * avgR(k);
-    return d > th ? 1 : d < -th ? -1 : 0;
-  };
-  const add = (key, i, span) => {
-    const times = []; for (let j = i - span + 1; j <= i; j++) times.push(candles[j].time);
-    out.push({ key, idx: i, span, times, time: candles[i].time, price: candles[i].close, id: key + '@' + candles[i].time });
-  };
-
-  for (let i = 6; i < n; i++) {
-    const x = candles[i], r = range(x), b = body(x), u = upper(x), l = lower(x);
-    if (!(r > 0)) continue;
-    const t = trend(i);
-
-    // ── single-candle patterns ──
-    if (b <= 0.1 * r) {
-      if (u <= 0.1 * r && l >= 0.6 * r) add('dragonfly_doji', i, 1);
-      else if (l <= 0.1 * r && u >= 0.6 * r) add('gravestone_doji', i, 1);
-      else add('doji', i, 1);
-    } else if (l >= 2 * b && u <= 0.15 * r) {
-      if (t < 0) add('hammer', i, 1); else if (t > 0) add('hanging_man', i, 1);
-    } else if (u >= 2 * b && l <= 0.15 * r) {
-      if (t < 0) add('inverted_hammer', i, 1); else if (t > 0) add('shooting_star', i, 1);
-    } else if (b <= 0.3 * r && u > b && l > b) {
-      add('spinning_top', i, 1);
-    } else if (b >= 0.9 * r && r >= avgR(i)) {
-      add(isBull(x) ? 'bullish_marubozu' : 'bearish_marubozu', i, 1);
-    }
-
-    // ── two-candle patterns (trend measured before the first candle) ──
-    const p = candles[i - 1], bp = body(p), tp = trend(i - 1);
-    if (bp > 0) {
-      if (tp < 0 && isBear(p) && isBull(x) && x.open <= p.close && x.close >= p.open && b > bp) add('bullish_engulfing', i, 2);
-      if (tp > 0 && isBull(p) && isBear(x) && x.open >= p.close && x.close <= p.open && b > bp) add('bearish_engulfing', i, 2);
-      if (tp < 0 && isBear(p) && bp >= avgB(i - 1) && isBull(x) && x.open >= p.close && x.close <= p.open && b <= 0.5 * bp) add('bullish_harami', i, 2);
-      if (tp > 0 && isBull(p) && bp >= avgB(i - 1) && isBear(x) && x.open <= p.close && x.close >= p.open && b <= 0.5 * bp) add('bearish_harami', i, 2);
-      if (tp < 0 && isBear(p) && bp >= avgB(i - 1) && isBull(x) && x.open <= p.close && x.close > mid(p) && x.close < p.open) add('piercing_line', i, 2);
-      if (tp > 0 && isBull(p) && bp >= avgB(i - 1) && isBear(x) && x.open >= p.close && x.close < mid(p) && x.close > p.open) add('dark_cloud_cover', i, 2);
-      const tol = 0.1 * avgR(i), minB = 0.3 * avgB(i);
-      if (tp > 0 && isBull(p) && isBear(x) && bp >= minB && b >= minB && Math.abs(p.high - x.high) <= tol) add('tweezer_top', i, 2);
-      if (tp < 0 && isBear(p) && isBull(x) && bp >= minB && b >= minB && Math.abs(p.low - x.low) <= tol) add('tweezer_bottom', i, 2);
-    }
-
-    // ── three-candle patterns ──
-    const a = candles[i - 2], m = p, ba = body(a), ta = trend(i - 2);
-    if (ba >= avgB(i - 2) && body(m) <= 0.3 * ba) {
-      if (ta < 0 && isBear(a) && Math.max(m.open, m.close) < mid(a) && isBull(x) && x.close > mid(a)) add('morning_star', i, 3);
-      if (ta > 0 && isBull(a) && Math.min(m.open, m.close) > mid(a) && isBear(x) && x.close < mid(a)) add('evening_star', i, 3);
-    }
-    const strong = (y, k) => body(y) >= 0.5 * range(y) && body(y) >= 0.5 * avgB(k);
-    if ([a, m, x].every(isBull) && strong(a, i - 2) && strong(m, i - 1) && strong(x, i) &&
-        m.close > a.close && x.close > m.close && m.open >= a.open && m.open <= a.close && x.open >= m.open && x.open <= m.close &&
-        [a, m, x].every(y => upper(y) <= 0.3 * body(y))) add('three_white_soldiers', i, 3);
-    if ([a, m, x].every(isBear) && strong(a, i - 2) && strong(m, i - 1) && strong(x, i) &&
-        m.close < a.close && x.close < m.close && m.open <= a.open && m.open >= a.close && x.open <= m.open && x.open >= m.close &&
-        [a, m, x].every(y => lower(y) <= 0.3 * body(y))) add('three_black_crows', i, 3);
-  }
-  return out;
-}
-
-let patDetections = [];   // recent detections, newest first
-let patFilter = null;     // pattern key the list is filtered to
-let patSel = null;        // { kind: 'type', key } | { kind: 'det', id }
-let patDemoDone = false;
-
-const patFmtTime = t => new Date(t * 1000).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-const patFmtPrice = v => '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
-
-function updatePatterns(klines) {
-  // only closed candles, so detections don't flicker while the current hour is still forming
-  const now = Date.now();
-  const candles = klines.filter(c => c[6] < now).map(c => ({ time: Math.floor(c[0] / 1000), open: +c[1], high: +c[2], low: +c[3], close: +c[4] }));
-  const minIdx = candles.length - PAT_LOOKBACK;
-  patDetections = detectPatterns(candles).filter(d => d.idx >= minIdx)
-    .sort((a, b) => b.time - a.time || b.span - a.span);
-  const last = candles[candles.length - 1];
-  document.getElementById('pat-meta').textContent = patDetections.length + ' hits · last closed candle ' + (last ? patFmtTime(last.time) : '—') + ' · updated ' + new Date().toLocaleTimeString();
-
-  // keep the current selection if it still exists
-  if (patSel && patSel.kind === 'det' && !patDetections.some(d => d.id === patSel.id)) patSel = null;
-  renderPatternPanel();
-  applyPatternMarkers(false);
-
-  if (!patDemoDone && /[?&]demo=1\b/.test(location.search) && patDetections.length) {
-    patDemoDone = true;
-    selectPatternDetection(patDetections[0].id);
-  }
-}
-
-function renderPatternPanel() {
-  const counts = {};
-  patDetections.forEach(d => { counts[d.key] = (counts[d.key] || 0) + 1; });
-  let types = `<div class="pat-type${patFilter ? '' : ' active'}" data-type=""><span class="pat-dot all"></span>All patterns<span class="cnt">${patDetections.length}</span></div>`;
-  Object.keys(PATTERN_DEFS).forEach(k => {
-    const def = PATTERN_DEFS[k], c = counts[k] || 0;
-    types += `<div class="pat-type${c ? '' : ' zero'}${patFilter === k ? ' active' : ''}" data-type="${k}" title="${def.info}">` +
-      `<span class="pat-dot ${def.bias}"></span>${def.name}<span class="pat-tag ${def.bias}">${def.bias}</span><span class="cnt">${c}</span></div>`;
-  });
-  document.getElementById('pat-types').innerHTML = types;
-
-  const rows = patDetections.filter(d => !patFilter || d.key === patFilter);
-  const selId = patSel && patSel.kind === 'det' ? patSel.id : null;
-  document.getElementById('pat-list').innerHTML = rows.length ? rows.map(d => {
-    const def = PATTERN_DEFS[d.key];
-    return `<div class="pat-row${d.id === selId ? ' active' : ''}" data-id="${d.id}">` +
-      `<div class="pat-row-top"><span class="pat-dot ${def.bias}"></span><span class="pat-row-name">${def.name}</span><span class="pat-tag ${def.bias}">${def.bias}</span>` +
-      (d.span > 1 ? `<span class="pat-tag neutral" style="color:var(--text-dim);border-color:#333">${d.span} candles</span>` : '') +
-      `<span class="pat-row-meta"><span>${patFmtTime(d.time)}</span> · ${patFmtPrice(d.price)}</span></div>` +
-      `<div class="pat-row-info">${def.info}</div></div>`;
-  }).join('') : `<div class="pat-empty">${patFilter ? 'No ' + PATTERN_DEFS[patFilter].name + ' in the last ' + PAT_LOOKBACK + ' candles — click it again or Clear to see all.' : 'No patterns in the last ' + PAT_LOOKBACK + ' candles.'}</div>`;
-}
-
-function patMarkers(dets) {
-  const map = new Map();
-  dets.forEach(d => {
-    const def = PATTERN_DEFS[d.key];
-    const pos = def.bias === 'bullish' ? 'belowBar' : 'aboveBar';
-    d.times.forEach((t, j) => {
-      const isLast = j === d.times.length - 1;
-      const k = t + pos;
-      const m = map.get(k) || { time: t, position: pos, color: PAT_COLORS[def.bias], shape: def.bias === 'bullish' ? 'arrowUp' : 'arrowDown', text: '' };
-      const label = isLast ? def.name : String(j + 1);
-      if (!m.text.split(' / ').includes(label)) m.text = m.text ? m.text + ' / ' + label : label;
-      map.set(k, m);
-    });
-  });
-  return [...map.values()].sort((a, b) => a.time - b.time);
-}
-
-function patSelectedDets() {
-  if (!patSel) return [];
-  if (patSel.kind === 'type') return patDetections.filter(d => d.key === patSel.key);
-  return patDetections.filter(d => d.id === patSel.id);
-}
-
-function applyPatternMarkers(focus) {
-  if (!candleSeries) return;
-  const dets = patSelectedDets();
-  candleSeries.setMarkers(patMarkers(dets));
-  const info = document.getElementById('pat-info');
-  if (!patSel) {
-    info.innerHTML = 'Click a pattern type to mark every hit on the 1H chart, or click a detection to jump to that candle.';
-  } else {
-    const def = PATTERN_DEFS[patSel.kind === 'type' ? patSel.key : dets[0].key];
-    const where = patSel.kind === 'type' ? `${dets.length} hit${dets.length === 1 ? '' : 's'} marked on the 1H chart` :
-      `marked on the 1H chart at ${patFmtTime(dets[0].time)} · ${patFmtPrice(dets[0].price)}`;
-    info.innerHTML = `<b style="color:${PAT_COLORS[def.bias]}">${def.name}</b> — ${def.info} <span style="color:var(--text-dim)">(${where})</span>`;
-  }
-  if (focus && dets.length) {
-    const from = Math.min(...dets.map(d => d.idx - d.span + 1)), to = Math.max(...dets.map(d => d.idx));
-    const pad = Math.max(0, 50 - (to - from)) / 2;
-    chart.timeScale().setVisibleLogicalRange({ from: from - pad - 5, to: to + pad + 5 });
-  }
-}
-
-function selectPatternType(key) {
-  if (!key || patFilter === key) { clearPatterns(); return; }
-  patFilter = key;
-  patSel = { kind: 'type', key };
-  renderPatternPanel();
-  applyPatternMarkers(true);
-}
-
-function selectPatternDetection(id) {
-  patSel = { kind: 'det', id };
-  renderPatternPanel();
-  applyPatternMarkers(true);
-  const row = document.querySelector('.pat-row.active');
-  if (row) row.scrollIntoView({ block: 'nearest' });
-}
-
-function clearPatterns() {
-  patFilter = null;
-  patSel = null;
-  renderPatternPanel();
-  applyPatternMarkers(false);
-  if (chart) chart.timeScale().fitContent();
-}
-
-document.getElementById('pat-types').addEventListener('click', e => {
-  const el = e.target.closest('.pat-type'); if (el) selectPatternType(el.dataset.type);
-});
-document.getElementById('pat-list').addEventListener('click', e => {
-  const el = e.target.closest('.pat-row'); if (el) selectPatternDetection(el.dataset.id);
-});
-document.getElementById('pat-clear').addEventListener('click', clearPatterns);
 
 // >>> CMP  Compression Breakout (port of Mort's compression_scanner/scanner.py, PAPER)
 // 36-candle box; BB(20,2) width at the last box candle in the lowest 30% of the last 720 candles;
@@ -967,12 +678,6 @@ document.querySelectorAll('.ema-seg').forEach(seg => seg.addEventListener('click
   e.stopPropagation();
 }));
 document.addEventListener('click', () => document.querySelectorAll('.ema-seg.open').forEach(x => x.classList.remove('open')));
-
-// Chart tabs: Patterns / Heatmap
-document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => {
-  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === btn));
-  document.querySelectorAll('.tab-pane').forEach(p => { p.hidden = p.id !== 'tab-' + btn.dataset.tab; });
-}));
 
 // ─── Fear & Greed ─────────────────────────────────────────────────────────
 async function loadFG() {
