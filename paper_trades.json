@@ -1,0 +1,70 @@
+{
+ "generated": "2026-10-04T20:49-05:00",
+ "source": "mort/paper_log/trades.csv",
+ "costs": "0.16% round trip; win = net R > 0",
+ "scanners": [
+  {
+   "key": "swing",
+   "emoji": "🌊",
+   "label": "Swing",
+   "paused": false,
+   "closed": 0,
+   "wins": 0,
+   "win_rate": 0.0,
+   "total_r": 0,
+   "open": 0
+  },
+  {
+   "key": "flush",
+   "emoji": "⚡",
+   "label": "Flush",
+   "paused": false,
+   "closed": 0,
+   "wins": 0,
+   "win_rate": 0.0,
+   "total_r": 0,
+   "open": 0
+  },
+  {
+   "key": "compression",
+   "emoji": "🗜️",
+   "label": "Compression",
+   "paused": false,
+   "closed": 0,
+   "wins": 0,
+   "win_rate": 0.0,
+   "total_r": 0,
+   "open": 1
+  },
+  {
+   "key": "1h",
+   "emoji": "₿",
+   "label": "1H",
+   "paused": true,
+   "closed": 0,
+   "wins": 0,
+   "win_rate": 0.0,
+   "total_r": 0,
+   "open": 0
+  }
+ ],
+ "open": [
+  {
+   "scanner": "compression",
+   "side": "long",
+   "armed_time": "2026-10-04T16:00-05:00",
+   "entry": 85791.1,
+   "stop": 84455.6,
+   "target1": 89797.5,
+   "target2": null,
+   "expiry": "96 x 1H",
+   "tp1_time": ""
+  }
+ ],
+ "closed": [],
+ "totals": {
+  "closed": 0,
+  "wins": 0,
+  "total_r": 0
+ }
+}
