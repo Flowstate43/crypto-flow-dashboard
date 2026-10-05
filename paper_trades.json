@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-04T20:49-05:00",
+ "generated": "2026-10-04T20:56-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "scanners": [
@@ -62,6 +62,27 @@
   }
  ],
  "closed": [],
+ "compression": {
+  "open": {
+   "paper_id": "compression-2026-10-04T16:00-05:00",
+   "side": "long",
+   "time": "2026-10-04T16:00-05:00",
+   "entry": 85791.1,
+   "stop": 84455.6,
+   "target": 89797.5,
+   "max_bars": 96,
+   "box_high": 85550.8,
+   "box_low": 84476.9,
+   "box_ratio": 0.315,
+   "bbw_pct": 0.226,
+   "oi_chg_pct": 0.071,
+   "oi_src": "OKX proxy",
+   "risk_pct": 1.56
+  },
+  "last": null,
+  "scanner_runs": "hourly at :12 CT",
+  "source": "compression_scanner/state.json + signals.csv"
+ },
  "totals": {
   "closed": 0,
   "wins": 0,
