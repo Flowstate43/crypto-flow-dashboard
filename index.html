@@ -121,7 +121,7 @@
   .error-msg { color: var(--red); font-size: 0.7rem; padding: 8px; background: #1a0008; border: 1px solid #330011; border-radius: 4px; margin-top: 8px; }
   .ok-msg { color: var(--green); font-size: 0.7rem; padding: 8px; background: #001a08; border: 1px solid #003311; border-radius: 4px; margin-top: 8px; }
 
-  /* ===== Decluttered layout (hero / EMA strip / small row / chart + heatmap link) ===== */
+  /* ===== Decluttered layout (hero / small row / chart + heatmap link) ===== */
   .header { max-width: 1400px; margin: 0 auto 14px; padding: 6px 4px 12px; }
   .wrap { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
   .hero { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(0, 1.7fr); grid-template-areas: "price cmp" "paper cmp"; gap: 14px; }
@@ -158,17 +158,6 @@
   .cmp-details summary:hover { color: var(--cyan); }
   .cmp-details .cmp-info { border-top: none; margin-top: 6px; padding-top: 0; line-height: 1.7; font-size: 0.6rem; }
   .cmp-details .scan-status { font-size: 0.58rem; }
-  .ema-strip { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; }
-  .ema-seg { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 14px; border-left: 1px solid var(--card-border); border-top: 2px solid transparent; outline: none; cursor: default; }
-  .ema-seg:first-child { border-left: none; border-top-left-radius: 8px; } .ema-seg:last-child { border-top-right-radius: 8px; }
-  .ema-seg.bullish { border-top-color: var(--green); } .ema-seg.bearish { border-top-color: var(--red); } .ema-seg.neutral { border-top-color: var(--yellow); }
-  .ema-seg.experimental .seg-tf::after { content: ' \00b7 exp'; color: #444; }
-  .seg-tf { font-family: var(--font-header); font-size: 0.58rem; letter-spacing: 1.5px; color: var(--text-dim); text-transform: uppercase; white-space: nowrap; }
-  .ema-seg .scan-direction { font-size: 0.82rem; margin: 0; letter-spacing: 1.5px; }
-  .seg-tip { display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 250px; z-index: 50; background: #0b0b0b; border: 1px solid #222; border-radius: 6px; padding: 10px 12px; box-shadow: 0 8px 24px rgba(0,0,0,.7); }
-  .ema-seg:hover .seg-tip, .ema-seg.open .seg-tip { display: block; }
-  .ema-seg { cursor: pointer; }
-  .ema-seg:last-child .seg-tip, .ema-seg:nth-child(3) .seg-tip { left: auto; right: 0; }
   .small-row { display: grid; grid-template-columns: 1fr 2fr; gap: 14px; }
   .mini { padding: 12px 14px; }
   .mini .card-title { margin-bottom: 8px; }
@@ -191,12 +180,6 @@
     .cmp-card { padding: 16px; }
     .cmp-levels b { font-size: 0.9rem; }
     .cmp-levels > div { padding: 8px; }
-    .ema-strip { grid-template-columns: 1fr 1fr; }
-    .ema-seg:nth-child(3) { border-left: none; }
-    .ema-seg:nth-child(n+3) { border-top-left-radius: 0; border-top-right-radius: 0; }
-    .ema-seg:nth-child(2) { border-top-right-radius: 8px; }
-    .ema-seg:nth-child(odd) .seg-tip { left: 0; right: auto; } .ema-seg:nth-child(even) .seg-tip { left: auto; right: 0; }
-    .seg-tip { min-width: 230px; }
     .mini .liq-stats { grid-template-columns: 1fr 1fr; }
     #chart { height: 300px; }
   }
@@ -238,43 +221,6 @@
   <div class="card paper-card" id="card-paper">
     <div class="cmp-head"><div class="card-title" style="margin:0">Paper Trades &middot; Mort</div><div class="pp-upd" id="pp-upd"></div></div>
     <div id="pp-body"><div class="pp-empty" style="margin-top:8px">Loading paper log&hellip;</div></div>
-  </div>
-</div>
-
-<!-- EMA strip (hover / tap a segment for EMA values and res/sup) -->
-<div class="ema-strip">
-  <div class="ema-seg" id="card-swing" tabindex="0">
-    <span class="seg-tf">Swing 4H+1D</span><span class="scan-direction neutral" id="swing-dir">&hellip;</span>
-    <div class="seg-tip">
-      <div class="scan-detail">4H EMA21 <span id="swing-4h-ema21">&mdash;</span> &middot; EMA200 <span id="swing-4h-ema200">&mdash;</span></div>
-      <div class="scan-detail">1D EMA21 <span id="swing-1d-ema21">&mdash;</span> &middot; EMA200 <span id="swing-1d-ema200">&mdash;</span></div>
-      <div class="scan-detail">Res <span class="res" id="swing-res">&mdash;</span> &middot; Sup <span class="sup" id="swing-sup">&mdash;</span></div>
-      <div class="scan-status" id="swing-status"></div>
-    </div>
-  </div>
-  <div class="ema-seg" id="card-intraday" tabindex="0">
-    <span class="seg-tf">Intraday 1H</span><span class="scan-direction neutral" id="intraday-dir">&hellip;</span>
-    <div class="seg-tip">
-      <div class="scan-detail">EMA9 <span id="intraday-ema9">&mdash;</span> &middot; EMA21 <span id="intraday-ema21">&mdash;</span></div>
-      <div class="scan-detail">Res <span class="res" id="intraday-res">&mdash;</span> &middot; Sup <span class="sup" id="intraday-sup">&mdash;</span></div>
-      <div class="scan-status" id="intraday-status"></div>
-    </div>
-  </div>
-  <div class="ema-seg experimental" id="card-15m" tabindex="0">
-    <span class="seg-tf">15m</span><span class="scan-direction neutral" id="m15-dir">&hellip;</span>
-    <div class="seg-tip">
-      <div class="scan-detail">EMA9 <span id="m15-ema9">&mdash;</span> &middot; EMA21 <span id="m15-ema21">&mdash;</span></div>
-      <div class="scan-detail">Res <span class="res" id="m15-res">&mdash;</span> &middot; Sup <span class="sup" id="m15-sup">&mdash;</span></div>
-      <div class="scan-status" id="m15-status"></div>
-    </div>
-  </div>
-  <div class="ema-seg experimental" id="card-1m" tabindex="0">
-    <span class="seg-tf">1m</span><span class="scan-direction neutral" id="m1-dir">&hellip;</span>
-    <div class="seg-tip">
-      <div class="scan-detail">EMA9 <span id="m1-ema9">&mdash;</span> &middot; EMA21 <span id="m1-ema21">&mdash;</span></div>
-      <div class="scan-detail">Res <span class="res" id="m1-res">&mdash;</span> &middot; Sup <span class="sup" id="m1-sup">&mdash;</span></div>
-      <div class="scan-status" id="m1-status"></div>
-    </div>
   </div>
 </div>
 
@@ -356,137 +302,11 @@ async function pollPrice() {
 }
 function startTicker() { pollPrice(); setInterval(pollPrice, 15000); }
 
-// ─── EMA helper ────────────────────────────────────────────────────────────
-function calcEMA(closes, period) {
-  if (closes.length < period) return null;
-  const k = 2 / (period + 1);
-  let ema = closes.slice(0, period).reduce((a, b) => a + b, 0) / period;
-  for (let i = period; i < closes.length; i++) {
-    ema = closes[i] * k + ema * (1 - k);
-  }
-  return ema;
-}
-
-function recentHigh(closes, lookback = 20) {
-  return Math.max(...closes.slice(-lookback));
-}
-function recentLow(closes, lookback = 20) {
-  return Math.min(...closes.slice(-lookback));
-}
-
-// ─── Scanner Logic ──────────────────────────────────────────────────────────
-function detectCross(emaFast, emaSlow) {
-  // emaFast and emaSlow are arrays of [time, value] pairs, newest last
-  if (emaFast.length < 2 || emaSlow.length < 2) return null;
-  const [t1, f1] = emaFast[emaFast.length - 2];
-  const [t2, f2] = emaFast[emaFast.length - 1];
-  const [s1] = emaSlow[emaSlow.length - 2];
-  const [s2] = emaSlow[emaSlow.length - 1];
-  const prevAbove = f1 > s1;
-  const nowAbove = f2 > s2;
-  if (!prevAbove && nowAbove) return 'LONG';
-  if (prevAbove && !nowAbove) return 'SHORT';
-  return f2 > s2 ? 'LONG' : 'SHORT';
-}
-
-function scanEMA(closes, fastP, slowP) {
-  if (closes.length < slowP + 2) return null;
-  let emaF = closes.slice(0, fastP).reduce((a, b) => a + b, 0) / fastP;
-  let emaS = closes.slice(0, slowP).reduce((a, b) => a + b, 0) / slowP;
-  const kf = 2 / (fastP + 1), ks = 2 / (slowP + 1);
-  let prevF = null, prevS = null;
-  let crossType = null;
-  for (let i = fastP; i < closes.length; i++) {
-    const newF = closes[i] * kf + emaF * (1 - kf);
-    const newS = closes[i] * ks + emaS * (1 - ks);
-    if (i > fastP) {
-      const wasAbove = emaF > emaS;
-      const isAbove = newF > newS;
-      if (!wasAbove && isAbove) crossType = 'LONG';
-      else if (wasAbove && !isAbove) crossType = 'SHORT';
-    }
-    prevF = emaF; prevS = emaS;
-    emaF = newF; emaS = newS;
-  }
-  const dir = crossType || (emaF > emaS ? 'LONG' : 'SHORT');
-  const res = recentHigh(closes);
-  const sup = recentLow(closes);
-  return { dir, emaF: emaF.toFixed(2), emaS: emaS.toFixed(2), res, sup };
-}
-
-function updateScannerCard(id, dir, emaF, emaS, res, sup, status) {
-  const card = document.getElementById('card-' + ({m1: '1m', m15: '15m'}[id] || id));
-  const dirEl = document.getElementById(id + '-dir');
-  dirEl.textContent = dir;
-  dirEl.className = 'scan-direction ' + (dir === 'LONG' ? 'long' : dir === 'SHORT' ? 'short' : 'neutral');
-  card.className = 'ema-seg ' + (dir === 'LONG' ? 'bullish' : dir === 'SHORT' ? 'bearish' : 'neutral') + (id === 'm1' || id === 'm15' ? ' experimental' : '');
-  document.getElementById(id + '-ema9').textContent = emaF;
-  document.getElementById(id + '-ema21').textContent = emaS;
-  document.getElementById(id + '-res').textContent = res ? '$' + res.toLocaleString('en-US', {maximumFractionDigits: 0}) : '—';
-  document.getElementById(id + '-sup').textContent = sup ? '$' + sup.toLocaleString('en-US', {maximumFractionDigits: 0}) : '—';
-  const stEl = document.getElementById(id + '-status');
-  if (status) {
-    stEl.textContent = status;
-    stEl.className = 'scan-status firing';
-  }
-}
-
-// ─── Load Klines & Run Scanners ──────────────────────────────────────────
+// ─── Load 1H Klines (chart + compression) ─────────────────────────────────
 async function loadAndScan() {
   try {
-    // Fetch all needed intervals in parallel
-    const [r1m, r5m, r15m, r1hAll, r4h, r1d] = await Promise.all([
-      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1m&limit=300`).then(r => r.json()),
-      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=5m&limit=300`).then(r => r.json()),
-      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=15m&limit=300`).then(r => r.json()),
-      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1h&limit=1000`).then(r => r.json()),
-      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=4h&limit=500`).then(r => r.json()),
-      fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1d&limit=500`).then(r => r.json()),
-    ]);
-
-    const r1h = r1hAll.slice(-500);   // chart / intraday use the last 500; compression needs 1000 for the 30-day rank
-    const closes1m = r1m.map(c => parseFloat(c[4]));
-    const closes5m = r5m.map(c => parseFloat(c[4]));
-    const closes15m = r15m.map(c => parseFloat(c[4]));
-    const closes1h = r1h.map(c => parseFloat(c[4]));
-    const closes4h = r4h.map(c => parseFloat(c[4]));
-    const closes1d = r1d.map(c => parseFloat(c[4]));
-
-    // 1m
-    const s1m = scanEMA(closes1m, 9, 21);
-    if (s1m) updateScannerCard('m1', s1m.dir, s1m.emaF, s1m.emaS, s1m.res, s1m.sup, null);
-
-    // 15m
-    const s15m = scanEMA(closes15m, 9, 21);
-    if (s15m) updateScannerCard('m15', s15m.dir, s15m.emaF, s15m.emaS, s15m.res, s15m.sup, null);
-
-    // Intraday (1H)
-    const s1h = scanEMA(closes1h, 9, 21);
-    if (s1h) updateScannerCard('intraday', s1h.dir, s1h.emaF, s1h.emaS, s1h.res, s1h.sup, null);
-
-    // Swing (4H + 1D)
-    const s4h = scanEMA(closes4h, 21, 200);
-    const s1d = scanEMA(closes1d, 21, 200);
-    const swingDir = (s4h && s1d) ? (s4h.dir === 'LONG' && s1d.dir === 'LONG' ? 'LONG' : s4h.dir === 'SHORT' && s1d.dir === 'SHORT' ? 'SHORT' : 'NEUTRAL') : 'NEUTRAL';
-    if (s4h) {
-      document.getElementById('swing-4h-ema21').textContent = s4h.emaF;
-      document.getElementById('swing-4h-ema200').textContent = s4h.emaS;
-    }
-    if (s1d) {
-      document.getElementById('swing-1d-ema21').textContent = s1d.emaF;
-      document.getElementById('swing-1d-ema200').textContent = s1d.emaS;
-    }
-    const swingRes = s4h ? s4h.res : null;
-    const swingSup = s4h ? s4h.sup : null;
-    if (swingRes) document.getElementById('swing-res').textContent = '$' + swingRes.toLocaleString('en-US', {maximumFractionDigits: 0});
-    if (swingSup) document.getElementById('swing-sup').textContent = '$' + swingSup.toLocaleString('en-US', {maximumFractionDigits: 0});
-    const swingDirEl = document.getElementById('swing-dir');
-    swingDirEl.textContent = swingDir;
-    swingDirEl.className = 'scan-direction ' + (swingDir === 'LONG' ? 'long' : swingDir === 'SHORT' ? 'short' : 'neutral');
-    const swingCard = document.getElementById('card-swing');
-    swingCard.className = 'ema-seg ' + (swingDir === 'LONG' ? 'bullish' : swingDir === 'SHORT' ? 'bearish' : 'neutral');
-    if (s4h && s4h.dir === 'LONG') document.getElementById('swing-status').textContent = '↑ 4H EMA Golden Cross';
-    if (s4h && s4h.dir === 'SHORT') document.getElementById('swing-status').textContent = '↓ 4H EMA Death Cross';
+    const r1hAll = await fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1h&limit=1000`).then(r => r.json());
+    const r1h = r1hAll.slice(-500);   // chart uses the last 500; compression needs 1000 for the 30-day rank
 
     // Draw chart
     drawChart(r1h);
@@ -669,15 +489,6 @@ function updateCompression(klines) {
     if (r.open) { add(r.open.stop, '#ff3366', 'Stop', 1); add(r.open.target, '#00ff88', '3R', 1); }
   }
 }
-
-// EMA strip: tap/click a segment to pin its tooltip (phones have no hover); click elsewhere closes it
-document.querySelectorAll('.ema-seg').forEach(seg => seg.addEventListener('click', e => {
-  const was = seg.classList.contains('open');
-  document.querySelectorAll('.ema-seg.open').forEach(x => x.classList.remove('open'));
-  if (!was) seg.classList.add('open');
-  e.stopPropagation();
-}));
-document.addEventListener('click', () => document.querySelectorAll('.ema-seg.open').forEach(x => x.classList.remove('open')));
 
 // ─── Fear & Greed ─────────────────────────────────────────────────────────
 async function loadFG() {
