@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-05T15:27-05:00",
+ "generated": "2026-10-05T16:15-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "scanners": [
@@ -56,28 +56,8 @@
    "oi_chg_pct": 0.071,
    "oi_src": "OKX proxy",
    "risk_pct": 1.56,
-   "bars": 23,
+   "bars": 24,
    "risk": 1335.5,
-   "trail_B": {
-    "status": "be",
-    "stop": 85791.1,
-    "tp1": 86624.7,
-    "tp1_hit": true,
-    "banked": 0.312,
-    "activated_be": true,
-    "sma21_4h": 85243.8,
-    "label": "BE · trail"
-   },
-   "book_b": {
-    "status": "be",
-    "stop": 85791.1,
-    "tp1": 86624.7,
-    "tp1_hit": true,
-    "banked": 0.312,
-    "activated_be": true,
-    "sma21_4h": 85243.8,
-    "label": "BE · trail"
-   },
    "book_a": {
     "label": "3R full",
     "target": 89797.5,
@@ -86,7 +66,17 @@
    }
   },
   "last": null,
-  "trail_last": null,
+  "trail_last": {
+   "side": "long",
+   "result": "tp1_be",
+   "entry": 85791.1,
+   "stop": 85791.1,
+   "exit_price": 86207.9,
+   "r_net": 0.20931638119103446,
+   "paper_id": "compression-2026-10-04T16:00-05:00",
+   "tp1": 86624.7,
+   "label": "book B"
+  },
   "scanner_runs": "hourly at :12 CT",
   "source": "compression_scanner/state.json + signals.csv",
   "books": "A: full 3R · B: half at measured-move TP1 → BE → 4H SMA21 (no 3R on B)"
