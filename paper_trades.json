@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-04T20:56-05:00",
+ "generated": "2026-10-05T14:01-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "scanners": [
@@ -77,11 +77,22 @@
    "bbw_pct": 0.226,
    "oi_chg_pct": 0.071,
    "oi_src": "OKX proxy",
-   "risk_pct": 1.56
+   "risk_pct": 1.56,
+   "bars": 22,
+   "risk": 1335.5,
+   "trail_B": {
+    "status": "watching",
+    "stop": 84455.6,
+    "activated_be": false,
+    "sma21_4h": 85261.5,
+    "label": "box→+1.5R"
+   }
   },
   "last": null,
+  "trail_last": null,
   "scanner_runs": "hourly at :12 CT",
-  "source": "compression_scanner/state.json + signals.csv"
+  "source": "compression_scanner/state.json + signals.csv",
+  "books": "official 3R + quiet trail_B (+1.5R BE → 4H SMA21)"
  },
  "totals": {
   "closed": 0,

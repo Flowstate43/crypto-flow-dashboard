@@ -208,11 +208,11 @@
   </div>
   <div class="card scan-card cmp-card" id="card-compression">
     <div class="cmp-head">
-      <div class="card-title" style="margin:0">Compression Breakout &middot; 1H <span class="cmp-tag">Paper</span></div>
+      <div class="card-title" style="margin:0">Compression Breakout &middot; Mort <span class="cmp-tag">Paper</span></div>
       <div class="cmp-trig" id="cmp-trig"></div>
     </div>
     <div class="scan-direction neutral cmp-dir" id="cmp-dir">CALCULATING</div>
-    <div id="cmp-body"><div class="cmp-sub">Loading 1H history&hellip;</div></div>
+    <div id="cmp-body"><div class="cmp-sub">Loading Mort paper log&hellip;</div></div>
     <details class="cmp-details"><summary>Details</summary>
       <div class="cmp-info" id="cmp-info"></div>
       <div class="scan-status" id="cmp-status"></div>
@@ -305,13 +305,9 @@ function startTicker() { pollPrice(); setInterval(pollPrice, 15000); }
 // ─── Load 1H Klines (chart + compression) ─────────────────────────────────
 async function loadAndScan() {
   try {
-    const r1hAll = await fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1h&limit=1000`).then(r => r.json());
-    const r1h = r1hAll.slice(-500);   // chart uses the last 500; compression needs 1000 for the 30-day rank
-
-    // Draw chart
-    drawChart(r1h);
-    try { updateCompression(r1hAll); } catch (e) { console.error('Compression error:', e); }
-
+    const r1hAll = await fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1h&limit=500`).then(r => r.json());
+    drawChart(r1hAll);                 // chart only — compression card reads Mort paper_trades.json
+    renderMortCompression();           // keep Mort levels / live R in sync with price + paper log
   } catch(err) {
     console.error('Scanner error:', err);
     if (!chart) document.getElementById('chart').innerHTML = '<div class="chart-error">Chart data unavailable: ' + err.message + '</div>';
@@ -337,93 +333,10 @@ function drawChart(klines) {
   if (first) chart.timeScale().fitContent();
 }
 
-// >>> CMP  Compression Breakout (port of Mort's compression_scanner/scanner.py, PAPER)
-// 36-candle box; BB(20,2) width at the last box candle in the lowest 30% of the last 720 candles;
-// box height <= 0.65x the 36 candles before it; 1H close beyond the box -> stop other side -/+ 0.1 ATR,
-// target 3R, expiry 96 candles, one trade at a time. Spot candles (Binance.US), so levels differ a bit from the perp.
-const CMP = { N: 36, BB_N: 20, BB_LOOK: 720, BB_MIN: 500, BB_PCT: 0.30, RATIO: 0.65, BUF: 0.1, TGT_R: 3, MAX_BARS: 96, WALK: 300 };
+// >>> CMP  Compression card — Mort paper_trades.json ONLY (no browser Binance.US scan)
 let cmpLines = [];
 
-function cmpATR(c, n = 14) {
-  const out = new Array(c.length).fill(null); let a = null; const trs = [];
-  for (let i = 1; i < c.length; i++) {
-    const tr = Math.max(c[i].h - c[i].l, Math.abs(c[i].h - c[i - 1].c), Math.abs(c[i].l - c[i - 1].c));
-    if (a === null) { trs.push(tr); if (trs.length === n) a = trs.reduce((x, y) => x + y, 0) / n; }
-    else a = (a * (n - 1) + tr) / n;
-    out[i] = a;
-  }
-  return out;
-}
-function cmpBBW(c, n = CMP.BB_N) {
-  const out = new Array(c.length).fill(null);
-  for (let i = n - 1; i < c.length; i++) {
-    let m = 0; for (let j = i - n + 1; j <= i; j++) m += c[j].c; m /= n;
-    let v = 0; for (let j = i - n + 1; j <= i; j++) v += (c[j].c - m) ** 2;
-    out[i] = 4 * Math.sqrt(v / n) / m;
-  }
-  return out;
-}
-function cmpRank(bbw, i) {   // average-rank percentile of bbw[i] among the last BB_LOOK values ending at i
-  const lo = Math.max(CMP.BB_N - 1, i - CMP.BB_LOOK + 1), cnt = i - lo + 1;
-  if (cnt < CMP.BB_MIN) return null;
-  const x = bbw[i]; let less = 0, eq = 0;
-  for (let j = lo; j <= i; j++) { if (bbw[j] < x) less++; else if (bbw[j] === x) eq++; }
-  return (less + (eq + 1) / 2) / cnt;
-}
-function cmpBox(c, bbw, end) {   // box = the N candles ending at `end`, compared with the N before it
-  const N = CMP.N; if (end - 2 * N + 1 < 0) return null;
-  let hi = -Infinity, lo = Infinity, ph = -Infinity, pl = Infinity;
-  for (let j = end - N + 1; j <= end; j++) { hi = Math.max(hi, c[j].h); lo = Math.min(lo, c[j].l); }
-  for (let j = end - 2 * N + 1; j <= end - N; j++) { ph = Math.max(ph, c[j].h); pl = Math.min(pl, c[j].l); }
-  const ratio = ph > pl ? (hi - lo) / (ph - pl) : Infinity, rank = cmpRank(bbw, end);
-  return { hi, lo, ratio, rank, compressed: rank !== null && rank <= CMP.BB_PCT && ratio <= CMP.RATIO };
-}
-function runCompression(c) {     // c: CLOSED 1H candles {t,o,h,l,c}, oldest first
-  const atr = cmpATR(c), bbw = cmpBBW(c), n = c.length;
-  let open = null, last = null, busy = -1;
-  for (let i = Math.max(2 * CMP.N + CMP.BB_MIN + CMP.BB_N, n - CMP.WALK); i < n; i++) {
-    if (open) {                  // paper tracking: stop checked before target, expiry at the 96th close
-      const s = open.side === 'LONG' ? 1 : -1, k = c[i]; open.bars++;
-      let res = null, R = null;
-      if (s === 1 ? k.l <= open.stop : k.h >= open.stop) { res = 'STOP'; R = -1; }
-      else if (s === 1 ? k.h >= open.target : k.l <= open.target) { res = 'TARGET'; R = CMP.TGT_R; }
-      else if (open.bars >= CMP.MAX_BARS) { res = 'EXPIRED'; R = (k.c - open.entry) * s / open.risk; }
-      if (res) { last = Object.assign({}, open, { res, R, exitT: k.t }); open = null; busy = i; }
-      else {                     // a fresh breakout while a trade is open is skipped (one at a time) but noted
-        const b2 = cmpBox(c, bbw, i - 1);
-        if (b2 && b2.compressed && (c[i].c > b2.hi || c[i].c < b2.lo)) open.skipped = { t: k.t, side: c[i].c > b2.hi ? 'LONG' : 'SHORT', entry: k.c };
-      }
-      continue;
-    }
-    if (i <= busy) continue;
-    const b = cmpBox(c, bbw, i - 1); if (!b || !b.compressed) continue;
-    const s = c[i].c > b.hi ? 1 : c[i].c < b.lo ? -1 : 0; if (!s) continue;
-    const entry = c[i].c, stop = s === 1 ? b.lo - CMP.BUF * atr[i] : b.hi + CMP.BUF * atr[i], risk = (entry - stop) * s;
-    if (!(risk > 0)) continue;
-    open = { side: s === 1 ? 'LONG' : 'SHORT', entry, stop, risk, target: entry + s * CMP.TGT_R * risk, t: c[i].t, bars: 0, box: b };
-  }
-  return { open, last, now: cmpBox(c, bbw, n - 1), atr: atr[n - 1], lastT: n ? c[n - 1].t : null };
-}
-function cmpIndicators(c) {      // info only: RSI(14), slow Stoch %K(14,3), MACD(12,26,9) histogram
-  const cl = c.map(x => x.c), n = cl.length, R = 14;
-  let g = 0, l = 0;
-  for (let i = 1; i < n; i++) {
-    const d = cl[i] - cl[i - 1], up = Math.max(d, 0), dn = Math.max(-d, 0);
-    if (i <= R) { g += up / R; l += dn / R; } else { g = (g * (R - 1) + up) / R; l = (l * (R - 1) + dn) / R; }
-  }
-  const rsi = l ? 100 - 100 / (1 + g / l) : 100;
-  let ks = 0;
-  for (let i = n - 3; i < n; i++) {
-    let hh = -Infinity, ll = Infinity; for (let j = i - 13; j <= i; j++) { hh = Math.max(hh, c[j].h); ll = Math.min(ll, c[j].l); }
-    ks += hh > ll ? 100 * (c[i].c - ll) / (hh - ll) : 50;
-  }
-  const emaArr = (xs, p) => { const k = 2 / (p + 1); let e = null; return xs.map(x => (e = e === null ? x : e + k * (x - e))); };
-  const e12 = emaArr(cl, 12), e26 = emaArr(cl, 26), macd = e12.map((v, i) => v - e26[i]), sig = emaArr(macd, 9);
-  return { rsi, stoch: ks / 3, hist: macd[n - 1] - sig[n - 1] };
-}
-// <<< CMP
-
-function cmpRel(t) {   // candle open time (s) -> 'today 1:00 AM \u00b7 19h ago' / 'yesterday 3:00 PM \u00b7 29h ago'
+function cmpRel(t) {   // unix seconds -> 'today 1:00 AM · 19h ago'
   const d = new Date(t * 1000), now = new Date();
   const day0 = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
   const dd = Math.round((day0(now) - day0(d)) / 86400000);
@@ -431,146 +344,98 @@ function cmpRel(t) {   // candle open time (s) -> 'today 1:00 AM \u00b7 19h ago'
   const day = dd === 0 ? 'today' : dd === 1 ? 'yesterday' : d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
   const mins = Math.max(0, Math.round((now - d) / 60000));
   const ago = mins < 60 ? mins + 'm ago' : mins < 72 * 60 ? Math.round(mins / 60) + 'h ago' : Math.round(mins / 1440) + 'd ago';
-  return day + ' ' + hm + ' \u00b7 ' + ago;
+  return day + ' ' + hm + ' · ' + ago;
 }
 
-function updateCompression(klines) {
-  const nowMs = Date.now();
-  const c = klines.filter(k => k[6] < nowMs).map(k => ({ t: Math.floor(k[0] / 1000), o: +k[1], h: +k[2], l: +k[3], c: +k[4] }));
-  const card = document.getElementById('card-compression'), dirEl = document.getElementById('cmp-dir'), trig = document.getElementById('cmp-trig');
-  const body = document.getElementById('cmp-body'), info = document.getElementById('cmp-info'), st = document.getElementById('cmp-status');
-  if (c.length < 2 * CMP.N + CMP.BB_MIN + CMP.BB_N + 2) { dirEl.textContent = 'NO DATA'; body.innerHTML = '<div class="cmp-sub">Not enough 1H history (' + c.length + ' candles)</div>'; return; }
-  const r = runCompression(c), ind = cmpIndicators(c);
-  const live = klines.length ? +klines[klines.length - 1][4] : c[c.length - 1].c;   // forming candle close
-  const $ = v => '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
-  const pct = v => v === null ? 'n/a' : Math.round(v * 100) + '%';
+function renderMortCompression() {
+  const card = document.getElementById('card-compression');
+  const dirEl = document.getElementById('cmp-dir');
+  const trig = document.getElementById('cmp-trig');
+  const body = document.getElementById('cmp-body');
+  const info = document.getElementById('cmp-info');
+  const st = document.getElementById('cmp-status');
+  const d = paperData;
+  const $ = v => v == null ? '—' : '$' + Math.round(v).toLocaleString('en-US');
   const lv = (label, val, cls) => '<div><label>' + label + '</label><b class="' + (cls || '') + '">' + val + '</b></div>';
-  const need = t => ' <small style="color:var(--text-dim);font-weight:400">' + t + '</small>';
-  let dir = 'NO COMPRESSION', cls = '', dcls = 'neutral', html = '', trigTxt = '', extra = [], box = null;
-  if (r.open) {
-    const o = r.open, s = o.side === 'LONG' ? 1 : -1, curR = (live - o.entry) * s / o.risk;
-    dir = 'ARMED ' + o.side; cls = s === 1 ? 'bullish' : 'bearish'; dcls = s === 1 ? 'long' : 'short'; box = o.box;
-    trigTxt = 'Triggered ' + cmpRel(o.t);
-    html = '<div class="cmp-r ' + (curR >= 0 ? 'pos' : 'neg') + '">' + (curR >= 0 ? '+' : '') + curR.toFixed(2) + 'R<small>now ' + $(live) + '</small></div>' +
-      '<div class="cmp-levels">' + lv('Entry', $(o.entry)) + lv('Stop', $(o.stop), 'neg') + lv('Target 3R', $(o.target), 'pos') + '</div>' +
-      '<div class="cmp-sub">' + o.bars + '/' + CMP.MAX_BARS + ' candles &middot; risk ' + (o.risk / o.entry * 100).toFixed(2) + '% &middot; box ' + $(o.box.lo) + '&ndash;' + $(o.box.hi) + '</div>';
-    if (o.skipped) extra.push('Also fired: ' + o.skipped.side + ' ' + cmpRel(o.skipped.t) + ' @ ' + $(o.skipped.entry) + ' (skipped, trade already open)');
-    extra.push('Box rank ' + pct(o.box.rank) + ' &middot; range ' + o.box.ratio.toFixed(2) + '&times; prior');
-  } else if (r.now && r.now.compressed) {
-    const b = r.now; dir = 'WATCHING'; cls = 'watching'; dcls = 'watching'; box = b;
-    trigTxt = 'Compression forming';
-    html = '<div class="cmp-levels">' + lv('Long above', $(b.hi), 'pos') + lv('Short below', $(b.lo), 'neg') + lv('BB-width rank', pct(b.rank), 'cy') + '</div>' +
-      '<div class="cmp-sub">box height ' + ((b.hi - b.lo) / live * 100).toFixed(2) + '% &middot; range ' + b.ratio.toFixed(2) + '&times; prior &middot; triggers on a 1H close</div>';
-  } else if (r.now) {
-    const b = r.now; trigTxt = 'No setup';
-    html = '<div class="cmp-levels">' + lv('BB-width rank', pct(b.rank) + need('need &le;30%'), b.rank !== null && b.rank <= CMP.BB_PCT ? 'pos' : '') +
-      lv('Range vs prior', b.ratio.toFixed(2) + '&times;' + need('need &le;0.65'), b.ratio <= CMP.RATIO ? 'pos' : '') + lv('Price', $(live)) + '</div>';
+  if (!d || !d.compression) {
+    dirEl.textContent = 'LOADING'; dirEl.className = 'scan-direction cmp-dir neutral';
+    body.innerHTML = '<div class="cmp-sub">Waiting for Mort paper_trades.json…</div>';
+    return;
   }
-  if (r.last && !r.open) {
-    const L = r.last;
-    html += '<div class="cmp-sub">Last: ' + L.side + ' ' + cmpRel(L.t) + ' &rarr; <span class="' + (L.R >= 0 ? 'pos' : 'neg') + '">' + L.res + ' ' + (L.R >= 0 ? '+' : '') + L.R.toFixed(2) + 'R</span></div>';
+  const cmp = d.compression, o = cmp.open, live = (typeof btcPrice === 'number' && btcPrice > 0) ? btcPrice : null;
+  let dir = 'NO OPEN TRADE', cls = '', dcls = 'neutral', html = '', trigTxt = 'Mort paper · quiet', extra = [];
+
+  if (o) {
+    const s = o.side === 'long' || o.side === 'LONG' ? 1 : -1;
+    const risk = o.risk || (o.entry != null && o.stop != null ? Math.abs(o.entry - o.stop) : null);
+    const curR = (live != null && risk) ? (live - o.entry) * s / risk : null;
+    dir = 'ARMED ' + String(o.side).toUpperCase();
+    cls = s === 1 ? 'bullish' : 'bearish';
+    dcls = s === 1 ? 'long' : 'short';
+    const armedSec = o.time ? Date.parse(o.time) / 1000 : null;
+    trigTxt = armedSec ? ('Mort · armed ' + cmpRel(armedSec)) : 'Mort paper';
+    html = (curR == null ? '' : '<div class="cmp-r ' + (curR >= 0 ? 'pos' : 'neg') + '">' + (curR >= 0 ? '+' : '') + curR.toFixed(2) + 'R<small>now ' + $(live) + '</small></div>') +
+      '<div class="cmp-levels">' + lv('Entry', $(o.entry)) + lv('Stop 3R book', $(o.stop), 'neg') + lv('Target 3R', $(o.target), 'pos') + '</div>';
+    const tb = o.trail_B;
+    if (tb) {
+      html += '<div class="cmp-levels" style="margin-top:6px">' +
+        lv('trail_B', tb.label || tb.status || '—', 'cy') +
+        lv('Trail stop', $(tb.stop), 'neg') +
+        lv(tb.activated_be ? 'BE armed' : 'Wait +1.5R', tb.sma21_4h != null ? ('SMA ' + $(tb.sma21_4h)) : '—') +
+        '</div>';
+    }
+    const bars = o.bars != null ? (o.bars + '/' + (o.max_bars || 96) + ' candles') : '';
+    const box = (o.box_low != null && o.box_high != null) ? ('box ' + $(o.box_low) + '–' + $(o.box_high)) : '';
+    html += '<div class="cmp-sub">' + [bars, o.risk_pct != null ? ('risk ' + Number(o.risk_pct).toFixed(2) + '%') : '', box].filter(Boolean).join(' · ') + '</div>';
+    if (o.bbw_pct != null) extra.push('Armed BB-width rank ' + Math.round(o.bbw_pct * 100) + '%' + (o.box_ratio != null ? (' · range ' + Number(o.box_ratio).toFixed(2) + '× prior') : ''));
+    if (o.oi_chg_pct != null) extra.push('OI on arm ' + (o.oi_chg_pct >= 0 ? '+' : '') + Number(o.oi_chg_pct).toFixed(2) + '%' + (o.oi_src ? (' (' + o.oi_src + ')') : ''));
+  } else if (cmp.last) {
+    const L = cmp.last;
+    dir = 'FLAT';
+    trigTxt = 'Last closed';
+    html = '<div class="cmp-sub">Last: ' + (L.side || '') + ' → <span class="' + ((L.r_net || 0) >= 0 ? 'pos' : 'neg') + '">' +
+      (L.result || '') + ' ' + ((L.r_net || 0) >= 0 ? '+' : '') + Number(L.r_net || 0).toFixed(2) + 'R</span></div>';
+  } else {
+    html = '<div class="cmp-sub">No open Mort compression trade. Scanner runs hourly at :12 CT.</div>';
   }
+  if (cmp.trail_last && !o) {
+    const T = cmp.trail_last;
+    html += '<div class="cmp-sub">trail_B last: ' + (T.result || '') + ' ' +
+      ((T.r_net || 0) >= 0 ? '+' : '') + Number(T.r_net || 0).toFixed(2) + 'R</div>';
+  }
+
   dirEl.textContent = dir; dirEl.className = 'scan-direction cmp-dir ' + dcls;
   card.className = 'card scan-card cmp-card' + (cls ? ' ' + cls : '');
   trig.textContent = trigTxt;
   body.innerHTML = html;
-  extra.push('RSI ' + ind.rsi.toFixed(0) + ' &middot; Stoch ' + ind.stoch.toFixed(0) + ' &middot; MACD hist ' + (ind.hist >= 0 ? '+' : '') + ind.hist.toFixed(1) + ' (info only)');
-  extra.push('OI: n/a in browser (OKX OI history blocks cross-site requests); Mort\'s bot requires OI up');
-  extra.push('Rules: 36-candle box, BB-width rank &le;30%, range &le;0.65&times; prior, 1H close beyond the box, stop far side &plusmn;0.1 ATR, 3R target, 96-candle expiry');
+  extra.push('Source: Mort paper_trades.json (same book as Paper Trades) · official 3R + quiet trail_B');
+  extra.push('Rules: box stop / 3R / 96-candle expiry · trail: +1.5R → BE, then under 4H SMA21');
+  if (cmp.scanner_runs) extra.push(cmp.scanner_runs);
   info.innerHTML = extra.join('<br>');
-  st.textContent = 'PAPER \u00b7 Binance.US spot 1H \u00b7 last close ' + new Date((r.lastT + 3600) * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + ' \u00b7 updated ' + new Date().toLocaleTimeString();
-  st.className = 'scan-status' + (r.open ? ' firing' : '');
-  // box (and stop/target when armed) as price lines on the 1H chart
+  st.textContent = 'PAPER · Mort · ' + (d.generated ? ('log ' + d.generated) : 'updated ' + new Date().toLocaleTimeString());
+  st.className = 'scan-status' + (o ? ' firing' : '');
+
+  // Chart lines = Mort levels only
   if (candleSeries) {
     cmpLines.forEach(pl => { try { candleSeries.removePriceLine(pl); } catch (e) {} });
     cmpLines = [];
-    const add = (price, color, title, style) => cmpLines.push(candleSeries.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title }));
-    if (box) { add(box.hi, '#00ffe5', 'Box H', 2); add(box.lo, '#00ffe5', 'Box L', 2); }
-    if (r.open) { add(r.open.stop, '#ff3366', 'Stop', 1); add(r.open.target, '#00ff88', '3R', 1); }
-  }
-}
-
-// ─── Fear & Greed ─────────────────────────────────────────────────────────
-async function loadFG() {
-  try {
-    const r = await fetch(FNG_API);
-    const d = await r.json();
-    const v = parseInt(d.data[0].value);
-    const cls = d.data[0].value_classification;
-    document.getElementById('fg-value').textContent = v;
-    document.getElementById('fg-label').textContent = cls;
-    document.getElementById('fg-label').style.color = v < 30 ? 'var(--red)' : v > 70 ? 'var(--green)' : v < 50 ? 'var(--yellow)' : 'var(--cyan)';
-    document.getElementById('fg-bar').style.width = v + '%';
-    const barColor = v < 20 ? 'var(--red)' : v < 40 ? '#ff6644' : v < 60 ? 'var(--yellow)' : v < 80 ? '#88ff44' : 'var(--green)';
-    document.getElementById('fg-bar').style.background = barColor;
-  } catch(e) {
-    document.getElementById('fg-value').textContent = '—';
-    document.getElementById('fg-label').textContent = 'Unavailable';
-  }
-}
-
-// ─── Liquidation Stats ────────────────────────────────────────────────────
-async function loadLiqStats() {
-  try {
-    const r = await fetch('https://www.okx.com/api/v5/public/liquidation-orders?instType=SWAP&uly=BTC-USDT&state=filled&limit=100');
-    const d = await r.json();
-    const rows = (d.data && d.data[0] && d.data[0].details) || [];
-    if (!rows.length) throw new Error('no data');
-    let longUsd = 0, shortUsd = 0, largest = 0;
-    rows.forEach(x => {
-      const usd = parseFloat(x.sz) * 0.01 * parseFloat(x.bkPx); // 1 contract = 0.01 BTC
-      if (x.posSide === 'long') longUsd += usd; else shortUsd += usd;
-      if (usd > largest) largest = usd;
-    });
-    const fmt = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : '$' + (v / 1e3).toFixed(0) + 'K';
-    const ts = rows.map(x => parseInt(x.ts));
-    const hrs = ((Date.now() - Math.min(...ts)) / 3600000).toFixed(1);
-    document.getElementById('liq-long').textContent = fmt(longUsd);
-    document.getElementById('liq-short').textContent = fmt(shortUsd);
-    document.getElementById('liq-total').textContent = fmt(longUsd + shortUsd);
-    document.getElementById('liq-largest').textContent = fmt(largest);
-    document.getElementById('liq-error').innerHTML = '<div class="liq-stat-label" style="margin-top:8px;text-align:center">Last ' + rows.length + ' BTC liquidations on OKX (~' + hrs + 'h)</div>';
-  } catch(e) {
-    document.getElementById('liq-error').innerHTML = '<div class="error-msg">Liquidation data unavailable right now</div>';
-  }
-}
-
-// ─── Heatmap iframe fallback ──────────────────────────────────────────────
-function checkHeatmap() {
-  const iframe = document.getElementById('heatmap-iframe');
-  iframe.onload = () => {
-    try {
-      const doc = iframe.contentDocument || iframe.contentWindow.document;
-      if (!doc || doc.body.innerText.length < 10) {
-        document.getElementById('heatmap-container').style.display = 'none';
-        document.getElementById('heatmap-error').style.display = 'flex';
-      }
-    } catch(e) {
-      document.getElementById('heatmap-container').style.display = 'none';
-      document.getElementById('heatmap-error').style.display = 'flex';
+    const add = (price, color, title, style) => {
+      if (price == null || !isFinite(price)) return;
+      cmpLines.push(candleSeries.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title }));
+    };
+    if (o) {
+      if (o.box_high != null) add(o.box_high, '#00ffe5', 'Box H', 2);
+      if (o.box_low != null) add(o.box_low, '#00ffe5', 'Box L', 2);
+      add(o.stop, '#ff3366', 'Stop', 1);
+      add(o.target, '#00ff88', '3R', 1);
+      if (o.trail_B && o.trail_B.stop != null && Math.abs(o.trail_B.stop - o.stop) > 0.5)
+        add(o.trail_B.stop, '#ffaa00', 'Trail', 2);
+      add(o.entry, '#8899aa', 'Entry', 2);
     }
-  };
-  setTimeout(() => {
-    const errEl = document.getElementById('heatmap-error');
-    if (errEl && errEl.style.display !== 'flex') {
-      // Check if iframe loaded meaningful content
-    }
-  }, 5000);
-}
-
-// ─── TradingView Widget ───────────────────────────────────────────────────
-function openTV() {
-  const c = document.getElementById('tv-widget-container');
-  if (!c.innerHTML.trim()) {
-    const tz = encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Etc/UTC');
-    c.innerHTML = '<iframe src="https://www.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=60&hidesidetoolbar=0&symboledit=1&savechanges=0&studies=[]&theme=dark&style=1&timezone=' + tz + '&locale=en" width="100%" height="100%" frameborder="0" allowtransparency="true" allowfullscreen="true"></iframe>';
   }
-  document.getElementById('tv-modal').classList.add('open');
 }
-function closeTV() { document.getElementById('tv-modal').classList.remove('open'); }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTV(); });
+// <<< CMP
 
-// ─── Boot ────────────────────────────────────────────────────────────────
 // Paper trades card: Mort's real PAPER log, exported hourly to paper_trades.json by mort/paper_log/publish_dashboard.sh
 let paperData = null;
 async function loadPaper() {
@@ -579,6 +444,7 @@ async function loadPaper() {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     paperData = await r.json();
     renderPaper();
+    renderMortCompression();
   } catch (e) {
     console.warn('Paper trades:', e.message);
     if (!paperData) document.getElementById('pp-body').innerHTML = '<div class="pp-empty" style="margin-top:8px">Paper log unavailable right now</div>';
@@ -606,10 +472,17 @@ function renderPaper() {
   d.open.forEach(o => {
     const s = o.side === 'long' ? 1 : -1, risk = Math.abs(o.entry - o.stop);
     const R = (typeof btcPrice === 'number' && btcPrice > 0 && risk) ? (btcPrice - o.entry) * s / risk : null;
+    const tb = (o.scanner === 'compression' && d.compression && d.compression.open) ? d.compression.open.trail_B : null;
     h += '<div class="pp-open"><b class="' + (s === 1 ? 'pos' : 'neg') + '">' + emo(o.scanner) + ' ' + o.side.toUpperCase() + '</b>' +
       '<span>' + m(o.entry) + '</span><span class="neg">SL ' + m(o.stop) + '</span><span class="pos">TP ' + m(o.target1) + (o.target2 ? ' / ' + m(o.target2) : '') + '</span>' +
       (R === null ? '' : '<b class="' + rc(R) + '">' + sr(R) + '</b>') + (o.tp1_time ? '<small>TP1 hit, stop at BE</small>' : '') +
-      '<small>' + lab(o.scanner) + ' &middot; ' + ts(o.armed_time) + '</small></div>';
+      '<small>' + lab(o.scanner) + ' · 3R book · ' + ts(o.armed_time) + '</small></div>';
+    if (tb) {
+      h += '<div class="pp-open" style="opacity:.85"><b class="cy">trail_B</b>' +
+        '<span class="neg">SL ' + m(tb.stop) + '</span><span>' + (tb.label || tb.status || '') + '</span>' +
+        '<small>' + (tb.activated_be ? 'BE armed' : 'wait +1.5R') +
+        (tb.sma21_4h != null ? (' · SMA21 ' + m(tb.sma21_4h)) : '') + '</small></div>';
+    }
   });
   h += '<div class="pp-sec">Last closed</div>';
   if (!d.closed.length) h += '<div class="pp-empty">No closed trades yet; results land here at stop, target or expiry.</div>';
