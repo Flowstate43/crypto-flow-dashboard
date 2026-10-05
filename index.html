@@ -128,7 +128,7 @@
   .hero-price { grid-area: price; } .cmp-card { grid-area: cmp; } .paper-card { grid-area: paper; }
   .paper-card { padding: 14px 16px; font-family: var(--font-mono); }
   .pp-upd { font-size: 0.55rem; color: #555; }
-  .pp-tbl { display: grid; grid-template-columns: 1fr auto auto auto; column-gap: 14px; row-gap: 3px; margin: 10px 0 8px; font-size: 0.66rem; align-items: baseline; }
+  .pp-tbl { display: grid; grid-template-columns: 1fr auto auto auto auto auto; column-gap: 12px; row-gap: 3px; margin: 10px 0 8px; font-size: 0.66rem; align-items: baseline; }
   .pp-tbl .h { font-size: 0.52rem; color: #555; text-transform: uppercase; letter-spacing: 1px; }
   .pp-tbl .n { text-align: right; color: var(--text); }
   .pp-tbl .dim { color: #555; }
@@ -175,6 +175,19 @@
   .cmp-book .cmp-r { font-size: 1.15rem; margin: 4px 0 6px; }
   .cmp-book .cmp-r small { font-size: 0.58rem; margin-left: 6px; }
   .cmp-book .bk-sub { font-size: 0.58rem; color: var(--text-dim); font-family: var(--font-mono); margin-top: 8px; }
+  .cmp-book .cmp-r .usd { margin-left: 8px; }
+  .bk-acct { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; row-gap: 2px; margin-top: 8px; padding-top: 7px; border-top: 1px solid #1a1a1a; font-family: var(--font-mono); font-size: 0.6rem; }
+  .bk-acct span { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.52rem; align-self: baseline; }
+  .bk-acct b { color: var(--text); font-weight: 600; text-align: right; }
+  .bk-acct b small { color: var(--text-dim); font-weight: 400; font-size: 0.55rem; }
+  .pp-c2 { font-size: 0.55rem; color: #555; padding: 0 0 3px 18px; }
+  .pp-log { margin-top: 8px; border-top: 1px solid #1a1a1a; padding-top: 6px; }
+  .pp-log summary { cursor: pointer; font-size: 0.55rem; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+  .pp-log summary:hover { color: var(--cyan); }
+  .pp-log-row { background: #111; border-radius: 6px; padding: 6px 8px; margin-top: 5px; font-size: 0.6rem; color: var(--text-dim); }
+  .pp-log-row .t { display: flex; justify-content: space-between; gap: 8px; color: var(--text); }
+  .pp-eq { display: flex; justify-content: space-between; gap: 8px; font-size: 0.62rem; color: var(--text-dim); margin: 2px 0 6px; }
+  .pp-eq b { color: var(--text); }
   @media (max-width: 900px) { .cmp-dual { grid-template-columns: 1fr; } }
   .small-row { display: grid; grid-template-columns: 1fr 2fr; gap: 14px; }
   .mini { padding: 12px 14px; }
@@ -353,6 +366,33 @@ function drawChart(klines) {
 
 // >>> CMP  Compression card — Mort paper_trades.json ONLY (no browser Binance.US scan)
 let cmpLines = [];
+// Paper account $ helpers (simulated $1,000 per book, 1% risk, 20x max — see paper_trades.json account)
+const usd = v => v == null || !isFinite(v) ? '—' : (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const sUsd = v => v == null || !isFinite(v) ? '—' : (v >= 0 ? '+$' : '−$') + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const usd0 = v => v == null || !isFinite(v) ? '—' : '$' + Math.round(v).toLocaleString('en-US');
+const sR = v => v == null || !isFinite(v) ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + 'R';
+const pn = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+// open position live P&L: qty x (live - entry) x side on the still-open fraction
+function livePos(p, side, entry, live) {
+  if (!p || live == null || !entry) return null;
+  const s = String(side).toLowerCase() === 'long' ? 1 : -1, frac = p.open_frac == null ? 1 : p.open_frac;
+  const u = frac * p.qty * (live - entry) * s;
+  return { u: u, r: p.risk_usd ? u / p.risk_usd : null, banked: p.banked_usd || 0, frac: frac };
+}
+function acctBook(key) { const a = paperData && paperData.account; return a ? (a.books || []).find(b => b.key === key) || null : null; }
+function acctRows(p, opts) {   // compact labeled $ grid for a book card
+  const row = (k, v) => '<span>' + k + '</span><b>' + v + '</b>';
+  let h = '<div class="bk-acct">';
+  if (opts.unrl !== undefined) h += row('Unrealized', opts.unrl);
+  if (opts.real !== undefined) h += row('Realized', opts.real);
+  if (p) {
+    h += row('Money in', usd(p.margin) + ' margin <small>· ' + usd0(p.notional) + ' notional</small>');
+    h += row('Size', Number(p.qty).toFixed(5) + ' BTC <small>· ' + Number(p.lev).toFixed(2) + 'x of ' + (p.max_lev || 20) + 'x' + (p.capped ? ' · capped' : '') + '</small>');
+    h += row('Risk', usd(p.risk_usd) + ' <small>(' + Number(p.risk_pct).toFixed(1) + '% · stop ' + Number(p.stop_pct).toFixed(2) + '%)</small>');
+  }
+  if (opts.eq !== undefined) h += row('Equity', opts.eq);
+  return h + '</div>';
+}
 
 function cmpRel(t) {   // unix seconds -> 'today 1:00 AM · 19h ago'
   const d = new Date(t * 1000), now = new Date();
@@ -407,32 +447,62 @@ function renderMortCompression() {
     // Book B: before half = full MTM; after half = banked + 0.5*leg
     const banked = b ? Number(b.banked || 0) : 0;
     const bHalf = !!(b && b.tp1_hit);
-    const bR = legR == null ? null : (bHalf ? banked + 0.5 * legR : legR);
+    const bR = (b && b.status === 'closed') ? Number(b.r_net || 0) : (legR == null ? null : (bHalf ? banked + 0.5 * legR : legR));
 
     const bars = o.bars != null ? (o.bars + '/' + (o.max_bars || 96)) : '';
+    const pa = o.book_a && o.book_a.notional != null ? o.book_a : null;
+    const eqA = acctBook('A'), eqB = acctBook('B');
     html += '<div class="cmp-dual">';
     // --- Book A ---
+    const la = livePos(pa, o.side, o.entry, live);
     html += '<div class="cmp-book book-a">' +
       '<div class="bk-title"><b>Book A</b><span class="tag a">3R full</span></div>' +
-      (aR == null ? '' : '<div class="cmp-r ' + (aR >= 0 ? 'pos' : 'neg') + '">' + (aR >= 0 ? '+' : '') + aR.toFixed(2) + 'R<small>full size</small></div>') +
+      (aR == null ? '' : '<div class="cmp-r ' + pn(aR) + '">' + sR(aR) + (la ? '<span class="usd">' + sUsd(la.u) + '</span>' : '') + '<small>open · full size</small></div>') +
       '<div class="cmp-levels">' + lv('Target 3R', $(aTgt), 'pos') + lv('Stop', $(o.stop), 'neg') + '</div>' +
+      (pa ? acctRows(pa, {
+        unrl: la ? '<span class="' + pn(la.u) + '">' + sUsd(la.u) + ' · ' + sR(la.r) + '</span> <small>before ' + usd(pa.cost_usd) + ' costs</small>' : '—',
+        real: usd(0) + ' <small>· nothing banked</small>',
+        eq: eqA ? usd(eqA.equity) + (la ? ' <small>· live ' + usd(eqA.equity + la.u) + '</small>' : '') : '—' }) : '') +
       '<div class="bk-sub">Full size to 3R · box stop · dead at 96 bars</div></div>';
     // --- Book B ---
     const bStop = b && b.stop != null ? b.stop : o.stop;
     const bTp1 = b && b.tp1 != null ? b.tp1 : null;
     const bLabel = b ? (b.label || b.status || 'box→TP1') : 'box→TP1 mm';
-    html += '<div class="cmp-book book-b">' +
-      '<div class="bk-title"><b>Book B</b><span class="tag">measured move</span></div>' +
-      (bR == null ? '' : '<div class="cmp-r ' + (bR >= 0 ? 'pos' : 'neg') + '">' + (bR >= 0 ? '+' : '') + bR.toFixed(2) + 'R<small>' +
-        (bHalf ? ('half · banked ' + (banked >= 0 ? '+' : '') + banked.toFixed(2) + 'R') : 'await TP1 half') + '</small></div>') +
-      '<div class="cmp-levels">' + lv('TP1 (half)', $(bTp1), 'pos') + lv(bHalf ? 'BE / trail' : 'Stop', $(bStop), 'neg') + '</div>' +
-      '<div class="bk-sub">' + bLabel +
-        (b && b.sma21_4h != null ? (' · SMA21 ' + $(b.sma21_4h)) : '') +
-        ' · no 3R cap on B</div></div>';
+    const bClosed = !!(b && b.status === 'closed');
+    const pb = b && b.notional != null ? b : null;
+    const RES = { tp1_be: 'TP1 + BE', trail_stop: 'TP1 + trail stop', tp1_exp: 'TP1 + expiry', stop: 'stopped', expired: 'expired', target: 'target' };
+    if (bClosed) {
+      const rn = Number(b.r_net || 0);
+      html += '<div class="cmp-book book-b">' +
+        '<div class="bk-title"><b>Book B</b><span class="tag">closed · ' + (RES[b.result] || b.result || '') + '</span></div>' +
+        '<div class="cmp-r ' + pn(rn) + '">' + sR(rn) + (pb && pb.pnl_usd != null ? '<span class="usd">' + sUsd(pb.pnl_usd) + '</span>' : '') + '<small>realized · net</small></div>' +
+        '<div class="cmp-levels">' + lv('TP1 (half)', $(bTp1), 'pos') + lv('Avg exit', $(b.exit_price)) + '</div>' +
+        (pb ? acctRows(pb, {
+          unrl: usd(0) + ' · 0.00R <small>· flat</small>',
+          real: '<span class="' + pn(pb.pnl_usd) + '">' + sUsd(pb.pnl_usd) + ' · ' + sR(rn) + '</span> <small>(' + sUsd(pb.gross_usd) + ' − ' + usd(pb.cost_usd) + ' costs)</small>',
+          eq: eqB ? usd(eqB.equity) : usd(pb.equity_after) }) : '') +
+        '<div class="bk-sub">Half off at TP1' + (b.tp1_time ? ' ' + cmpRel(Date.parse(b.tp1_time) / 1000).split(' · ')[0] : '') +
+          ' · runner out' + (b.exit_time ? ' ' + cmpRel(Date.parse(b.exit_time) / 1000).split(' · ')[0] : '') + '</div></div>';
+    } else {
+      const lb = livePos(pb, o.side, o.entry, live);
+      const bUsd = lb ? lb.banked + lb.u : null;
+      html += '<div class="cmp-book book-b">' +
+        '<div class="bk-title"><b>Book B</b><span class="tag">measured move</span></div>' +
+        (bR == null ? '' : '<div class="cmp-r ' + pn(bR) + '">' + sR(bR) + (bUsd != null ? '<span class="usd">' + sUsd(bUsd) + '</span>' : '') + '<small>' +
+          (bHalf ? ('half · banked ' + sR(banked)) : 'await TP1 half') + '</small></div>') +
+        '<div class="cmp-levels">' + lv('TP1 (half)', $(bTp1), 'pos') + lv(bHalf ? 'BE / trail' : 'Stop', $(bStop), 'neg') + '</div>' +
+        (pb ? acctRows(pb, {
+          unrl: lb ? '<span class="' + pn(lb.u) + '">' + sUsd(lb.u) + ' · ' + sR(lb.r) + '</span>' + (bHalf ? ' <small>half open</small>' : '') : '—',
+          real: bHalf ? '<span class="pos">' + sUsd(pb.banked_usd) + ' · ' + sR(banked) + '</span> <small>half at TP1, costs at close</small>' : usd(0),
+          eq: eqB ? usd(eqB.equity) + (lb ? ' <small>· live ' + usd(eqB.equity + lb.banked + lb.u) + '</small>' : '') : '—' }) : '') +
+        '<div class="bk-sub">' + bLabel +
+          (b && b.sma21_4h != null ? (' · SMA21 ' + $(b.sma21_4h)) : '') +
+          ' · no 3R cap on B</div></div>';
+    }
     html += '</div>';
 
     const box = (o.box_low != null && o.box_high != null) ? ('box ' + $(o.box_low) + '–' + $(o.box_high)) : '';
-    html += '<div class="cmp-sub">' + [bars ? (bars + ' candles') : '', o.risk_pct != null ? ('risk ' + Number(o.risk_pct).toFixed(2) + '%') : '', box].filter(Boolean).join(' · ') + '</div>';
+    html += '<div class="cmp-sub">' + [bars ? (bars + ' candles') : '', o.risk_pct != null ? ('stop ' + Number(o.risk_pct).toFixed(2) + '% away') : '', box].filter(Boolean).join(' · ') + '</div>';
     if (o.bbw_pct != null) extra.push('Armed BB-width rank ' + Math.round(o.bbw_pct * 100) + '%' + (o.box_ratio != null ? (' · range ' + Number(o.box_ratio).toFixed(2) + '× prior') : ''));
     if (o.oi_chg_pct != null) extra.push('OI on arm ' + (o.oi_chg_pct >= 0 ? '+' : '') + Number(o.oi_chg_pct).toFixed(2) + '%' + (o.oi_src ? (' (' + o.oi_src + ')') : ''));
   } else if (cmp.last) {
@@ -447,7 +517,7 @@ function renderMortCompression() {
         ((T.r_net || 0) >= 0 ? '+' : '') + Number(T.r_net || 0).toFixed(2) + 'R</div>';
     }
   } else {
-    html = '<div class="cmp-sub">No open Mort compression trade. Scanner runs hourly at :12 CT.</div>';
+    html = '<div class="cmp-sub">No open Mort compression trade. Scanner checks every 15 min (:01/:16/:31/:46 CT).</div>';
   }
 
   dirEl.textContent = dir; dirEl.className = 'scan-direction cmp-dir ' + dcls;
@@ -455,6 +525,7 @@ function renderMortCompression() {
   trig.textContent = trigTxt;
   body.innerHTML = html;
   extra.push('Source: Mort paper_trades.json · dual books on same entry/stop');
+  if (d.account) extra.push('Paper $: each book starts ' + usd0(d.account.start) + ' · ' + d.account.sizing);
   extra.push(cmp.books || 'A: full 3R · B: half at measured-move TP1 → BE → 4H SMA21');
   if (cmp.scanner_runs) extra.push(cmp.scanner_runs);
   info.innerHTML = extra.join('<br>');
@@ -476,7 +547,7 @@ function renderMortCompression() {
       add(o.stop, '#ff3366', 'Stop', 1);
       const aTgt = (o.book_a && o.book_a.target != null) ? o.book_a.target : o.target;
       add(aTgt, '#00ff88', '3R', 1);
-      const b = o.book_b || o.trail_B;
+      const b0 = o.book_b || o.trail_B, b = b0 && b0.status !== 'closed' ? b0 : null;
       if (b && b.tp1 != null) add(b.tp1, '#00ffe5', 'TP1', 2);
       if (b && b.stop != null && Math.abs(b.stop - o.stop) > 0.5) add(b.stop, '#ffaa00', 'B stop', 2);
       if (b && b.sma21_4h != null) add(b.sma21_4h, '#ffaa00', 'SMA21', 2);
@@ -588,43 +659,80 @@ function renderPaper() {
   const emo = k => (d.scanners.find(x => x.key === k) || {}).emoji || '';
   const lab = k => (d.scanners.find(x => x.key === k) || {}).label || k;
   const ts = iso => cmpRel(Date.parse(iso) / 1000);
-  let h = '<div class="pp-tbl"><span class="h">Scanner</span><span class="h n">Trades</span><span class="h n">Win</span><span class="h n">Net R</span>';
-  d.scanners.forEach(x => {
-    const dim = x.paused && !x.closed && !x.open;
-    h += '<span class="' + (dim ? 'dim' : '') + '">' + x.emoji + ' ' + x.label + (x.paused ? ' <small class="dim">paused</small>' : '') + '</span>' +
-      '<span class="n' + (dim ? ' dim' : '') + '">' + x.closed + (x.open ? ' <small class="cy">+' + x.open + ' open</small>' : '') + '</span>' +
-      '<span class="n' + (x.closed ? '' : ' dim') + '">' + (x.closed ? Math.round(x.win_rate) + '%' : '&mdash;') + '</span>' +
-      '<span class="n ' + (x.closed ? rc(x.total_r) : 'dim') + '">' + (x.closed ? sr(x.total_r) : '&mdash;') + '</span>';
-  });
-  h += '</div>';
+  const live = (typeof btcPrice === 'number' && btcPrice > 0) ? btcPrice : null;
+  const cmpo = d.compression && d.compression.open;
+  let h = '';
+  if (d.account && d.account.books) {
+    const ico = { swing: emo('swing'), A: emo('compression'), B: emo('compression') };
+    const nm = { swing: 'Swing', A: 'Comp A · 3R', B: 'Comp B · MM' };
+    let liveTot = 0;
+    h += '<div class="pp-tbl"><span class="h">Book</span><span class="h n">Trades</span><span class="h n">Win</span><span class="h n">Net R</span><span class="h n">Net $</span><span class="h n">Equity</span>';
+    d.account.books.forEach(x => {
+      let u = 0;
+      if (x.open) {
+        const ref = x.key === 'swing' ? (d.open.find(o => o.scanner === 'swing') || null) : cmpo;
+        const lp = ref ? livePos(x.open, ref.side, ref.entry, live) : null;
+        if (lp) u = lp.banked + lp.u;
+      }
+      liveTot += x.equity + u;
+      h += '<span>' + ico[x.key] + ' ' + (nm[x.key] || x.label) + '</span>' +
+        '<span class="n">' + x.closed + (x.open ? ' <small class="cy">+1 open</small>' : '') + '</span>' +
+        '<span class="n' + (x.closed ? '' : ' dim') + '">' + (x.closed ? Math.round(x.win_rate) + '%' : '&mdash;') + '</span>' +
+        '<span class="n ' + (x.closed ? rc(x.total_r) : 'dim') + '">' + (x.closed ? sr(x.total_r) : '&mdash;') + '</span>' +
+        '<span class="n ' + (x.closed ? rc(x.realized_usd) : 'dim') + '">' + (x.closed ? sUsd(x.realized_usd) : '&mdash;') + '</span>' +
+        '<span class="n">' + usd(x.equity) + '</span>';
+    });
+    h += '</div>';
+    h += '<div class="pp-eq"><span>Paper equity (3 × ' + usd0(d.account.start) + ', realized)</span><b>' + usd(d.account.equity_total) + '</b></div>';
+    if (live) h += '<div class="pp-eq"><span>Incl. open P&amp;L at ' + usd0(live) + '</span><b class="' + rc(liveTot - d.account.equity_total) + '">' + usd(liveTot) + '</b></div>';
+  } else {
+    h += '<div class="pp-tbl"><span class="h">Scanner</span><span class="h n">Trades</span><span class="h n">Win</span><span class="h n">Net R</span><span></span><span></span>';
+    d.scanners.forEach(x => {
+      h += '<span>' + x.emoji + ' ' + x.label + '</span><span class="n">' + x.closed + '</span>' +
+        '<span class="n">' + (x.closed ? Math.round(x.win_rate) + '%' : '&mdash;') + '</span>' +
+        '<span class="n ' + (x.closed ? rc(x.total_r) : 'dim') + '">' + (x.closed ? sr(x.total_r) : '&mdash;') + '</span><span></span><span></span>';
+    });
+    h += '</div>';
+  }
   h += '<div class="pp-sec">Open</div>';
   if (!d.open.length) h += '<div class="pp-empty">No open paper trades</div>';
   d.open.forEach(o => {
     const s = o.side === 'long' ? 1 : -1, risk = Math.abs(o.entry - o.stop);
     const cmpo = (o.scanner === 'compression' && d.compression && d.compression.open) ? d.compression.open : null;
+    const inTxt = p => p && p.notional != null ? usd(p.margin) + ' margin · ' + usd0(p.notional) + ' notional · ' + Number(p.lev).toFixed(2) + 'x' : '';
     const legR = (typeof btcPrice === 'number' && btcPrice > 0 && risk) ? (btcPrice - o.entry) * s / risk : null;
     const b = cmpo ? (cmpo.book_b || cmpo.trail_B) : null;
     const aTgt = cmpo && cmpo.book_a && cmpo.book_a.target != null ? cmpo.book_a.target : o.target1;
     const banked = b ? Number(b.banked || 0) : 0;
     const half = !!(b && b.tp1_hit);
     const aR = legR;
-    const bR = legR == null ? null : (half ? banked + 0.5 * legR : legR);
+    const bClosed = !!(b && b.status === 'closed');
+    const bR = bClosed ? Number(b.r_net || 0) : (legR == null ? null : (half ? banked + 0.5 * legR : legR));
     if (o.scanner === 'compression' && cmpo) {
+      const pa = cmpo.book_a, la = livePos(pa && pa.notional != null ? pa : null, o.side, o.entry, live);
+      const lb = !bClosed && b && b.notional != null ? livePos(b, o.side, o.entry, live) : null;
       h += '<div class="pp-open"><b class="' + (s === 1 ? 'pos' : 'neg') + '">' + emo(o.scanner) + ' ' + o.side.toUpperCase() + '</b>' +
         '<span>' + m(o.entry) + '</span><span class="neg">SL ' + m(o.stop) + '</span>' +
         '<small>shared entry/stop · ' + ts(o.armed_time) + '</small></div>';
       h += '<div class="pp-open" style="opacity:.95"><b class="pos">A · 3R</b><span class="pos">TP ' + m(aTgt) + '</span>' +
-        (aR == null ? '' : '<b class="' + rc(aR) + '">' + sr(aR) + '</b>') +
-        '<small>full size</small></div>';
-      h += '<div class="pp-open" style="opacity:.95"><b class="cy">B · MM</b><span class="pos">TP1 ' + m(b && b.tp1) + '</span><span class="neg">SL ' + m(b && b.stop != null ? b.stop : o.stop) + '</span>' +
-        (bR == null ? '' : '<b class="' + rc(bR) + '">' + sr(bR) + '</b>') +
-        '<small>' + (half ? ('half · banked ' + sr(banked)) : 'await TP1') +
-        (b && b.sma21_4h != null ? (' · SMA ' + m(b.sma21_4h)) : '') + '</small></div>';
+        (aR == null ? '' : '<b class="' + rc(aR) + '">' + sr(aR) + '</b>') + (la ? '<b class="' + rc(la.u) + '">' + sUsd(la.u) + '</b>' : '') +
+        '<small>open · ' + inTxt(pa) + '</small></div>';
+      if (bClosed) {
+        h += '<div class="pp-open" style="opacity:.95"><b class="cy">B · MM</b><span>closed ' + String(b.result || '').replace('_', ' ') + '</span>' +
+          '<b class="' + rc(bR) + '">' + sr(bR) + '</b>' + (b.pnl_usd != null ? '<b class="' + rc(b.pnl_usd) + '">' + sUsd(b.pnl_usd) + '</b>' : '') +
+          '<small>realized · ' + inTxt(b) + '</small></div>';
+      } else {
+        h += '<div class="pp-open" style="opacity:.95"><b class="cy">B · MM</b><span class="pos">TP1 ' + m(b && b.tp1) + '</span><span class="neg">SL ' + m(b && b.stop != null ? b.stop : o.stop) + '</span>' +
+          (bR == null ? '' : '<b class="' + rc(bR) + '">' + sr(bR) + '</b>') + (lb ? '<b class="' + rc(lb.banked + lb.u) + '">' + sUsd(lb.banked + lb.u) + '</b>' : '') +
+          '<small>' + (half ? ('half · banked ' + sr(banked) + ' ' + sUsd(b.banked_usd)) : 'await TP1') +
+          (b && b.sma21_4h != null ? (' · SMA ' + m(b.sma21_4h)) : '') + (b && b.notional != null ? ' · ' + inTxt(b) : '') + '</small></div>';
+      }
     } else {
       h += '<div class="pp-open"><b class="' + (s === 1 ? 'pos' : 'neg') + '">' + emo(o.scanner) + ' ' + o.side.toUpperCase() + '</b>' +
         '<span>' + m(o.entry) + '</span><span class="neg">SL ' + m(o.stop) + '</span><span class="pos">TP ' + m(o.target1) + (o.target2 ? ' / ' + m(o.target2) : '') + '</span>' +
         (legR === null ? '' : '<b class="' + rc(legR) + '">' + sr(legR) + '</b>') +
-        (o.tp1_time ? '<small>TP1 hit, stop at BE</small>' : '') +
+        (function () { const lp = o.notional != null ? livePos(o, o.side, o.entry, live) : null; return lp ? '<b class="' + rc(lp.banked + lp.u) + '">' + sUsd(lp.banked + lp.u) + '</b>' : ''; })() +
+        (o.tp1_time ? '<small>TP1 hit, stop at BE</small>' : '') + (o.notional != null ? '<small>' + inTxt(o) + '</small>' : '') +
         '<small>' + lab(o.scanner) + ' · ' + ts(o.armed_time) + '</small></div>';
     }
   });
@@ -632,10 +740,24 @@ function renderPaper() {
   if (!d.closed.length) h += '<div class="pp-empty">No closed trades yet; results land here at stop, target or expiry.</div>';
   d.closed.slice(0, 5).forEach(c => {
     const ic = /^tp|target/.test(c.result) ? (c.result === 'tp1_exp' ? '\u23f3' : '\u2705') : c.result === 'stop' ? '\ud83d\uded1' : '\u23f3';
-    h += '<div class="pp-c"><span>' + ic + ' ' + emo(c.scanner) + ' ' + c.side.toUpperCase() + ' &middot; ' + c.result.replace('_', ' ') + ' &middot; ' + ts(c.exit_time).split(' \u00b7 ')[0] + '</span>' +
-      '<b class="' + rc(c.r_net) + '">' + sr(c.r_net) + '</b></div>';
+    h += '<div class="pp-c"><span>' + ic + ' ' + emo(c.scanner) + (c.book_label ? ' ' + c.book_label : '') + ' ' + c.side.toUpperCase() + ' &middot; ' + c.result.replace('_', ' ') + ' &middot; ' + (c.exit_time ? ts(c.exit_time).split(' \u00b7 ')[0] : '') + '</span>' +
+      '<span><b class="' + rc(c.r_net) + '">' + sr(c.r_net) + '</b>' + (c.pnl_usd != null ? ' <b class="' + rc(c.pnl_usd) + '">' + sUsd(c.pnl_usd) + '</b>' : '') + '</span></div>';
+    if (c.notional != null) h += '<div class="pp-c2">in ' + usd(c.margin) + ' margin · ' + usd0(c.notional) + ' notional (' + Number(c.lev).toFixed(2) + 'x) · risk ' + usd(c.risk_usd) + ' · equity after ' + usd(c.equity_after) + '</div>';
   });
-  if (d.totals && d.totals.closed) h += '<div class="pp-c" style="border-top:1px solid #1a1a1a;margin-top:4px;padding-top:4px"><span>All scanners &middot; ' + d.totals.closed + ' trades</span><b class="' + rc(d.totals.total_r) + '">' + sr(d.totals.total_r) + '</b></div>';
+  if (!d.account && d.totals && d.totals.closed) h += '<div class="pp-c" style="border-top:1px solid #1a1a1a;margin-top:4px;padding-top:4px"><span>All scanners &middot; ' + d.totals.closed + ' trades</span><b class="' + rc(d.totals.total_r) + '">' + sr(d.totals.total_r) + '</b></div>';
+  // Trade log: every closed paper trade (all books), collapsed by default; remembers open/closed across refreshes
+  const tl = d.trade_log || d.closed || [];
+  h += '<details class="pp-log" id="pp-log"' + (window.ppLogOpen ? ' open' : '') + ' ontoggle="window.ppLogOpen=this.open"><summary>Trade log &middot; ' + tl.length + ' closed</summary>';
+  if (!tl.length) h += '<div class="pp-empty" style="margin-top:5px">No closed trades yet.</div>';
+  const dt = iso => iso ? new Date(Date.parse(iso)).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
+  tl.forEach(c => {
+    h += '<div class="pp-log-row"><div class="t"><span>' + emo(c.scanner) + ' ' + (c.book_label || lab(c.scanner)) + ' &middot; ' + String(c.side).toUpperCase() + ' &middot; ' + String(c.result || '').replace('_', ' ') + '</span>' +
+      '<span><b class="' + rc(c.r_net) + '">' + sr(c.r_net) + '</b> <b class="' + rc(c.pnl_usd) + '">' + sUsd(c.pnl_usd) + '</b></span></div>' +
+      '<div>Entry ' + m(c.entry) + ' &rarr; exit ' + m(c.exit_price) + ' &middot; SL ' + m(c.stop) + '</div>' +
+      '<div>In ' + usd(c.margin) + ' margin &middot; ' + usd0(c.notional) + ' notional (' + Number(c.lev).toFixed(2) + 'x) &middot; risk ' + usd(c.risk_usd) + ' &middot; costs ' + usd(c.cost_usd) + '</div>' +
+      '<div>' + dt(c.armed_time) + ' &rarr; ' + dt(c.exit_time) + ' &middot; equity after ' + usd(c.equity_after) + '</div></div>';
+  });
+  h += '</details>';
   document.getElementById('pp-body').innerHTML = h;
   document.getElementById('pp-upd').textContent = d.generated ? 'log ' + ts(d.generated).split(' \u00b7 ')[1] : '';
 }
