@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-05T15:07-05:00",
+ "generated": "2026-10-05T15:27-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "scanners": [
@@ -59,24 +59,24 @@
    "bars": 23,
    "risk": 1335.5,
    "trail_B": {
-    "status": "watching",
-    "stop": 84455.6,
+    "status": "be",
+    "stop": 85791.1,
     "tp1": 86624.7,
-    "tp1_hit": false,
-    "banked": 0.0,
-    "activated_be": false,
+    "tp1_hit": true,
+    "banked": 0.312,
+    "activated_be": true,
     "sma21_4h": 85243.8,
-    "label": "box→TP1 mm"
+    "label": "BE · trail"
    },
    "book_b": {
-    "status": "watching",
-    "stop": 84455.6,
+    "status": "be",
+    "stop": 85791.1,
     "tp1": 86624.7,
-    "tp1_hit": false,
-    "banked": 0.0,
-    "activated_be": false,
+    "tp1_hit": true,
+    "banked": 0.312,
+    "activated_be": true,
     "sma21_4h": 85243.8,
-    "label": "box→TP1 mm"
+    "label": "BE · trail"
    },
    "book_a": {
     "label": "3R full",
