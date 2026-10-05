@@ -216,7 +216,7 @@
   }
 
 
-  /* ===== Agent selector (Mort / Trend / All) ===== */
+  /* ===== Agent selector (Mort / Swing / Trend / All) ===== */
   .agent-nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .agent-nav button {
     font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase;
@@ -227,7 +227,9 @@
   .agent-nav button.active { color: var(--cyan); border-color: rgba(0,255,229,0.55); background: rgba(0,255,229,0.06); }
   .agent-view { display: none; }
   .agent-view.active { display: block; }
-  .overview-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .overview-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .swing-lines { font-family: var(--font-mono); font-size: 0.66rem; color: var(--text); line-height: 1.75; margin-top: 8px; }
+  .swing-lines div { white-space: normal; }
   .ov-card .ov-name { font-family: var(--font-header); font-size: 0.7rem; letter-spacing: 1.5px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 10px; }
   .ov-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .ov-grid > div { background: #111; border-radius: 6px; padding: 9px 11px; }
@@ -259,16 +261,17 @@
 <div class="header">
   <div class="logo">Flow<span>BOT</span></div>
   <div class="agent-nav" id="agent-nav" role="tablist" aria-label="Agent">
-    <button type="button" data-agent="mort" class="active" role="tab" aria-selected="true">Mort · compression + swing</button>
+    <button type="button" data-agent="mort" class="active" role="tab" aria-selected="true">Mort · compression</button>
+    <button type="button" data-agent="swing" role="tab" aria-selected="false">Swing 🌊</button>
     <button type="button" data-agent="trend" role="tab" aria-selected="false">Trend 📈</button>
-    <button type="button" data-agent="all" role="tab" aria-selected="false">All agents</button>
+    <button type="button" data-agent="all" role="tab" aria-selected="false">All</button>
   </div>
   <div class="updated-at" id="updated-at"></div>
 </div>
 
 <div class="wrap">
 <!-- Hero: price + compression breakout -->
-<!-- Agent views: Mort (default) / Trend / All -->
+<!-- Agent views: Mort (default) / Swing / Trend / All -->
 <div id="view-mort" class="agent-view active" data-agent="mort">
 <div class="hero">
   <div class="card hero-price">
@@ -292,6 +295,32 @@
   <div class="card paper-card" id="card-paper">
     <div class="cmp-head"><div class="card-title" style="margin:0">Paper Trades &middot; Mort</div><div class="pp-upd" id="pp-upd"></div></div>
     <div id="pp-body"><div class="pp-empty" style="margin-top:8px">Loading paper log&hellip;</div></div>
+  </div>
+</div>
+</div>
+
+<div id="view-swing" class="agent-view" data-agent="swing">
+<div class="trend-hero">
+  <div class="card hero-price">
+    <div class="card-title" style="margin-bottom:0">BTC / USD</div>
+    <div class="btc-price" id="btc-price-swing">&mdash;</div>
+    <div class="btc-change up" id="btc-change-swing">&mdash;</div>
+    <div class="hero-src">CoinGecko &middot; refreshes every 15s</div>
+  </div>
+  <div class="card scan-card cmp-card trend-status-card" id="card-swing-status">
+    <div class="cmp-head">
+      <div class="card-title" style="margin:0">Swing 4H/1D &middot; Swing <span class="cmp-tag">Paper</span><span class="trend-status-pill" id="swing-status-pill">&mdash;</span></div>
+      <div class="cmp-trig" id="swing-trig"></div>
+    </div>
+    <div class="scan-direction neutral cmp-dir" id="swing-dir">CALCULATING</div>
+    <div id="swing-body"><div class="cmp-sub">Loading Swing paper log&hellip;</div></div>
+    <details class="cmp-details"><summary>Details</summary>
+      <div class="cmp-info" id="swing-info"></div>
+    </details>
+  </div>
+  <div class="card paper-card trend-paper-card" id="card-swing-paper">
+    <div class="cmp-head"><div class="card-title" style="margin:0">Paper Trades &middot; Swing</div><div class="pp-upd" id="swing-pp-upd"></div></div>
+    <div id="swing-pp-body"><div class="pp-empty" style="margin-top:8px">Loading paper log&hellip;</div></div>
   </div>
 </div>
 </div>
@@ -325,13 +354,22 @@
 <div id="view-all" class="agent-view" data-agent="all">
   <div class="overview-row" id="overview-row">
     <div class="card ov-card" id="ov-mort">
-      <div class="ov-name">Mort · compression + swing</div>
+      <div class="ov-name">Mort · compression A/B</div>
       <div class="ov-grid">
         <div><label>Equity</label><b id="ov-mort-eq">&mdash;</b></div>
         <div><label>Net R</label><b id="ov-mort-r">&mdash;</b></div>
         <div><label>Net $</label><b id="ov-mort-usd">&mdash;</b></div>
       </div>
       <div class="ov-status" id="ov-mort-st">Loading&hellip;</div>
+    </div>
+    <div class="card ov-card" id="ov-swing">
+      <div class="ov-name">Swing 🌊 · 4H sweep / 1D bias</div>
+      <div class="ov-grid">
+        <div><label>Equity</label><b id="ov-swing-eq">&mdash;</b></div>
+        <div><label>Net R</label><b id="ov-swing-r">&mdash;</b></div>
+        <div><label>Net $</label><b id="ov-swing-usd">&mdash;</b></div>
+      </div>
+      <div class="ov-status" id="ov-swing-st">Loading&hellip;</div>
     </div>
     <div class="card ov-card" id="ov-trend">
       <div class="ov-name">Trend 📈 · trend-following</div>
@@ -736,13 +774,32 @@ async function loadPaper() {
     paperData = await r.json();
     renderPaper();
     renderMortCompression();
+    renderSwing();
+    if (currentAgent === 'all') renderOverview();
   } catch (e) {
     console.warn('Paper trades:', e.message);
-    if (!paperData) document.getElementById('pp-body').innerHTML = '<div class="pp-empty" style="margin-top:8px">Paper log unavailable right now</div>';
+    if (!paperData) ['pp-body', 'swing-pp-body'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = '<div class="pp-empty" style="margin-top:8px">Paper log unavailable right now</div>'; });
   }
 }
-function renderPaper() {
-  const d = paperData; if (!d) return;
+// One paper.json feeds two agent tabs: Mort = compression books A/B, Swing = swing book.
+const PAPER_SCOPES = {
+  mort: { books: ['A', 'B'], scanners: ['compression'], body: 'pp-body', upd: 'pp-upd', log: 'ppLogOpen', logId: 'pp-log' },
+  swing: { books: ['swing'], scanners: ['swing'], body: 'swing-pp-body', upd: 'swing-pp-upd', log: 'swingLogOpen', logId: 'swing-pp-log' },
+};
+function scopedPaper(key) {
+  const d0 = paperData; if (!d0) return null;
+  const sc = PAPER_SCOPES[key] || PAPER_SCOPES.mort;
+  const inSc = r => sc.scanners.includes(r.scanner);
+  const books = ((d0.account && d0.account.books) || []).filter(b => sc.books.includes(b.key));
+  const tl = (d0.trade_log || d0.closed || []).filter(inSc);
+  return Object.assign({}, d0, {
+    open: (d0.open || []).filter(inSc), closed: tl.slice(0, 10), trade_log: tl,
+    account: d0.account ? Object.assign({}, d0.account, { books, equity_total: Math.round(books.reduce((s, b) => s + (Number(b.equity) || 0), 0) * 100) / 100 }) : null,
+  });
+}
+function renderPaper(scopeKey) {
+  const sc = PAPER_SCOPES[scopeKey] || PAPER_SCOPES.mort;
+  const d = scopedPaper(scopeKey); if (!d) return;
   const m = v => v == null ? '&mdash;' : Math.round(v).toLocaleString('en-US');
   const sr = v => (v >= 0 ? '+' : '') + v.toFixed(2) + 'R';
   const rc = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
@@ -773,7 +830,7 @@ function renderPaper() {
         '<span class="n">' + usd(x.equity) + '</span>';
     });
     h += '</div>';
-    h += '<div class="pp-eq"><span>Paper equity (3 × ' + usd0(d.account.start) + ', realized)</span><b>' + usd(d.account.equity_total) + '</b></div>';
+    h += '<div class="pp-eq"><span>Paper equity (' + (d.account.books.length > 1 ? d.account.books.length + ' × ' : '') + usd0(d.account.start) + ', realized)</span><b>' + usd(d.account.equity_total) + '</b></div>';
     if (live) h += '<div class="pp-eq"><span>Incl. open P&amp;L at ' + usd0(live) + '</span><b class="' + rc(liveTot - d.account.equity_total) + '">' + usd(liveTot) + '</b></div>';
   } else {
     h += '<div class="pp-tbl"><span class="h">Scanner</span><span class="h n">Trades</span><span class="h n">Win</span><span class="h n">Net R</span><span></span><span></span>';
@@ -837,7 +894,7 @@ function renderPaper() {
   if (!d.account && d.totals && d.totals.closed) h += '<div class="pp-c" style="border-top:1px solid #1a1a1a;margin-top:4px;padding-top:4px"><span>All scanners &middot; ' + d.totals.closed + ' trades</span><b class="' + rc(d.totals.total_r) + '">' + sr(d.totals.total_r) + '</b></div>';
   // Trade log: every closed paper trade (all books), collapsed by default; remembers open/closed across refreshes
   const tl = d.trade_log || d.closed || [];
-  h += '<details class="pp-log" id="pp-log"' + (window.ppLogOpen ? ' open' : '') + ' ontoggle="window.ppLogOpen=this.open"><summary>Trade log &middot; ' + tl.length + ' closed</summary>';
+  h += '<details class="pp-log" id="' + sc.logId + '"' + (window[sc.log] ? ' open' : '') + ' ontoggle="window.' + sc.log + '=this.open"><summary>Trade log &middot; ' + tl.length + ' closed</summary>';
   if (!tl.length) h += '<div class="pp-empty" style="margin-top:5px">No closed trades yet.</div>';
   const dt = iso => iso ? new Date(Date.parse(iso)).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
   tl.forEach(c => {
@@ -848,17 +905,64 @@ function renderPaper() {
       '<div>' + dt(c.armed_time) + ' &rarr; ' + dt(c.exit_time) + ' &middot; equity after ' + usd(c.equity_after) + '</div></div>';
   });
   h += '</details>';
-  document.getElementById('pp-body').innerHTML = h;
-  document.getElementById('pp-upd').textContent = d.generated ? 'log ' + ts(d.generated).split(' \u00b7 ')[1] : '';
+  const bodyEl = document.getElementById(sc.body), updEl = document.getElementById(sc.upd);
+  if (bodyEl) bodyEl.innerHTML = h;
+  if (updEl) updEl.textContent = d.generated ? 'log ' + ts(d.generated).split(' \u00b7 ')[1] : '';
 }
 
-// ─── Agent selector (Mort / Trend / All) ───────────────────────────────────
+// ─── Swing tab (Swing agent; data = swing book + "swing" section of paper_trades.json) ───
+function renderSwing() {
+  const d = scopedPaper('swing');
+  const dirEl = document.getElementById('swing-dir');
+  const pill = document.getElementById('swing-status-pill');
+  const trig = document.getElementById('swing-trig');
+  const body = document.getElementById('swing-body');
+  const info = document.getElementById('swing-info');
+  if (!d) { if (dirEl) { dirEl.textContent = 'LOADING'; dirEl.className = 'scan-direction cmp-dir neutral'; } return; }
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const usdF = v => v == null ? '—' : '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const sr = v => (v >= 0 ? '+' : '') + Number(v).toFixed(2) + 'R';
+  const rc = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+  const sw = d.swing || {};
+  const status = String(sw.status || 'idle').toLowerCase();
+  const side = String(sw.side || '').toLowerCase();
+  const o = (d.open || [])[0] || null;
+  if (pill) {
+    pill.textContent = status;
+    const col = status === 'armed' ? 'var(--green)' : status === 'building' || status === 'sweep' ? 'var(--yellow)' : 'var(--text-dim)';
+    pill.style.color = col; pill.style.borderColor = 'rgba(0,255,229,0.35)';
+  }
+  if (dirEl) {
+    if (o) { dirEl.textContent = String(o.side).toUpperCase() + ' OPEN'; dirEl.className = 'scan-direction cmp-dir ' + (o.side === 'long' ? 'long' : 'short'); }
+    else {
+      dirEl.textContent = status.toUpperCase() + (side && status !== 'no setup' ? ' · ' + side.toUpperCase() : '');
+      dirEl.className = 'scan-direction cmp-dir ' + (status === 'armed' ? (side === 'short' ? 'short' : 'long') : status === 'building' ? 'neutral' : 'watching');
+    }
+  }
+  if (trig) trig.textContent = sw.close_time ? '4H close ' + cmpRel(Date.parse(sw.close_time) / 1000) : '';
+  const book = (d.account && d.account.books && d.account.books[0]) || null;
+  let html = '<div class="cmp-shared">' +
+    '<div><label>Equity</label><b>' + usdF(book ? book.equity : null) + '</b></div>' +
+    '<div><label>Net R</label><b class="' + (book && book.closed ? rc(book.total_r) : '') + '">' + (book && book.closed ? sr(book.total_r) : '—') + '</b></div>' +
+    '<div><label>Net $</label><b class="' + (book && book.closed ? rc(book.realized_usd) : '') + '">' + (book && book.closed ? sUsd(book.realized_usd) : '—') + '</b></div>' +
+    '</div>';
+  const lines = (sw.body || []).slice(1);
+  if (lines.length) html += '<div class="swing-lines">' + lines.map(l => '<div>' + esc(l) + '</div>').join('') + '</div>';
+  else html += '<div class="cmp-sub">No swing card yet.</div>';
+  if (body) body.innerHTML = html;
+  if (info) info.innerHTML = (sw.rules ? esc(sw.rules) + '<br>' : '') + (sw.scanner_runs ? esc(sw.scanner_runs) + '<br>' : '') +
+    'Book ' + usdF(d.account && d.account.start) + ' · risk ' + (d.account ? d.account.risk_pct : 1) + '% · cap ' + (d.account ? d.account.max_lev : 20) + 'x · ' + esc(d.costs || '') +
+    (sw.updated ? '<br>last check ' + esc(cmpRel(Date.parse(sw.updated) / 1000)) : '');
+  renderPaper('swing');
+}
+
+// ─── Agent selector (Mort / Swing / Trend / All) ───────────────────────────────────
 const AGENT_LS_KEY = 'flowbot_agent';
 let trendData = null;
 let currentAgent = 'mort';
 
 function setAgent(id) {
-  if (!['mort', 'trend', 'all'].includes(id)) id = 'mort';
+  if (!['mort', 'swing', 'trend', 'all'].includes(id)) id = 'mort';
   currentAgent = id;
   try { localStorage.setItem(AGENT_LS_KEY, id); } catch (e) {}
   document.querySelectorAll('.agent-view').forEach(el => {
@@ -871,6 +975,7 @@ function setAgent(id) {
   });
   // Sync BTC price mirrors when switching
   syncTrendPrice();
+  if (id === 'swing') { renderSwing(); }
   if (id === 'trend') { renderTrend(); }
   if (id === 'all') { renderOverview(); }
 }
@@ -882,6 +987,9 @@ function syncTrendPrice() {
   const ct = document.getElementById('btc-change-trend');
   if (p && pt) pt.textContent = p.textContent;
   if (c && ct) { ct.textContent = c.textContent; ct.className = c.className; }
+  const ps = document.getElementById('btc-price-swing'), cs = document.getElementById('btc-change-swing');
+  if (p && ps) ps.textContent = p.textContent;
+  if (c && cs) { cs.textContent = c.textContent; cs.className = c.className; }
 }
 
 function initAgentNav() {
@@ -994,7 +1102,7 @@ function renderOverview() {
   const rcCls = (el, v) => { if (!el) return; el.className = v > 0 ? 'pos' : v < 0 ? 'neg' : ''; };
 
   // Mort
-  const md = paperData;
+  const md = scopedPaper('mort');
   if (md && md.account) {
     const books = md.account.books || [];
     const eq = md.account.equity_total;
@@ -1010,6 +1118,19 @@ function renderOverview() {
     if (uEl) { uEl.textContent = closed ? usd(netUsd) : '—'; rcCls(uEl, netUsd); }
     const st = document.getElementById('ov-mort-st');
     if (st) st.textContent = closed + ' closed · ' + openN + ' open · paper';
+  }
+  // Swing
+  const sd = scopedPaper('swing');
+  if (sd && sd.account) {
+    const b = (sd.account.books || [])[0] || {};
+    const eqEl = document.getElementById('ov-swing-eq');
+    const rEl = document.getElementById('ov-swing-r');
+    const uEl = document.getElementById('ov-swing-usd');
+    if (eqEl) eqEl.textContent = usd(sd.account.equity_total);
+    if (rEl) { rEl.textContent = b.closed ? sr(b.total_r) : '—'; rcCls(rEl, b.total_r || 0); }
+    if (uEl) { uEl.textContent = b.closed ? usd(b.realized_usd) : '—'; rcCls(uEl, b.realized_usd || 0); }
+    const st = document.getElementById('ov-swing-st');
+    if (st) st.textContent = (b.closed || 0) + ' closed · ' + (sd.open || []).length + ' open · ' + ((sd.swing && sd.swing.status) || 'paper') + ' · paper';
   }
   // Trend
   const td = trendData;
@@ -1047,7 +1168,7 @@ initAgentNav();
 // Refresh scanners every 60s
 setInterval(() => { loadAndScan(); }, 60000);
 setInterval(() => { loadPaper(); loadTrendPaper(); }, 60000);
-setInterval(() => { renderPaper(); renderMortCompression(); if (currentAgent === 'trend') renderTrend(); if (currentAgent === 'all') renderOverview(); }, 15000);
+setInterval(() => { renderPaper(); renderMortCompression(); if (currentAgent === 'swing') renderSwing(); if (currentAgent === 'trend') renderTrend(); if (currentAgent === 'all') renderOverview(); }, 15000);
 setInterval(() => { loadFG(); }, 120000);
 setInterval(() => { loadLiqStats(); }, 120000);
 </script>

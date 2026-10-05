@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-05T18:05-05:00",
+ "generated": "2026-10-05T18:48-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -248,6 +248,27 @@
   "scanner_runs": "checks :01/:16/:31/:46 CT (entries on closed 1H only; fills intrabar); publish every 5 min",
   "source": "compression_scanner/state.json + signals.csv",
   "books": "A: full 3R · B: half at measured-move TP1 → BE → 4H SMA21 (no 3R on B)"
+ },
+ "swing": {
+  "status": "no setup",
+  "side": "long",
+  "body": [
+   "⚪ NO SETUP",
+   "🕯 4H close 3:00 PM CT",
+   "💰 Price 85,691.2 · 📏 4H ATR 787.8",
+   "🧭 1D Bias 🟢 Long",
+   "🎯 Liquidity 84,476.9 (4H swing low, 1.54 ATR away)",
+   "🧱 Order Block 84,710.6 – 84,794.7",
+   "📊 Filters: OI ➖ flat · Volume ❌ · Funding ✅ -0.0015%",
+   "💬 Why: nearest 4H liquidity 84476.9 is 1.54 ATR away (building <= 1.0); OI 4H change +0.02%"
+  ],
+  "close_time": "2026-10-05T15:00-05:00",
+  "updated": "2026-10-05T15:05-05:00",
+  "armed_pending": false,
+  "agent": "swing",
+  "scanner_runs": "card 5 past 9/10/11 AM+PM CT; quiet check :01/:16/:31/:46 (intrabar fills)",
+  "rules": "4H sweep + reclaim of untaken swing low/high, 1D bias, next-4H confirmation; TP1 >= 2R, TP2 daily swing",
+  "source": "swing/swing_scanner/state.json"
  },
  "totals": {
   "closed": 0,
