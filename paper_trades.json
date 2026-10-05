@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-05T16:15-05:00",
+ "generated": "2026-10-05T16:20-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "scanners": [
@@ -77,7 +77,7 @@
    "tp1": 86624.7,
    "label": "book B"
   },
-  "scanner_runs": "hourly at :12 CT",
+  "scanner_runs": "catch-up :01 CT; publish every 5 min",
   "source": "compression_scanner/state.json + signals.csv",
   "books": "A: full 3R · B: half at measured-move TP1 → BE → 4H SMA21 (no 3R on B)"
  },
