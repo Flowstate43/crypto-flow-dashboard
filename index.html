@@ -390,7 +390,7 @@
     <div class="fg-scale"><span class="fg-extreme-fear">Fear</span><span>Neutral</span><span class="fg-extreme-greed">Greed</span></div>
   </div>
   <div class="card mini">
-    <div class="card-title">Recent Liquidations</div>
+    <div class="card-title">Liquidations · 4h avg</div>
     <div class="liq-stats">
       <div class="liq-stat"><div class="liq-stat-label">Long Liqs</div><div class="liq-stat-val green" id="liq-long">&mdash;</div></div>
       <div class="liq-stat"><div class="liq-stat-label">Short Liqs</div><div class="liq-stat-val red" id="liq-short">&mdash;</div></div>
@@ -421,7 +421,7 @@
 </div>
 
 <div class="footer">
-  Data from <span>CoinGecko</span> · <span>Binance.US</span> · <span>Alternative.me</span> · <span>OKX</span> · <span>CoinGlass</span> · <span>TradingView</span> &nbsp;|&nbsp; Experimental signals only — not financial advice &nbsp;|&nbsp; FlowBOT
+  Data from <span>CoinGecko</span> · <span>Binance.US</span> · <span>Alternative.me</span> · <span>OKX</span> · <span>Bitget</span> · <span>Gate</span> · <span>CoinGlass</span> · <span>TradingView</span> &nbsp;|&nbsp; Experimental signals only — not financial advice &nbsp;|&nbsp; FlowBOT
 </div>
 
 <script>
@@ -701,30 +701,108 @@ async function loadFG() {
   }
 }
 
-// ─── Liquidation Stats ────────────────────────────────────────────────────
-async function loadLiqStats() {
-  try {
-    const r = await fetch('https://www.okx.com/api/v5/public/liquidation-orders?instType=SWAP&uly=BTC-USDT&state=filled&limit=100');
-    const d = await r.json();
-    const rows = (d.data && d.data[0] && d.data[0].details) || [];
-    if (!rows.length) throw new Error('no data');
-    let longUsd = 0, shortUsd = 0, largest = 0;
-    rows.forEach(x => {
-      const usd = parseFloat(x.sz) * 0.01 * parseFloat(x.bkPx); // 1 contract = 0.01 BTC
-      if (x.posSide === 'long') longUsd += usd; else shortUsd += usd;
-      if (usd > largest) largest = usd;
+// ─── Liquidation Stats ──────────────────────────────────────────────────────
+// 4h BTC perp liquidations, averaged across the largest venues with a public US feed.
+// Binance and Bybit futures are geo-blocked from the US, so they are not included.
+const LIQ_WINDOW_MS = 4 * 60 * 60 * 1000;
+
+function fmtLiqUsd(v) {
+  if (v >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return '$' + (v / 1e3).toFixed(1) + 'K';
+  return '$' + Math.round(v).toLocaleString('en');
+}
+
+function bucketLiqs(events) {
+  const cutoff = Date.now() - LIQ_WINDOW_MS;
+  let longUsd = 0, shortUsd = 0, largest = 0, n = 0;
+  events.forEach(e => {
+    if (!e || e.ts < cutoff || !isFinite(e.usd) || e.usd <= 0) return;
+    n++;
+    if (e.side === 'long') longUsd += e.usd; else shortUsd += e.usd;
+    if (e.usd > largest) largest = e.usd;
+  });
+  return { longUsd, shortUsd, total: longUsd + shortUsd, largest, n };
+}
+
+async function fetchOkxLiqs() {
+  const r = await fetch('https://www.okx.com/api/v5/public/liquidation-orders?instType=SWAP&uly=BTC-USDT&state=filled&limit=100');
+  if (!r.ok) throw new Error('okx ' + r.status);
+  const d = await r.json();
+  const rows = (d.data && d.data[0] && d.data[0].details) || [];
+  return rows.map(x => ({
+    ts: parseInt(x.ts, 10),
+    usd: Math.abs(parseFloat(x.sz) * 0.01 * parseFloat(x.bkPx)), // 1 contract = 0.01 BTC
+    side: x.posSide === 'long' ? 'long' : 'short',
+  }));
+}
+
+async function fetchBitgetLiqs() {
+  const r = await fetch('https://api.bitget.com/api/v3/market/liquidations?category=USDT-FUTURES&symbol=BTCUSDT&limit=100');
+  if (!r.ok) throw new Error('bitget ' + r.status);
+  const d = await r.json();
+  const rows = (d.data && d.data.list) || [];
+  return rows.map(x => ({
+    ts: parseInt(x.ts, 10),
+    usd: Math.abs(parseFloat(x.amount) * parseFloat(x.price)), // amount is BTC
+    side: String(x.side).toLowerCase() === 'sell' ? 'long' : 'short', // sell closes a long
+  }));
+}
+
+async function fetchGateLiqs() {
+  const nowSec = Math.floor(Date.now() / 1000);
+  const batches = await Promise.all([0, 1, 2, 3].map(async i => {
+    const to = nowSec - i * 3600;
+    const from = to - 3600;
+    const r = await fetch('https://api.gateio.ws/api/v4/futures/usdt/liq_orders?contract=BTC_USDT&limit=100&from=' + from + '&to=' + to);
+    if (!r.ok) throw new Error('gate ' + r.status);
+    const rows = await r.json();
+    if (!Array.isArray(rows)) throw new Error('gate');
+    return rows;
+  }));
+  const seen = new Set();
+  const out = [];
+  batches.flat().forEach(x => {
+    const key = x.time + '|' + x.size + '|' + x.fill_price;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({
+      ts: parseInt(x.time, 10) * 1000,
+      usd: Math.abs(parseFloat(x.size) * 0.0001 * parseFloat(x.fill_price)), // quanto 0.0001 BTC
+      side: parseFloat(x.order_size) < 0 ? 'long' : 'short', // negative order is a sell
     });
-    const fmt = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : '$' + (v / 1e3).toFixed(0) + 'K';
-    const ts = rows.map(x => parseInt(x.ts));
-    const hrs = ((Date.now() - Math.min(...ts)) / 3600000).toFixed(1);
-    document.getElementById('liq-long').textContent = fmt(longUsd);
-    document.getElementById('liq-short').textContent = fmt(shortUsd);
-    document.getElementById('liq-total').textContent = fmt(longUsd + shortUsd);
-    document.getElementById('liq-largest').textContent = fmt(largest);
-    document.getElementById('liq-error').innerHTML = '<div class="liq-stat-label" style="margin-top:8px;text-align:center">Last ' + rows.length + ' BTC liquidations on OKX (~' + hrs + 'h)</div>';
-  } catch(e) {
+  });
+  return out;
+}
+
+async function loadLiqStats() {
+  const sources = [
+    ['OKX', fetchOkxLiqs],
+    ['Bitget', fetchBitgetLiqs],
+    ['Gate', fetchGateLiqs],
+  ];
+  const settled = await Promise.allSettled(sources.map(async ([name, fn]) => {
+    const b = bucketLiqs(await fn());
+    if (!b.n) throw new Error(name + ' empty');
+    return Object.assign({ name }, b);
+  }));
+  const ok = [];
+  const missed = [];
+  settled.forEach((s, i) => {
+    if (s.status === 'fulfilled') ok.push(s.value);
+    else missed.push(sources[i][0]);
+  });
+  if (!ok.length) {
     document.getElementById('liq-error').innerHTML = '<div class="error-msg">Liquidation data unavailable right now</div>';
+    return;
   }
+  const avg = k => ok.reduce((sum, x) => sum + x[k], 0) / ok.length;
+  document.getElementById('liq-long').textContent = fmtLiqUsd(avg('longUsd'));
+  document.getElementById('liq-short').textContent = fmtLiqUsd(avg('shortUsd'));
+  document.getElementById('liq-total').textContent = fmtLiqUsd(avg('total'));
+  document.getElementById('liq-largest').textContent = fmtLiqUsd(avg('largest'));
+  let note = '4h average across ' + ok.map(x => x.name).join(', ');
+  if (missed.length) note += ' · no data: ' + missed.join(', ');
+  document.getElementById('liq-error').innerHTML = '<div class="liq-stat-label" style="margin-top:8px;text-align:center">' + note + '</div>';
 }
 
 // ─── Heatmap iframe fallback ──────────────────────────────────────────────
