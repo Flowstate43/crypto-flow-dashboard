@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FlowBOT — BTC</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
 <style>
   :root {
     --bg: #050505;
@@ -86,6 +86,8 @@
 
   /* Chart */
   #chart { width: 100%; height: 300px; border-radius: 6px; overflow: hidden; }
+  .ma-legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 8px; font-size: 0.68rem; letter-spacing: 0.04em; color: var(--text-dim); }
+  .ma-legend b { font-weight: 600; }
   .chart-loading { height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 0.8rem; }
   .chart-error { height: 300px; display: flex; align-items: center; justify-content: center; color: var(--red); font-size: 0.75rem; text-align: center; padding: 20px; }
 
@@ -404,6 +406,13 @@
 <!-- Chart + heatmap link -->
 <div class="card chart-card">
   <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">BTC/USDT &mdash; 1H Chart <button class="tv-btn" onclick="openTV()">&#128200; TradingView</button></div>
+  <div class="ma-legend">
+    <span><b style="color:#ffffff">SMA 21</b></span>
+    <span><b style="color:#f5d90a">SMA 50</b></span>
+    <span><b style="color:#ff9f1a">EMA 50</b></span>
+    <span><b style="color:#ff3355">EMA 200</b></span>
+    <span><b style="color:#2746b0">EMA 312</b></span>
+  </div>
   <div id="chart"><div class="chart-loading">Loading chart...</div></div>
   <div class="heatmap-row" id="heatmap-error">
     <span class="card-title">Liquidation Heatmap</span>
@@ -447,32 +456,160 @@ function showPrice(price, pct) {
   document.getElementById('updated-at').textContent = new Date().toLocaleTimeString();
 }
 
-// Live price from CoinGecko (plain HTTPS polling, no WebSocket needed)
+// Live price: Binance.US first, CoinGecko if that fails. History is 1H klines.
 const COINGECKO_PRICE = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true';
+const COINGECKO_OHLC = 'https://api.coingecko.com/api/v3/coins/bitcoin/ohlc?vs_currency=usd&days=30';
 async function pollPrice() {
+  try {
+    const r = await fetch(BINANCE_REST + '/ticker/24hr?symbol=BTCUSDT');
+    if (r.ok) {
+      const d = await r.json();
+      const price = parseFloat(d.lastPrice);
+      const pct = parseFloat(d.priceChangePercent);
+      if (price > 0) { showPrice(price, isFinite(pct) ? pct : 0); updateLiveCandle(price); return; }
+    }
+  } catch (e) { /* fall through */ }
   try {
     const r = await fetch(COINGECKO_PRICE);
     if (!r.ok) return;
     const d = await r.json();
-    if (d.bitcoin && d.bitcoin.usd) showPrice(d.bitcoin.usd, d.bitcoin.usd_24h_change || 0);
+    if (d.bitcoin && d.bitcoin.usd) {
+      showPrice(d.bitcoin.usd, d.bitcoin.usd_24h_change || 0);
+      updateLiveCandle(d.bitcoin.usd);
+    }
   } catch (e) { /* keep last price */ }
 }
 function startTicker() { pollPrice(); setInterval(pollPrice, 15000); }
 
-// ─── Load 1H Klines (chart + compression) ─────────────────────────────────
+// ─── Load 1H Klines (chart) ───────────────────────────────────────────────
+async function fetchKlines() {
+  try {
+    const r = await fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1h&limit=1000`);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const rows = await r.json();
+    if (!Array.isArray(rows) || rows.length < 50 || !Array.isArray(rows[0])) throw new Error('bad klines');
+    return rows;
+  } catch (err) {
+    console.warn('Binance.US klines failed, CoinGecko fallback', err);
+    const r = await fetch(COINGECKO_OHLC);
+    if (!r.ok) throw new Error('Chart data unavailable');
+    const rows = await r.json();
+    if (!Array.isArray(rows) || !rows.length || !Array.isArray(rows[0])) throw new Error('Chart data unavailable');
+    return rows.map(c => [c[0], c[1], c[2], c[3], c[4]]);
+  }
+}
 async function loadAndScan() {
   try {
-    const r1hAll = await fetch(`${BINANCE_REST}/klines?symbol=BTCUSDT&interval=1h&limit=500`).then(r => r.json());
-    drawChart(r1hAll);                 // chart only — compression card reads Mort paper_trades.json
-    renderMortCompression();           // keep Mort levels / live R in sync with price + paper log
+    const rows = await fetchKlines();
+    drawChart(rows);
+    renderMortCompression();
   } catch(err) {
     console.error('Scanner error:', err);
     if (!chart) document.getElementById('chart').innerHTML = '<div class="chart-error">Chart data unavailable: ' + err.message + '</div>';
   }
 }
 
-// ─── Chart ────────────────────────────────────────────────────────────────
+// ─── Chart (TradingView Lightweight Charts, not the embed widget) ─────────
 const chartH = () => (window.innerWidth <= 768 ? 300 : 420);
+let candleData = [];
+let maSeries = null;
+let boxPrimitive = null;
+let cmpLines = [];
+
+function smaSeries(data, n) {
+  const out = [];
+  let sum = 0;
+  for (let i = 0; i < data.length; i++) {
+    sum += data[i].close;
+    if (i >= n) sum -= data[i - n].close;
+    if (i >= n - 1) out.push({ time: data[i].time, value: sum / n });
+  }
+  return out;
+}
+function emaSeries(data, n) {
+  const out = [];
+  const k = 2 / (n + 1);
+  let prev = null;
+  let sum = 0;
+  for (let i = 0; i < data.length; i++) {
+    const c = data[i].close;
+    if (prev == null) {
+      sum += c;
+      if (i === n - 1) { prev = sum / n; out.push({ time: data[i].time, value: prev }); }
+      continue;
+    }
+    prev = c * k + prev * (1 - k);
+    out.push({ time: data[i].time, value: prev });
+  }
+  return out;
+}
+function barStep() {
+  if (candleData.length < 2) return 3600;
+  const step = candleData[candleData.length - 1].time - candleData[candleData.length - 2].time;
+  return step > 0 ? step : 3600;
+}
+function setMaData() {
+  if (!maSeries || candleData.length < 21) return;
+  maSeries.sma21.setData(smaSeries(candleData, 21));
+  maSeries.sma50.setData(smaSeries(candleData, 50));
+  maSeries.ema50.setData(emaSeries(candleData, 50));
+  maSeries.ema200.setData(emaSeries(candleData, 200));
+  maSeries.ema312.setData(emaSeries(candleData, 312));
+}
+
+class CompressionBoxPrimitive {
+  constructor() {
+    this._box = null;
+    this._chart = null;
+    this._series = null;
+    this._requestUpdate = null;
+    const self = this;
+    this._view = {
+      zOrder: () => 'bottom',
+      renderer: () => ({ draw: target => self.draw(target) }),
+    };
+  }
+  setBox(box) {
+    this._box = box;
+    if (this._requestUpdate) this._requestUpdate();
+  }
+  attached(param) {
+    this._chart = param.chart;
+    this._series = param.series;
+    this._requestUpdate = param.requestUpdate;
+  }
+  detached() {
+    this._chart = null;
+    this._series = null;
+    this._requestUpdate = null;
+  }
+  updateAllViews() {}
+  paneViews() { return [this._view]; }
+  draw(target) {
+    const box = this._box;
+    if (!box || !this._chart || !this._series) return;
+    const x1 = this._chart.timeScale().timeToCoordinate(box.start);
+    const x2 = this._chart.timeScale().timeToCoordinate(box.end);
+    const yHi = this._series.priceToCoordinate(box.high);
+    const yLo = this._series.priceToCoordinate(box.low);
+    if (x1 == null || x2 == null || yHi == null || yLo == null) return;
+    target.useBitmapCoordinateSpace(scope => {
+      const ctx = scope.context;
+      const hr = scope.horizontalPixelRatio;
+      const vr = scope.verticalPixelRatio;
+      const left = Math.round(Math.min(x1, x2) * hr);
+      const right = Math.round(Math.max(x1, x2) * hr);
+      const top = Math.round(Math.min(yHi, yLo) * vr);
+      const bot = Math.round(Math.max(yHi, yLo) * vr);
+      ctx.fillStyle = 'rgba(0, 255, 229, 0.30)';
+      ctx.fillRect(left, top, Math.max(1, right - left), Math.max(1, bot - top));
+      ctx.strokeStyle = 'rgba(0, 255, 229, 0.9)';
+      ctx.lineWidth = Math.max(1, hr);
+      ctx.strokeRect(left + 0.5, top + 0.5, Math.max(1, right - left - 1), Math.max(1, bot - top - 1));
+    });
+  }
+}
+
 function drawChart(klines) {
   const container = document.getElementById('chart');
   const first = !chart;
@@ -483,15 +620,99 @@ function drawChart(klines) {
       localization: { timeFormatter: t => localTime(t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) },
       layout: { background: { color: '#0d0d0d' }, textColor: '#888' }, grid: { vertLines: { color: '#1a1a1a' }, horzLines: { color: '#1a1a1a' } }, crosshair: { mode: 0 }, rightPriceScale: { borderColor: '#1a1a1a' }, timeScale: { borderColor: '#1a1a1a', timeVisible: true, tickMarkFormatter: (t, type) => type < 3 ? localTime(t).toLocaleDateString([], { month: 'short', day: 'numeric' }) : localTime(t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) } });
     candleSeries = chart.addCandlestickSeries({ upColor: '#00ff88', downColor: '#ff3366', borderVisible: false, wickUpColor: '#00ff88', wickDownColor: '#ff3366' });
+    const line = (color, width) => chart.addLineSeries({ color, lineWidth: width, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+    maSeries = {
+      sma21: line('#ffffff', 1),
+      sma50: line('#f5d90a', 1),
+      ema50: line('#ff9f1a', 1),
+      ema200: line('#ff3355', 2),
+      ema312: line('#2746b0', 2),
+    };
+    boxPrimitive = new CompressionBoxPrimitive();
+    candleSeries.attachPrimitive(boxPrimitive);
     window.addEventListener('resize', () => { chart.resize(container.clientWidth, chartH()); });
   }
-  const data = klines.map(c => ({ time: Math.floor(c[0] / 1000), open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4]) }));
-  candleSeries.setData(data);
+  candleData = klines.map(c => ({ time: Math.floor(c[0] / 1000), open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4]) }));
+  candleSeries.setData(candleData);
+  setMaData();
+  syncTradeOverlays();
   if (first) chart.timeScale().fitContent();
 }
 
+function updateLiveCandle(price) {
+  if (!candleSeries || !candleData.length || !(price > 0)) return;
+  const step = barStep();
+  const bucket = Math.floor(Date.now() / 1000 / step) * step;
+  const last = candleData[candleData.length - 1];
+  if (last.time === bucket) {
+    last.high = Math.max(last.high, price);
+    last.low = Math.min(last.low, price);
+    last.close = price;
+    candleSeries.update(Object.assign({}, last));
+  } else if (bucket > last.time) {
+    const bar = { time: bucket, open: last.close, high: Math.max(last.close, price), low: Math.min(last.close, price), close: price };
+    candleData.push(bar);
+    candleSeries.update(bar);
+  } else return;
+  setMaData();
+}
+
+function snapCandleTime(sec) {
+  if (!candleData.length) return sec;
+  let lo = 0, hi = candleData.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (candleData[mid].time < sec) lo = mid + 1;
+    else hi = mid;
+  }
+  const cand = candleData[lo];
+  const prev = candleData[lo - 1];
+  if (!prev) return cand.time;
+  return Math.abs(prev.time - sec) <= Math.abs(cand.time - sec) ? prev.time : cand.time;
+}
+// Mort's published time is the breakout candle CLOSE. The box is the 36 1H bars before that candle.
+function boxWindow(iso) {
+  const closeMs = Date.parse(iso);
+  if (!isFinite(closeMs)) return null;
+  const breakoutOpen = Math.floor(closeMs / 1000) - 3600;
+  const start = snapCandleTime(breakoutOpen - 36 * 3600);
+  const end = snapCandleTime(breakoutOpen);
+  if (!(end > start)) return null;
+  return { start, end };
+}
+function syncTradeOverlays() {
+  if (!candleSeries) return;
+  cmpLines.forEach(pl => { try { candleSeries.removePriceLine(pl); } catch (e) {} });
+  cmpLines = [];
+  const o = paperData && paperData.compression && paperData.compression.open;
+  if (!o) {
+    if (boxPrimitive) boxPrimitive.setBox(null);
+    return;
+  }
+  const px = v => '$' + Math.round(v).toLocaleString('en-US');
+  const add = (price, color, title) => {
+    if (price == null || !isFinite(Number(price))) return;
+    cmpLines.push(candleSeries.createPriceLine({ price: Number(price), color, lineWidth: 1, lineStyle: 0, axisLabelVisible: true, title: title + ' ' + px(price) }));
+  };
+  add(o.entry, '#d5dbe3', 'Entry');
+  add(o.stop, '#ff3366', 'Stop');
+  const aTgt = (o.book_a && o.book_a.target != null) ? o.book_a.target : o.target;
+  add(aTgt, '#00ff88', '3R');
+  const b = o.book_b || o.trail_B || null;
+  if (b && b.tp1 != null && !b.tp1_hit && b.status !== 'closed') add(b.tp1, '#35d0ff', 'TP1');
+  if (boxPrimitive) {
+    const w = (o.box_low != null && o.box_high != null && o.time) ? boxWindow(o.time) : null;
+    boxPrimitive.setBox(w ? { start: w.start, end: w.end, low: Number(o.box_low), high: Number(o.box_high) } : null);
+    if (w) frameOpenTrade(w);
+  }
+}
+let framedTrade = false;
+function frameOpenTrade(w) {
+  if (framedTrade || !chart || !candleData.length) return;
+  framedTrade = true;
+  chart.timeScale().setVisibleRange({ from: w.start - 24 * 3600, to: candleData[candleData.length - 1].time + 2 * 3600 });
+}
 // >>> CMP  Compression card — Mort paper_trades.json ONLY (no browser Binance.US scan)
-let cmpLines = [];
 // Paper account $ helpers (simulated $1,000 per book, 1% risk, 20x max — see paper_trades.json account)
 const usd = v => v == null || !isFinite(v) ? '—' : (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const sUsd = v => v == null || !isFinite(v) ? '—' : (v >= 0 ? '+$' : '−$') + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -658,27 +879,8 @@ function renderMortCompression() {
   st.textContent = 'PAPER · Mort · ' + (d.generated ? ('log ' + d.generated) : 'updated ' + new Date().toLocaleTimeString());
   st.className = 'scan-status' + (o ? ' firing' : '');
 
-  // Chart lines
-  if (candleSeries) {
-    cmpLines.forEach(pl => { try { candleSeries.removePriceLine(pl); } catch (e) {} });
-    cmpLines = [];
-    const add = (price, color, title, style) => {
-      if (price == null || !isFinite(price)) return;
-      cmpLines.push(candleSeries.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title }));
-    };
-    if (o) {
-      if (o.box_high != null) add(o.box_high, '#00ffe5', 'Box H', 2);
-      if (o.box_low != null) add(o.box_low, '#00ffe5', 'Box L', 2);
-      add(o.entry, '#8899aa', 'Entry', 2);
-      add(o.stop, '#ff3366', 'Stop', 1);
-      const aTgt = (o.book_a && o.book_a.target != null) ? o.book_a.target : o.target;
-      add(aTgt, '#00ff88', '3R', 1);
-      const b0 = o.book_b || o.trail_B, b = b0 && b0.status !== 'closed' ? b0 : null;
-      if (b && b.tp1 != null) add(b.tp1, '#00ffe5', 'TP1', 2);
-      if (b && b.stop != null && Math.abs(b.stop - o.stop) > 0.5) add(b.stop, '#ffaa00', 'B stop', 2);
-      if (b && b.sma21_4h != null) add(b.sma21_4h, '#ffaa00', 'SMA21', 2);
-    }
-  }
+  // Chart overlays: shaded box, entry, stop, Book A 3R. Book B TP1 only if not yet hit. Hidden when flat.
+  syncTradeOverlays();
 }
 // <<< CMP
 
