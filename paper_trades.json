@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-05T22:05-05:00",
+ "generated": "2026-10-05T22:14-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -247,7 +247,7 @@
   },
   "scanner_runs": "checks :01/:16/:31/:46 CT (entries on closed 1H only; fills intrabar); publish every 5 min",
   "source": "compression_scanner/state.json + signals.csv",
-  "books": "A: full 3R · B: half at measured-move TP1 → BE → 4H SMA21 (no 3R on B)"
+  "books": "A: full 3R · B: half at measured-move TP1 → BE → 4H 21 −0.5% (no 3R on B)"
  },
  "swing": null,
  "totals": {

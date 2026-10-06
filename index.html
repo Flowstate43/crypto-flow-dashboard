@@ -834,7 +834,7 @@ function renderMortCompression() {
       const lb = livePos(pb, o.side, o.entry, live);
       const bUsd = lb ? lb.banked + lb.u : null;
       html += '<div class="cmp-book book-b">' +
-        '<div class="bk-title"><b>Book B</b><span class="tag">measured move</span></div>' +
+        '<div class="bk-title"><b>Book B</b><span class="tag">' + (bHalf ? '4H 21 −0.5%' : 'measured move') + '</span></div>' +
         (bR == null ? '' : '<div class="cmp-r ' + pn(bR) + '">' + sR(bR) + (bUsd != null ? '<span class="usd">' + sUsd(bUsd) + '</span>' : '') + '<small>' +
           (bHalf ? ('half · banked ' + sR(banked)) : 'await TP1 half') + '</small></div>') +
         '<div class="cmp-levels">' + lv('TP1 (half)', $(bTp1), 'pos') + lv(bHalf ? 'BE / trail' : 'Stop', $(bStop), 'neg') + '</div>' +
@@ -843,7 +843,7 @@ function renderMortCompression() {
           real: bHalf ? '<span class="pos">' + sUsd(pb.banked_usd) + ' · ' + sR(banked) + '</span> <small>half at TP1, costs at close</small>' : usd(0),
           eq: eqB ? usd(eqB.equity) + (lb ? ' <small>· live ' + usd(eqB.equity + lb.banked + lb.u) + '</small>' : '') : '—' }) : '') +
         '<div class="bk-sub">' + bLabel +
-          (b && b.sma21_4h != null ? (' · SMA21 ' + $(b.sma21_4h)) : '') +
+          (b && b.sma21_4h != null ? (' · 4H 21 −0.5% ' + $(b.sma21_4h)) : '') +
           ' · no 3R cap on B</div></div>';
     }
     html += '</div>';
@@ -873,7 +873,7 @@ function renderMortCompression() {
   body.innerHTML = html;
   extra.push('Source: Mort paper_trades.json · dual books on same entry/stop');
   if (d.account) extra.push('Paper $: each book starts ' + usd0(d.account.start) + ' · ' + d.account.sizing);
-  extra.push(cmp.books || 'A: full 3R · B: half at measured-move TP1 → BE → 4H SMA21');
+  extra.push(cmp.books || 'A: full 3R · B: half at measured-move TP1 → BE → 4H 21 −0.5%');
   if (cmp.scanner_runs) extra.push(cmp.scanner_runs);
   info.innerHTML = extra.join('<br>');
   st.textContent = 'PAPER · Mort · ' + (d.generated ? ('log ' + d.generated) : 'updated ' + new Date().toLocaleTimeString());
