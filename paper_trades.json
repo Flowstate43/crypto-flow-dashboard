@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-05T18:48-05:00",
+ "generated": "2026-10-05T19:05-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -183,7 +183,7 @@
    "oi_chg_pct": 0.071,
    "oi_src": "OKX proxy",
    "risk_pct": 1.56,
-   "bars": 26,
+   "bars": 27,
    "risk": 1335.5,
    "book_b": {
     "status": "closed",
@@ -254,16 +254,16 @@
   "side": "long",
   "body": [
    "⚪ NO SETUP",
-   "🕯 4H close 3:00 PM CT",
-   "💰 Price 85,691.2 · 📏 4H ATR 787.8",
+   "🕯 4H close 7:00 PM CT",
+   "💰 Price 85,717.0 · 📏 4H ATR 761.0",
    "🧭 1D Bias 🟢 Long",
-   "🎯 Liquidity 84,476.9 (4H swing low, 1.54 ATR away)",
+   "🎯 Liquidity 84,476.9 (4H swing low, 1.63 ATR away)",
    "🧱 Order Block 84,710.6 – 84,794.7",
-   "📊 Filters: OI ➖ flat · Volume ❌ · Funding ✅ -0.0015%",
-   "💬 Why: nearest 4H liquidity 84476.9 is 1.54 ATR away (building <= 1.0); OI 4H change +0.02%"
+   "📊 Filters: OI ➖ flat · Volume ❌ · Funding ✅ -0.0025%",
+   "💬 Why: nearest 4H liquidity 84476.9 is 1.63 ATR away (building <= 1.0); OI 4H change -0.12%"
   ],
-  "close_time": "2026-10-05T15:00-05:00",
-  "updated": "2026-10-05T15:05-05:00",
+  "close_time": "2026-10-05T19:00-05:00",
+  "updated": "2026-10-05T19:01-05:00",
   "armed_pending": false,
   "agent": "swing",
   "scanner_runs": "card 5 past 9/10/11 AM+PM CT; quiet check :01/:16/:31/:46 (intrabar fills)",
