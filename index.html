@@ -254,6 +254,7 @@
     .grid.half { grid-template-columns: 1fr; }
     .header { flex-direction: column; gap: 12px; }
   }
+  #view-swing, #view-trend, #view-all { display: none !important; } /* paused agents */
 </style>
 </head>
 <body>
@@ -262,9 +263,6 @@
   <div class="logo">Flow<span>BOT</span></div>
   <div class="agent-nav" id="agent-nav" role="tablist" aria-label="Agent">
     <button type="button" data-agent="mort" class="active" role="tab" aria-selected="true">Mort · compression</button>
-    <button type="button" data-agent="swing" role="tab" aria-selected="false">Swing 🌊</button>
-    <button type="button" data-agent="trend" role="tab" aria-selected="false">Trend 📈</button>
-    <button type="button" data-agent="all" role="tab" aria-selected="false">All</button>
   </div>
   <div class="updated-at" id="updated-at"></div>
 </div>
@@ -962,9 +960,9 @@ let trendData = null;
 let currentAgent = 'mort';
 
 function setAgent(id) {
-  if (!['mort', 'swing', 'trend', 'all'].includes(id)) id = 'mort';
+  id = 'mort'; // Mort-only (Swing/Trend paused 2026-10-05)
   currentAgent = id;
-  try { localStorage.setItem(AGENT_LS_KEY, id); } catch (e) {}
+  try { localStorage.removeItem(AGENT_LS_KEY); } catch (e) {}
   document.querySelectorAll('.agent-view').forEach(el => {
     el.classList.toggle('active', el.dataset.agent === id);
   });
