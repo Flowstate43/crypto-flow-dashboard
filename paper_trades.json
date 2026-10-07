@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-06T13:05-05:00",
+ "generated": "2026-10-06T21:31-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -26,28 +26,14 @@
     "key": "A",
     "label": "Compression A · 3R",
     "start": 1000.0,
-    "equity": 1000.0,
-    "realized_usd": 0.0,
-    "ret_pct": 0.0,
-    "closed": 0,
+    "equity": 988.97,
+    "realized_usd": -11.03,
+    "ret_pct": -1.1,
+    "closed": 1,
     "wins": 0,
     "win_rate": 0.0,
-    "total_r": 0,
-    "open": {
-     "equity_at_entry": 1000.0,
-     "risk_usd": 10.0,
-     "risk_pct": 1.0,
-     "stop_pct": 1.557,
-     "notional": 642.39,
-     "qty": 0.007488,
-     "margin": 32.12,
-     "lev": 0.64,
-     "max_lev": 20.0,
-     "capped": false,
-     "cost_usd": 1.03,
-     "open_frac": 1.0,
-     "banked_usd": 0.0
-    }
+    "total_r": -1.1,
+    "open": null
    },
    {
     "key": "B",
@@ -63,7 +49,7 @@
     "open": null
    }
   ],
-  "equity_total": 3002.09
+  "equity_total": 2991.06
  },
  "scanners": [
   {
@@ -82,40 +68,39 @@
    "emoji": "🗜️",
    "label": "Compression",
    "paused": false,
-   "closed": 0,
+   "closed": 1,
    "wins": 0,
    "win_rate": 0.0,
-   "total_r": 0,
-   "open": 1
+   "total_r": -1.1,
+   "open": 0
   }
  ],
- "open": [
+ "open": [],
+ "closed": [
   {
    "scanner": "compression",
+   "book": "A",
+   "book_label": "A · 3R",
    "side": "long",
    "armed_time": "2026-10-04T16:00-05:00",
+   "exit_time": "2026-10-06T21:00-05:00",
    "entry": 85791.1,
    "stop": 84455.6,
-   "target1": 89797.5,
-   "target2": null,
-   "expiry": "96 x 1H",
-   "tp1_time": "",
-   "equity_at_entry": 1000.0,
-   "risk_usd": 10.0,
-   "risk_pct": 1.0,
-   "stop_pct": 1.557,
-   "notional": 642.39,
-   "qty": 0.007488,
-   "margin": 32.12,
-   "lev": 0.64,
-   "max_lev": 20.0,
-   "capped": false,
+   "exit_price": 84455.6,
+   "result": "stop",
+   "r_net": -1.1,
+   "r_gross": -1.0,
+   "pnl_usd": -11.03,
+   "gross_usd": -10.0,
    "cost_usd": 1.03,
-   "open_frac": 1.0,
-   "banked_usd": 0.0
-  }
- ],
- "closed": [
+   "risk_usd": 10.0,
+   "notional": 642.39,
+   "margin": 32.12,
+   "qty": 0.007488,
+   "lev": 0.64,
+   "capped": false,
+   "equity_after": 988.97
+  },
   {
    "scanner": "compression",
    "book": "B",
@@ -144,6 +129,30 @@
  "trade_log": [
   {
    "scanner": "compression",
+   "book": "A",
+   "book_label": "A · 3R",
+   "side": "long",
+   "armed_time": "2026-10-04T16:00-05:00",
+   "exit_time": "2026-10-06T21:00-05:00",
+   "entry": 85791.1,
+   "stop": 84455.6,
+   "exit_price": 84455.6,
+   "result": "stop",
+   "r_net": -1.1,
+   "r_gross": -1.0,
+   "pnl_usd": -11.03,
+   "gross_usd": -10.0,
+   "cost_usd": 1.03,
+   "risk_usd": 10.0,
+   "notional": 642.39,
+   "margin": 32.12,
+   "qty": 0.007488,
+   "lev": 0.64,
+   "capped": false,
+   "equity_after": 988.97
+  },
+  {
+   "scanner": "compression",
    "book": "B",
    "book_label": "B · MM",
    "side": "long",
@@ -168,72 +177,16 @@
   }
  ],
  "compression": {
-  "open": {
-   "paper_id": "compression-2026-10-04T16:00-05:00",
+  "open": null,
+  "last": {
    "side": "long",
    "time": "2026-10-04T16:00-05:00",
+   "exit_time": "2026-10-06T21:00-05:00",
+   "result": "stop",
    "entry": 85791.1,
-   "stop": 84455.6,
-   "target": 89797.5,
-   "max_bars": 96,
-   "box_high": 85550.8,
-   "box_low": 84476.9,
-   "box_ratio": 0.315,
-   "bbw_pct": 0.226,
-   "oi_chg_pct": 0.071,
-   "oi_src": "OKX proxy",
-   "risk_pct": 1.56,
-   "bars": 45,
-   "risk": 1335.5,
-   "book_b": {
-    "status": "closed",
-    "result": "tp1_be",
-    "stop": 85791.1,
-    "tp1": 86624.7,
-    "tp1_hit": true,
-    "banked": 0.312,
-    "exit_price": 86207.9,
-    "r_net": 0.2093,
-    "r_gross": 0.3121,
-    "label": "closed",
-    "exit_time": "2026-10-05T16:00-05:00",
-    "tp1_time": "2026-10-04T18:00-05:00",
-    "equity_at_entry": 1000.0,
-    "risk_usd": 10.0,
-    "risk_pct": 1.0,
-    "stop_pct": 1.557,
-    "notional": 642.39,
-    "qty": 0.007488,
-    "margin": 32.12,
-    "lev": 0.64,
-    "max_lev": 20.0,
-    "capped": false,
-    "cost_usd": 1.03,
-    "pnl_usd": 2.09,
-    "gross_usd": 3.12,
-    "equity_after": 1002.09
-   },
-   "book_a": {
-    "label": "3R full",
-    "target": 89797.5,
-    "stop": 84455.6,
-    "status": "open",
-    "equity_at_entry": 1000.0,
-    "risk_usd": 10.0,
-    "risk_pct": 1.0,
-    "stop_pct": 1.557,
-    "notional": 642.39,
-    "qty": 0.007488,
-    "margin": 32.12,
-    "lev": 0.64,
-    "max_lev": 20.0,
-    "capped": false,
-    "cost_usd": 1.03,
-    "open_frac": 1.0,
-    "banked_usd": 0.0
-   }
+   "exit_price": 84455.6,
+   "r_net": -1.1
   },
-  "last": null,
   "trail_last": {
    "side": "long",
    "result": "tp1_be",
@@ -251,8 +204,8 @@
  },
  "swing": null,
  "totals": {
-  "closed": 0,
+  "closed": 1,
   "wins": 0,
-  "total_r": 0
+  "total_r": -1.1
  }
 }
