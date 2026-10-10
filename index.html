@@ -201,7 +201,13 @@
   .mini .fg-bar-wrap { margin-top: 6px; }
   .mini .liq-stats { grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 0; }
   .mini .liq-stat { padding: 7px 6px; } .mini .liq-stat-val { font-size: 0.82rem; }
-  #chart { height: 420px; }
+  #chart { height: 240px; }
+  .bookc-term { margin-top: 10px; background: #070b07; border: 1px solid rgba(0,255,136,0.28); border-radius: 8px; padding: 10px 12px 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .bookc-prior, .bookc-line { margin: 0; white-space: pre-wrap; font-family: inherit; font-size: 0.68rem; line-height: 1.45; }
+  .bookc-prior { color: #4d6b58; margin-bottom: 6px; }
+  .bookc-line { color: #b6ffcf; min-height: 1.45em; }
+  .bookc-cursor { color: var(--green); font-size: 0.7rem; animation: bookc-blink 1s step-end infinite; }
+  @keyframes bookc-blink { 50% { opacity: 0; } }
   .heatmap-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--card-border); font-size: 0.72rem; color: var(--text-dim); }
   .heatmap-row .card-title { margin: 0; }
 
@@ -216,7 +222,7 @@
     .cmp-levels b { font-size: 0.9rem; }
     .cmp-levels > div { padding: 8px; }
     .mini .liq-stats { grid-template-columns: 1fr 1fr; }
-    #chart { height: 300px; }
+    #chart { height: 200px; }
   }
 
 
@@ -512,7 +518,7 @@ async function loadAndScan() {
 }
 
 // ─── Chart (TradingView Lightweight Charts, not the embed widget) ─────────
-const chartH = () => (window.innerWidth <= 768 ? 300 : 420);
+const chartH = () => (window.innerWidth <= 768 ? 200 : 240);
 let candleData = [];
 let maSeries = null;
 let boxPrimitive = null;
@@ -754,30 +760,71 @@ function cmpRel(t) {   // unix seconds -> 'today 1:00 AM · 19h ago'
   return day + ' ' + hm + ' · ' + ago;
 }
 
+let bookCTarget = '';
+let bookCShown = '';
+let bookCTimer = null;
+function bookCEsc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function bookCRowText(row) {
+  if (!row) return '';
+  if (typeof row === 'string') return row;
+  if (row.text) return row.text;
+  const call = row.opinion || row.decision || 'skip';
+  return [row.at || '', call, row.reason || row.why || ''].filter(Boolean).join(' | ');
+}
+function bookCIdle(c) {
+  const chk = c.last_check || {};
+  const bits = [];
+  if (chk.rank != null) bits.push('BB rank ' + Math.round(Number(chk.rank) * 100) + '%');
+  if (chk.vol_x != null) bits.push('vol ' + Number(chk.vol_x).toFixed(2) + 'x');
+  if (chk.oi_chg != null) bits.push('OI ' + (Number(chk.oi_chg) >= 0 ? '+' : '') + Number(chk.oi_chg).toFixed(2) + '%');
+  const divs = [];
+  if (c.rsi_div_4h) divs.push('4H ' + (c.rsi_div_4h.type || c.rsi_div_4h.side || 'div'));
+  if (c.rsi_div_daily) divs.push('1D ' + (c.rsi_div_daily.type || c.rsi_div_daily.side || 'div'));
+  if (divs.length) bits.push('RSI div ' + divs.join(', '));
+  else if (chk.fresh_div) bits.push('RSI div watch ' + chk.fresh_div);
+  const quiet = chk.signal ? 'signal on the tape, waiting on the read' : 'no setup';
+  return 'BOOK C | ' + (chk.at || 'idle') + ' | ' + quiet + ' | ' + (bits.length ? bits.join(' · ') : 'nothing lining up');
+}
+function bookCType(text) {
+  if (text === bookCTarget) return;
+  bookCTarget = text;
+  bookCShown = '';
+  if (bookCTimer) clearInterval(bookCTimer);
+  bookCTimer = setInterval(() => {
+    if (bookCShown.length >= bookCTarget.length) { clearInterval(bookCTimer); bookCTimer = null; return; }
+    bookCShown = bookCTarget.slice(0, bookCShown.length + 2);
+    const el = document.getElementById('bookc-line');
+    if (el) el.textContent = bookCShown;
+  }, 16);
+}
 function bookCHtml(c, live) {
   if (!c) return '';
-  const $ = v => v == null || v === '' ? '—' : (typeof v === 'number' ? '$' + Math.round(v).toLocaleString('en-US') : String(v));
-  const lv = (label, val, cls) => '<div><label>' + label + '</label><b class="' + (cls || '') + '">' + val + '</b></div>';
+  const rows = Array.isArray(c.log) ? c.log : [];
+  const last = c.latest || rows[rows.length - 1];
+  const active = !!last;
+  const text = active ? bookCRowText(last) : bookCIdle(c);
+  if (active) bookCType(text);
+  else { bookCTarget = text; bookCShown = text; if (bookCTimer) { clearInterval(bookCTimer); bookCTimer = null; } }
+  const prior = rows.slice(-4, -1).map(bookCRowText).filter(Boolean);
   const op = c.open;
-  const chk = c.last_check || {};
-  let h = '<div class="cmp-book book-c">' +
-    '<div class="bk-title"><b>Book C</b><span class="tag c">agent · 3R</span></div>';
+  let head = '';
   if (op && op.entry != null && op.stop != null) {
     const s = String(op.side).toLowerCase() === 'short' ? -1 : 1;
     const risk = Math.abs(Number(op.entry) - Number(op.stop));
     const r = (live != null && risk) ? (live - Number(op.entry)) * s / risk : null;
-    const box = (op.box_low != null && op.box_high != null) ? ('box ' + $(Number(op.box_low)) + '–' + $(Number(op.box_high))) : (op.pattern ? ('pattern ' + op.pattern) : '');
-    h += (r == null ? '' : '<div class="cmp-r ' + pn(r) + '">' + sR(r) + '<small>open · full size</small></div>') +
-      '<div class="cmp-levels">' + lv('Entry', $(Number(op.entry))) + lv('Stop', $(Number(op.stop)), 'neg') + lv('Target', op.target == null ? '—' : $(Number(op.target)), 'pos') + lv('Live', live != null ? $(live) : '—') + '</div>' +
-      '<div class="bk-sub">' + [String(op.side || '').toUpperCase(), box, op.why || '', op.bars != null ? (op.bars + ' bars') : '', chk.at ? ('updated ' + chk.at) : ''].filter(Boolean).join(' · ') + '</div>';
-  } else {
-    const trigs = (chk.triggers && chk.triggers.length) ? chk.triggers.join(', ') : 'no trigger';
-    h += '<div class="cmp-r">FLAT<small>no open trade</small></div>' +
-      '<div class="cmp-levels">' + lv('Last update', chk.at || '—') + lv('Triggers', trigs) + lv('Entry', '—') + lv('Stop / target', '—') + '</div>' +
-      '<div class="bk-sub">Grok 4.7 Fast · full size to 3R · paper only' +
-        (chk.rank != null ? (' · BB rank ' + Math.round(Number(chk.rank) * 100) + '%') : '') + '</div>';
+    head = '<div class="bookc-prior">OPEN ' + bookCEsc(String(op.side || '').toUpperCase()) +
+      ' entry ' + Math.round(op.entry) + ' stop ' + Math.round(op.stop) +
+      (op.target != null ? ' target ' + Math.round(op.target) : '') +
+      (r == null ? '' : ' ' + sR(r)) + '</div>';
   }
-  return h + '</div>';
+  return '<div class="bookc-term">' +
+    '<div class="bk-title"><b>Book C</b><span class="tag c">terminal · paper</span></div>' +
+    head +
+    (prior.length ? '<pre class="bookc-prior">' + prior.map(bookCEsc).join('\n') + '</pre>' : '') +
+    '<pre id="bookc-line" class="bookc-line">' + bookCEsc(active ? bookCShown : text) + '</pre>' +
+    '<div class="bookc-cursor">_</div></div>';
 }
 
 function renderMortCompression() {
