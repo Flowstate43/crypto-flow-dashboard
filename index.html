@@ -165,6 +165,8 @@
   .cmp-book { background: #0f0f0f; border: 1px solid #1c1c1c; border-radius: 8px; padding: 12px 12px 10px; }
   .cmp-book.book-a { border-color: rgba(0,255,136,0.25); }
   .cmp-book.book-b { border-color: rgba(0,255,229,0.25); }
+  .cmp-book.book-c { border-color: rgba(255,224,102,0.4); margin-top: 10px; }
+  .cmp-book .bk-title .tag.c { color: var(--yellow); border-color: rgba(255,224,102,0.5); }
   .cmp-book .bk-title { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; color: #888; margin-bottom: 6px; display: flex; justify-content: space-between; gap: 6px; }
   .cmp-book .bk-title b { color: var(--text); font-weight: 600; }
   .cmp-book .bk-title .tag { color: var(--cyan); border: 1px solid rgba(0,255,229,0.35); border-radius: 3px; padding: 0 5px; font-size: 0.5rem; }
@@ -282,7 +284,7 @@
   </div>
   <div class="card scan-card cmp-card" id="card-compression">
     <div class="cmp-head">
-      <div class="card-title" style="margin:0">Compression &middot; Mort <span class="cmp-tag">Paper</span> <span class="cmp-tag">A+B</span></div>
+      <div class="card-title" style="margin:0">Compression &middot; Mort <span class="cmp-tag">Paper</span> <span class="cmp-tag">A+B</span> <span class="cmp-tag">Book C</span></div>
       <div class="cmp-trig" id="cmp-trig"></div>
     </div>
     <div class="scan-direction neutral cmp-dir" id="cmp-dir">CALCULATING</div>
@@ -752,6 +754,32 @@ function cmpRel(t) {   // unix seconds -> 'today 1:00 AM · 19h ago'
   return day + ' ' + hm + ' · ' + ago;
 }
 
+function bookCHtml(c, live) {
+  if (!c) return '';
+  const $ = v => v == null || v === '' ? '—' : (typeof v === 'number' ? '$' + Math.round(v).toLocaleString('en-US') : String(v));
+  const lv = (label, val, cls) => '<div><label>' + label + '</label><b class="' + (cls || '') + '">' + val + '</b></div>';
+  const op = c.open;
+  const chk = c.last_check || {};
+  let h = '<div class="cmp-book book-c">' +
+    '<div class="bk-title"><b>Book C</b><span class="tag c">agent · 3R</span></div>';
+  if (op && op.entry != null && op.stop != null) {
+    const s = String(op.side).toLowerCase() === 'short' ? -1 : 1;
+    const risk = Math.abs(Number(op.entry) - Number(op.stop));
+    const r = (live != null && risk) ? (live - Number(op.entry)) * s / risk : null;
+    const box = (op.box_low != null && op.box_high != null) ? ('box ' + $(Number(op.box_low)) + '–' + $(Number(op.box_high))) : (op.pattern ? ('pattern ' + op.pattern) : '');
+    h += (r == null ? '' : '<div class="cmp-r ' + pn(r) + '">' + sR(r) + '<small>open · full size</small></div>') +
+      '<div class="cmp-levels">' + lv('Entry', $(Number(op.entry))) + lv('Stop', $(Number(op.stop)), 'neg') + lv('Target', op.target == null ? '—' : $(Number(op.target)), 'pos') + lv('Live', live != null ? $(live) : '—') + '</div>' +
+      '<div class="bk-sub">' + [String(op.side || '').toUpperCase(), box, op.why || '', op.bars != null ? (op.bars + ' bars') : '', chk.at ? ('updated ' + chk.at) : ''].filter(Boolean).join(' · ') + '</div>';
+  } else {
+    const trigs = (chk.triggers && chk.triggers.length) ? chk.triggers.join(', ') : 'no trigger';
+    h += '<div class="cmp-r">FLAT<small>no open trade</small></div>' +
+      '<div class="cmp-levels">' + lv('Last update', chk.at || '—') + lv('Triggers', trigs) + lv('Entry', '—') + lv('Stop / target', '—') + '</div>' +
+      '<div class="bk-sub">Grok 4.7 Fast · full size to 3R · paper only' +
+        (chk.rank != null ? (' · BB rank ' + Math.round(Number(chk.rank) * 100) + '%') : '') + '</div>';
+  }
+  return h + '</div>';
+}
+
 function renderMortCompression() {
   const card = document.getElementById('card-compression');
   const dirEl = document.getElementById('cmp-dir');
@@ -867,6 +895,7 @@ function renderMortCompression() {
     html = '<div class="cmp-sub">No open Mort compression trade. Scanner checks every 15 min (:01/:16/:31/:46 CT).</div>';
   }
 
+  html += bookCHtml(cmp.book_c, live);
   dirEl.textContent = dir; dirEl.className = 'scan-direction cmp-dir ' + dcls;
   card.className = 'card scan-card cmp-card' + (cls ? ' ' + cls : '');
   trig.textContent = trigTxt;
