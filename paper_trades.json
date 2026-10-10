@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-09T20:00-05:00",
+ "generated": "2026-10-09T20:05-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -217,14 +217,14 @@
   "book_c": {
    "plan": "full size to 3R",
    "paper_only": true,
-   "model": "xai/grok-4.7-build-fast",
+   "model": "xai/grok-4.7",
    "last_check": {
-    "at": "2026-10-09T19:58-05:00",
-    "close_time": "2026-10-09T19:00-05:00",
+    "at": "2026-10-09T20:03-05:00",
+    "close_time": "2026-10-09T20:00-05:00",
     "triggers": [],
-    "rank": 0.23194444444444445,
-    "vol_x": 0.21027058169916366,
-    "oi_chg": 0.0015594822113913498
+    "rank": 0.21805555555555556,
+    "vol_x": 0.2855033698469684,
+    "oi_chg": 0.0015181715582446298
    },
    "open": null,
    "decisions": [
