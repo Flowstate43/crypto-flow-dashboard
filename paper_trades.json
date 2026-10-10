@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-06T21:31-05:00",
+ "generated": "2026-10-09T19:49-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -47,9 +47,22 @@
     "win_rate": 100.0,
     "total_r": 0.21,
     "open": null
+   },
+   {
+    "key": "C",
+    "label": "Compression C · agent",
+    "start": 1000.0,
+    "equity": 1000.0,
+    "realized_usd": 0.0,
+    "ret_pct": 0.0,
+    "closed": 0,
+    "wins": 0,
+    "win_rate": 0.0,
+    "total_r": 0,
+    "open": null
    }
   ],
-  "equity_total": 2991.06
+  "equity_total": 3991.06
  },
  "scanners": [
   {
@@ -200,7 +213,23 @@
   },
   "scanner_runs": "checks :01/:16/:31/:46 CT (entries on closed 1H only; fills intrabar); publish every 5 min",
   "source": "compression_scanner/state.json + signals.csv",
-  "books": "A: full 3R · B: half at measured-move TP1 → BE → 4H 21 −0.5% (no 3R on B)"
+  "books": "A: full 3R · B: half at measured-move TP1 → BE → 4H 21 −0.5% (no 3R on B) · C: agent, full 3R",
+  "book_c": {
+   "plan": "full size to 3R",
+   "paper_only": true,
+   "model": "xai/grok-4.7-build-fast",
+   "last_check": {
+    "at": "2026-10-09T19:48-05:00",
+    "close_time": "2026-10-09T19:00-05:00",
+    "triggers": [],
+    "rank": 0.23194444444444445,
+    "vol_x": 0.21027058169916366,
+    "oi_chg": 0.0015594822113913498
+   },
+   "open": null,
+   "decisions": [],
+   "source": "compression_scanner/book_c.json"
+  }
  },
  "swing": null,
  "totals": {
