@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-09T19:49-05:00",
+ "generated": "2026-10-09T20:00-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -219,7 +219,7 @@
    "paper_only": true,
    "model": "xai/grok-4.7-build-fast",
    "last_check": {
-    "at": "2026-10-09T19:48-05:00",
+    "at": "2026-10-09T19:58-05:00",
     "close_time": "2026-10-09T19:00-05:00",
     "triggers": [],
     "rank": 0.23194444444444445,
@@ -227,7 +227,76 @@
     "oi_chg": 0.0015594822113913498
    },
    "open": null,
-   "decisions": [],
+   "decisions": [
+    {
+     "close_t": 1791590400000,
+     "at": 1791593806388,
+     "triggers": [
+      "test force"
+     ],
+     "pattern": null,
+     "decision": "skip",
+     "why": "RuntimeError: Missing required option \"--file <path>\".\nTry: openclaw infer image describe --help\n",
+     "chart": null,
+     "chart_error": "no chart: ModuleNotFoundError",
+     "error": "RuntimeError: Missing required option \"--file <path>\".\nTry: openclaw infer image describe --help\n",
+     "test": true,
+     "raw": null
+    },
+    {
+     "close_t": 1791590400000,
+     "at": 1791593854780,
+     "triggers": [
+      "test force"
+     ],
+     "pattern": null,
+     "decision": "skip",
+     "why": "RuntimeError: [openclaw] The CLI command failed.\n[openclaw] Reason: Model does not support images: xai/grok-4.7-build-fast (resolved xai/grok-4.7-build-fast input: text)\n[openclaw] Debug: set OPENCLAW_DEBUG=1 to include the stack trace.\n[openclaw] Try: openclaw doctor\n[openclaw] Help: openclaw --help\n",
+     "chart": "/home/flow/.openclaw/workspace/mort/compression_scanner/charts/bookc-1791590400000.png",
+     "chart_error": null,
+     "error": "RuntimeError: [openclaw] The CLI command failed.\n[openclaw] Reason: Model does not support images: xai/grok-4.7-build-fast (resolved xai/grok-4.7-build-fast input: text)\n[openclaw] Debug: set OPENCLAW_DEBUG=1 to include the stack trace.\n[openclaw] Try: openclaw doctor\n[openclaw] Help: openclaw --help\n",
+     "test": true,
+     "raw": null
+    },
+    {
+     "close_t": 1791590400000,
+     "at": 1791593883303,
+     "triggers": [
+      "test force"
+     ],
+     "pattern": null,
+     "decision": "skip",
+     "why": "RuntimeError: [provider-transport-fetch] [model-fetch] response provider=xai api=openai-responses model=grok-4.7-build-fast status=426 elapsedMs=176 dispatcher=new contentType=application/json\n[openclaw] The CLI command failed.\n[openclaw] Reason: No text output returned for provider \"xai\" model \"grok-4.7-build-fast\": 426 \"Your Grok CLI version (none) is outdated. Please update to version 1.0.13 or later via `gr",
+     "chart": "/home/flow/.openclaw/workspace/mort/compression_scanner/charts/bookc-1791590400000.png",
+     "chart_error": null,
+     "error": "RuntimeError: [provider-transport-fetch] [model-fetch] response provider=xai api=openai-responses model=grok-4.7-build-fast status=426 elapsedMs=176 dispatcher=new contentType=application/json\n[openclaw] The CLI command failed.\n[openclaw] Reason: No text output returned for provider \"xai\" model \"grok-4.7-build-fast\": 426 \"Your Grok CLI version (none) is outdated. Please update to version 1.0.13 or later via `gr",
+     "test": true,
+     "raw": null
+    },
+    {
+     "close_t": 1791590400000,
+     "at": 1791593922490,
+     "triggers": [
+      "test force"
+     ],
+     "pattern": "none",
+     "decision": "skip",
+     "why": "skip",
+     "chart": "/home/flow/.openclaw/workspace/mort/compression_scanner/charts/bookc-1791590400000.png",
+     "chart_error": null,
+     "error": null,
+     "test": true,
+     "raw": {
+      "pattern": "none",
+      "decision": "skip",
+      "side": null,
+      "entry": null,
+      "stop": null,
+      "target": null,
+      "why": "Price inside 80122-83488 box with no triangle, pennant, order block, or sweep. BB-width rank 23, range multiple 0.98, volume 0.21x, OI flat."
+     }
+    }
+   ],
    "source": "compression_scanner/book_c.json"
   }
  },
