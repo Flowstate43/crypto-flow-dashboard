@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-10T23:05-05:00",
+ "generated": "2026-10-10T23:20-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -220,7 +220,7 @@
    "screenshots": false,
    "model": "xai/grok-4.7-build-fast",
    "last_check": {
-    "at": "2026-10-10T23:03-05:00",
+    "at": "2026-10-10T23:18-05:00",
     "close_time": "2026-10-10T23:00-05:00",
     "triggers": [],
     "rank": null,
