@@ -7,14 +7,5 @@
     "oi_1h": -0.503,
     "context": "BTC $83,059 | ATR 385\n4H bias: unknown | 1D bias: unknown\nBB rank: 78.6% (gate \u226430%) | range: 2.30\u00d7 (gate \u22640.65\u00d7) | OI: -0.50% on 1H candle\nfunding: n/a\nvolume: 0.44\u00d7 avg 20h\nRSI 14: 49\nRSI divs (1H/4H/daily): 1h bearish\nswing high: +0.0 atr | swing low: -0.3 atr\nFear & Greed: n/a\nNo setup right now. Grok sees unknown 4H / unknown 1D. Compression gates: BB 79% (need \u226430%), range 2.30\u00d7 (need \u22640.65\u00d7).",
     "opinion": "No setup is firing because BB rank at 78.6% and range expansion at 2.30\u00d7 are nowhere near compression gates. The market is expanded, not coiled.\n\nThe low volume (0.44\u00d7 avg) combined with RSI near neutral and a bearish 1H divergence suggests supply is present but not overwhelming\u2014players are sitting on hands. This kind of setup without compression usually precedes a wash-out or a violent squeeze, not a clean directional move. Watch for the compression gates to reset before treating any signal as high-probability."
-  },
-  {
-    "ts": "2026-10-12 16:29",
-    "at": 1791840553679,
-    "bb_rank": 0.7861,
-    "range_x": 2.3036,
-    "oi_1h": -0.503,
-    "context": "BTC $83,059 | ATR 385\n4H bias: unknown | 1D bias: unknown\nBB rank: 78.6% (gate \u226430%) | range: 2.30\u00d7 (gate \u22640.65\u00d7) | OI: -0.50% on 1H candle\nfunding: n/a\nvolume: 0.44\u00d7 avg 20h\nRSI 14: 49\nRSI divs (1H/4H/daily): 1h bearish\nswing high: +0.0 atr | swing low: -0.3 atr\nFear & Greed: n/a\nNo setup right now. Grok sees unknown 4H / unknown 1D. Compression gates: BB 79% (need \u226430%), range 2.30\u00d7 (need \u22640.65\u00d7).",
-    "opinion": "No setup fires because Bollinger Bands remain expanded (BB rank 78.6%) and range is blown out (2.30\u00d7) \u2014 compression gates require \u226430% and \u22640.65\u00d7 respectively, so the squeeze setup simply hasn't materialized yet. We're sitting at the swing high with a 1H bearish RSI divergence and volume collapsing, which tells me this recent \"up\" move has no conviction behind it.\n\nMy second opinion: this looks like distribution at resistance rather than a genuine breakout impulse. The market is coiled tight in a volatile range with declining volume \u2014 when compression finally does trigger, the move will be fast and likely bearish given the structural indecision and hidden weakness (volume failing at highs). Watch for a squeeze lower through the -0.3 ATR swing low zone as the path of least resistance once conditions align."
   }
 ]
