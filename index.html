@@ -202,11 +202,16 @@
   .mini .liq-stats { grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 0; }
   .mini .liq-stat { padding: 7px 6px; } .mini .liq-stat-val { font-size: 0.82rem; }
   #chart { height: 240px; }
-  .bookc-term { margin-top: 10px; background: #070b07; border: 1px solid rgba(0,255,136,0.28); border-radius: 8px; padding: 10px 12px 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; }
-  .bookc-prior, .bookc-line { margin: 0; white-space: pre-wrap; font-family: inherit; font-size: 0.68rem; line-height: 1.45; }
-  .bookc-prior { color: #4d6b58; margin-bottom: 6px; }
-  .bookc-line { color: #b6ffcf; min-height: 1.45em; }
-  .bookc-cursor { color: var(--green); font-size: 0.7rem; animation: bookc-blink 1s step-end infinite; }
+  /* Mort one-card terminal */
+  .mort-term { background: #070b07; border: 1px solid rgba(0,255,136,0.28); border-radius: 8px; padding: 10px 12px 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; margin-top: 8px; }
+  .mort-prior, .mort-line { margin: 0; white-space: pre-wrap; font-family: inherit; font-size: 0.68rem; line-height: 1.45; }
+  .mort-prior { color: #4d6b58; margin-bottom: 6px; }
+  .mort-line { color: #b6ffcf; min-height: 1.45em; }
+  .mort-cursor { color: var(--green); font-size: 0.7rem; animation: bookc-blink 1s step-end infinite; }
+  .mort-open { background: #0f1a0f; border: 1px solid rgba(0,255,136,0.2); border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; font-family: var(--font-mono); font-size: 0.65rem; }
+  .mort-open-label { font-size: 0.55rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .mort-open-trade { color: var(--green); }
+  .mort-open-trade.bearish { color: var(--red); }
   @keyframes bookc-blink { 50% { opacity: 0; } }
   .heatmap-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--card-border); font-size: 0.72rem; color: var(--text-dim); }
   .heatmap-row .card-title { margin: 0; }
@@ -290,20 +295,22 @@
   </div>
   <div class="card scan-card cmp-card" id="card-compression">
     <div class="cmp-head">
-      <div class="card-title" style="margin:0">Compression &middot; Mort <span class="cmp-tag">Paper</span> <span class="cmp-tag">A+B</span> <span class="cmp-tag">Book C</span></div>
+      <div class="card-title" style="margin:0">Mort &middot; BTC pipeline <span class="cmp-tag">Paper</span></div>
       <div class="cmp-trig" id="cmp-trig"></div>
     </div>
     <div class="scan-direction neutral cmp-dir" id="cmp-dir">CALCULATING</div>
-    <div id="cmp-body"><div class="cmp-sub">Loading Mort paper log&hellip;</div></div>
-    <details class="cmp-details"><summary>Details</summary>
+    <div id="cmp-body"><div class="cmp-sub">Loading pipeline status&hellip;</div></div>
+    <details class="cmp-details"><summary>AI reads &amp; prior entries</summary>
       <div class="cmp-info" id="cmp-info"></div>
       <div class="scan-status" id="cmp-status"></div>
     </details>
   </div>
-  <div class="card paper-card" id="card-paper">
-    <div class="cmp-head"><div class="card-title" style="margin:0">Paper Trades &middot; Mort</div><div class="pp-upd" id="pp-upd"></div></div>
-    <div id="pp-body"><div class="pp-empty" style="margin-top:8px">Loading paper log&hellip;</div></div>
-  </div>
+</div>
+<div id="mort-history" class="card" style="margin-top:14px;display:none">
+  <details>
+    <summary style="cursor:pointer;font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Books A/B/C &amp; trade history</summary>
+    <div id="pp-body" style="margin-top:10px"><div class="pp-empty">Loading paper log&hellip;</div></div>
+  </details>
 </div>
 </div>
 
@@ -766,26 +773,32 @@ let bookCTimer = null;
 function bookCEsc(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-function bookCRowText(row) {
-  if (!row) return '';
-  if (typeof row === 'string') return row;
-  if (row.text) return row.text;
-  const call = row.opinion || row.decision || 'skip';
-  return [row.at || '', call, row.reason || row.why || ''].filter(Boolean).join(' | ');
+function bookCRowText(entry) {
+  if (!entry) return '';
+  if (typeof entry === 'string') return entry;
+  // status.json shape: { ts, bias_1d, bias_4h, bb_rank_1h, range_x_1h, context, opinion }
+  if (entry.context || entry.opinion) {
+    const gates = [];
+    if (entry.bb_rank_1h != null) gates.push('BB ' + (Number(entry.bb_rank_1h) * 100).toFixed(1) + '%');
+    if (entry.range_x_1h != null) gates.push('rng ' + Number(entry.range_x_1h).toFixed(2) + 'x');
+    const gateStr = gates.length ? ' · gates ' + gates.join(' · ') : '';
+    const call = entry.opinion ? entry.opinion.split('\n')[0].trim() : '';
+    return [entry.ts || '', gateStr, call].filter(Boolean).join(' | ');
+  }
+  // fallback: old decisions shape
+  const call = entry.opinion || entry.decision || 'skip';
+  return [entry.at || '', call, entry.reason || entry.why || ''].filter(Boolean).join(' | ');
 }
-function bookCIdle(c) {
-  const chk = c.last_check || {};
+function bookCIdle(s) {
+  if (!s || !s.context) return 'pipeline idle · no read yet';
+  const b1d = s.bias_1d || '';
+  const b4h = s.bias_4h || '';
   const bits = [];
-  if (chk.rank != null) bits.push('BB rank ' + Math.round(Number(chk.rank) * 100) + '%');
-  if (chk.vol_x != null) bits.push('vol ' + Number(chk.vol_x).toFixed(2) + 'x');
-  if (chk.oi_chg != null) bits.push('OI ' + (Number(chk.oi_chg) >= 0 ? '+' : '') + Number(chk.oi_chg).toFixed(2) + '%');
-  const divs = [];
-  if (c.rsi_div_4h) divs.push('4H ' + (c.rsi_div_4h.type || c.rsi_div_4h.side || 'div'));
-  if (c.rsi_div_daily) divs.push('1D ' + (c.rsi_div_daily.type || c.rsi_div_daily.side || 'div'));
-  if (divs.length) bits.push('RSI div ' + divs.join(', '));
-  else if (chk.fresh_div) bits.push('RSI div watch ' + chk.fresh_div);
-  const quiet = chk.signal ? 'signal on the tape, waiting on the read' : 'no setup';
-  return 'BOOK C | ' + (chk.at || 'idle') + ' | ' + quiet + ' | ' + (bits.length ? bits.join(' · ') : 'nothing lining up');
+  if (b1d) bits.push('1D ' + b1d);
+  if (b4h) bits.push('4H ' + b4h);
+  if (s.bb_rank_1h != null) bits.push('BB ' + (Number(s.bb_rank_1h) * 100).toFixed(0) + '%');
+  if (s.range_x_1h != null) bits.push('rng ' + Number(s.range_x_1h).toFixed(2) + 'x');
+  return 'MORT | ' + (s.ts || '') + ' | ' + (bits.length ? bits.join(' · ') : 'no signal');
 }
 function bookCType(text) {
   if (text === bookCTarget) return;
@@ -795,36 +808,45 @@ function bookCType(text) {
   bookCTimer = setInterval(() => {
     if (bookCShown.length >= bookCTarget.length) { clearInterval(bookCTimer); bookCTimer = null; return; }
     bookCShown = bookCTarget.slice(0, bookCShown.length + 2);
-    const el = document.getElementById('bookc-line');
+    const el = document.getElementById('mort-line');
     if (el) el.textContent = bookCShown;
   }, 16);
 }
-function bookCHtml(c, live) {
-  if (!c) return '';
-  const rows = Array.isArray(c.log) ? c.log : [];
-  const last = c.latest || rows[rows.length - 1];
-  const active = !!last;
-  const text = active ? bookCRowText(last) : bookCIdle(c);
+function bookCHtml(s, live) {
+  // s = mortStatus array (new pipeline) or c = book_c (old fallback)
+  const entries = Array.isArray(s) ? s : (Array.isArray(mortStatus) ? mortStatus : []);
+  const lastEntry = entries[entries.length - 1];
+  const active = !!lastEntry && !!lastEntry.opinion;
+  const text = active ? bookCRowText(lastEntry) : (lastEntry ? bookCIdle(lastEntry) : 'no pipeline data · loading...');
   if (active) bookCType(text);
   else { bookCTarget = text; bookCShown = text; if (bookCTimer) { clearInterval(bookCTimer); bookCTimer = null; } }
-  const prior = rows.slice(-4, -1).map(bookCRowText).filter(Boolean);
-  const op = c.open;
-  let head = '';
+  const prior = entries.slice(-5, -1).map(bookCRowText).filter(Boolean);
+  const op = paperData && paperData.compression && paperData.compression.open;
+  let openBlock = '';
   if (op && op.entry != null && op.stop != null) {
-    const s = String(op.side).toLowerCase() === 'short' ? -1 : 1;
+    const s2 = String(op.side).toLowerCase() === 'short' ? -1 : 1;
     const risk = Math.abs(Number(op.entry) - Number(op.stop));
-    const r = (live != null && risk) ? (live - Number(op.entry)) * s / risk : null;
-    head = '<div class="bookc-prior">OPEN ' + bookCEsc(String(op.side || '').toUpperCase()) +
-      ' entry ' + Math.round(op.entry) + ' stop ' + Math.round(op.stop) +
-      (op.target != null ? ' target ' + Math.round(op.target) : '') +
-      (r == null ? '' : ' ' + sR(r)) + '</div>';
+    const r = (live != null && risk) ? (live - Number(op.entry)) * s2 / risk : null;
+    openBlock = '<div class="mort-open">' +
+      '<div class="mort-open-label">Open trade</div>' +
+      '<div class="mort-open-trade' + (s2 < 0 ? ' bearish' : '') + '">' +
+      bookCEsc(String(op.side || '').toUpperCase()) + ' @ ' + Math.round(op.entry) +
+      ' stop ' + Math.round(op.stop) +
+      (op.target != null ? (' target ' + Math.round(op.target)) : '') +
+      (r == null ? '' : (' ' + sR(r) + ' R')) +
+      '</div></div>';
   }
-  return '<div class="bookc-term">' +
-    '<div class="bk-title"><b>Book C</b><span class="tag c">terminal · paper</span></div>' +
-    head +
-    (prior.length ? '<pre class="bookc-prior">' + prior.map(bookCEsc).join('\n') + '</pre>' : '') +
-    '<pre id="bookc-line" class="bookc-line">' + bookCEsc(active ? bookCShown : text) + '</pre>' +
-    '<div class="bookc-cursor">_</div></div>';
+  let opinionBlock = '';
+  if (lastEntry && lastEntry.opinion) {
+    const lines = lastEntry.opinion.split('\n').filter(l => l.trim());
+    const short = lines.slice(1).join('\n').trim();
+    if (short) opinionBlock = '<pre style="color:#5d8a6a;font-size:0.62rem;margin:8px 0 0;border-top:1px solid rgba(0,255,136,0.12);padding-top:6px;white-space:pre-wrap;line-height:1.5">' + bookCEsc(short) + '</pre>';
+  }
+  return '<div class="mort-term">' +
+    openBlock +
+    (prior.length ? '<pre class="mort-prior">' + prior.map(bookCEsc).join('\n') + '</pre>' : '') +
+    '<pre id="mort-line" class="mort-line">' + bookCEsc(active ? bookCShown : text) + '</pre>' +
+    '<div class="mort-cursor">_</div>' + opinionBlock + '</div>';
 }
 
 function renderMortCompression() {
@@ -834,128 +856,46 @@ function renderMortCompression() {
   const body = document.getElementById('cmp-body');
   const info = document.getElementById('cmp-info');
   const st = document.getElementById('cmp-status');
+  const histDiv = document.getElementById('mort-history');
+
+  // Show history section if paper log has data
   const d = paperData;
-  const $ = v => v == null ? '—' : '$' + Math.round(v).toLocaleString('en-US');
-  const lv = (label, val, cls) => '<div><label>' + label + '</label><b class="' + (cls || '') + '">' + val + '</b></div>';
-  if (!d || !d.compression) {
-    dirEl.textContent = 'LOADING'; dirEl.className = 'scan-direction cmp-dir neutral';
-    body.innerHTML = '<div class="cmp-sub">Waiting for Mort paper_trades.json…</div>';
-    return;
-  }
-  const cmp = d.compression, o = cmp.open, live = (typeof btcPrice === 'number' && btcPrice > 0) ? btcPrice : null;
-  let dir = 'NO OPEN TRADE', cls = '', dcls = 'neutral', html = '', trigTxt = 'Mort paper · quiet', extra = [];
-
-  if (o) {
-    const s = o.side === 'long' || o.side === 'LONG' ? 1 : -1;
-    const risk = o.risk || (o.entry != null && o.stop != null ? Math.abs(o.entry - o.stop) : null);
-    const legR = (live != null && risk) ? (live - o.entry) * s / risk : null;
-    const b = o.book_b || o.trail_B || null;
-    const aTgt = (o.book_a && o.book_a.target != null) ? o.book_a.target : o.target;
-    dir = 'ARMED ' + String(o.side).toUpperCase();
-    cls = s === 1 ? 'bullish' : 'bearish';
-    dcls = s === 1 ? 'long' : 'short';
-    const armedSec = o.time ? Date.parse(o.time) / 1000 : null;
-    trigTxt = armedSec ? ('Mort · armed ' + cmpRel(armedSec)) : 'Mort paper';
-
-    // Shared entry / stop (same for both books)
-    html += '<div class="cmp-shared">' +
-      lv('Entry (shared)', $(o.entry)) +
-      lv('Stop (shared)', $(o.stop), 'neg') +
-      lv('Live', live != null ? $(live) : '—') +
-      '</div>';
-
-    // Book A live R = full position vs 3R
-    const aR = legR;
-    // Book B: before half = full MTM; after half = banked + 0.5*leg
-    const banked = b ? Number(b.banked || 0) : 0;
-    const bHalf = !!(b && b.tp1_hit);
-    const bR = (b && b.status === 'closed') ? Number(b.r_net || 0) : (legR == null ? null : (bHalf ? banked + 0.5 * legR : legR));
-
-    const bars = o.bars != null ? (o.bars + '/' + (o.max_bars || 96)) : '';
-    const pa = o.book_a && o.book_a.notional != null ? o.book_a : null;
-    const eqA = acctBook('A'), eqB = acctBook('B');
-    html += '<div class="cmp-dual">';
-    // --- Book A ---
-    const la = livePos(pa, o.side, o.entry, live);
-    html += '<div class="cmp-book book-a">' +
-      '<div class="bk-title"><b>Book A</b><span class="tag a">3R full</span></div>' +
-      (aR == null ? '' : '<div class="cmp-r ' + pn(aR) + '">' + sR(aR) + (la ? '<span class="usd">' + sUsd(la.u) + '</span>' : '') + '<small>open · full size</small></div>') +
-      '<div class="cmp-levels">' + lv('Target 3R', $(aTgt), 'pos') + lv('Stop', $(o.stop), 'neg') + '</div>' +
-      (pa ? acctRows(pa, {
-        unrl: la ? '<span class="' + pn(la.u) + '">' + sUsd(la.u) + ' · ' + sR(la.r) + '</span> <small>before ' + usd(pa.cost_usd) + ' costs</small>' : '—',
-        real: usd(0) + ' <small>· nothing banked</small>',
-        eq: eqA ? usd(eqA.equity) + (la ? ' <small>· live ' + usd(eqA.equity + la.u) + '</small>' : '') : '—' }) : '') +
-      '<div class="bk-sub">Full size to 3R · box stop · dead at 96 bars</div></div>';
-    // --- Book B ---
-    const bStop = b && b.stop != null ? b.stop : o.stop;
-    const bTp1 = b && b.tp1 != null ? b.tp1 : null;
-    const bLabel = b ? (b.label || b.status || 'box→TP1') : 'box→TP1 mm';
-    const bClosed = !!(b && b.status === 'closed');
-    const pb = b && b.notional != null ? b : null;
-    const RES = { tp1_be: 'TP1 + BE', trail_stop: 'TP1 + trail stop', tp1_exp: 'TP1 + expiry', stop: 'stopped', expired: 'expired', target: 'target' };
-    if (bClosed) {
-      const rn = Number(b.r_net || 0);
-      html += '<div class="cmp-book book-b">' +
-        '<div class="bk-title"><b>Book B</b><span class="tag">closed · ' + (RES[b.result] || b.result || '') + '</span></div>' +
-        '<div class="cmp-r ' + pn(rn) + '">' + sR(rn) + (pb && pb.pnl_usd != null ? '<span class="usd">' + sUsd(pb.pnl_usd) + '</span>' : '') + '<small>realized · net</small></div>' +
-        '<div class="cmp-levels">' + lv('TP1 (half)', $(bTp1), 'pos') + lv('Avg exit', $(b.exit_price)) + '</div>' +
-        (pb ? acctRows(pb, {
-          unrl: usd(0) + ' · 0.00R <small>· flat</small>',
-          real: '<span class="' + pn(pb.pnl_usd) + '">' + sUsd(pb.pnl_usd) + ' · ' + sR(rn) + '</span> <small>(' + sUsd(pb.gross_usd) + ' − ' + usd(pb.cost_usd) + ' costs)</small>',
-          eq: eqB ? usd(eqB.equity) : usd(pb.equity_after) }) : '') +
-        '<div class="bk-sub">Half off at TP1' + (b.tp1_time ? ' ' + cmpRel(Date.parse(b.tp1_time) / 1000).split(' · ')[0] : '') +
-          ' · runner out' + (b.exit_time ? ' ' + cmpRel(Date.parse(b.exit_time) / 1000).split(' · ')[0] : '') + '</div></div>';
-    } else {
-      const lb = livePos(pb, o.side, o.entry, live);
-      const bUsd = lb ? lb.banked + lb.u : null;
-      html += '<div class="cmp-book book-b">' +
-        '<div class="bk-title"><b>Book B</b><span class="tag">' + (bHalf ? '4H 21 −0.5%' : 'measured move') + '</span></div>' +
-        (bR == null ? '' : '<div class="cmp-r ' + pn(bR) + '">' + sR(bR) + (bUsd != null ? '<span class="usd">' + sUsd(bUsd) + '</span>' : '') + '<small>' +
-          (bHalf ? ('half · banked ' + sR(banked)) : 'await TP1 half') + '</small></div>') +
-        '<div class="cmp-levels">' + lv('TP1 (half)', $(bTp1), 'pos') + lv(bHalf ? 'BE / trail' : 'Stop', $(bStop), 'neg') + '</div>' +
-        (pb ? acctRows(pb, {
-          unrl: lb ? '<span class="' + pn(lb.u) + '">' + sUsd(lb.u) + ' · ' + sR(lb.r) + '</span>' + (bHalf ? ' <small>half open</small>' : '') : '—',
-          real: bHalf ? '<span class="pos">' + sUsd(pb.banked_usd) + ' · ' + sR(banked) + '</span> <small>half at TP1, costs at close</small>' : usd(0),
-          eq: eqB ? usd(eqB.equity) + (lb ? ' <small>· live ' + usd(eqB.equity + lb.banked + lb.u) + '</small>' : '') : '—' }) : '') +
-        '<div class="bk-sub">' + bLabel +
-          (b && b.sma21_4h != null ? (' · 4H 21 −0.5% ' + $(b.sma21_4h)) : '') +
-          ' · no 3R cap on B</div></div>';
-    }
-    html += '</div>';
-
-    const box = (o.box_low != null && o.box_high != null) ? ('box ' + $(o.box_low) + '–' + $(o.box_high)) : '';
-    html += '<div class="cmp-sub">' + [bars ? (bars + ' candles') : '', o.risk_pct != null ? ('stop ' + Number(o.risk_pct).toFixed(2) + '% away') : '', box].filter(Boolean).join(' · ') + '</div>';
-    if (o.bbw_pct != null) extra.push('Armed BB-width rank ' + Math.round(o.bbw_pct * 100) + '%' + (o.box_ratio != null ? (' · range ' + Number(o.box_ratio).toFixed(2) + '× prior') : ''));
-    if (o.oi_chg_pct != null) extra.push('OI on arm ' + (o.oi_chg_pct >= 0 ? '+' : '') + Number(o.oi_chg_pct).toFixed(2) + '%' + (o.oi_src ? (' (' + o.oi_src + ')') : ''));
-  } else if (cmp.last) {
-    const L = cmp.last;
-    dir = 'FLAT';
-    trigTxt = 'Last closed';
-    html = '<div class="cmp-sub">Last A: ' + (L.side || '') + ' → <span class="' + ((L.r_net || 0) >= 0 ? 'pos' : 'neg') + '">' +
-      (L.result || '') + ' ' + ((L.r_net || 0) >= 0 ? '+' : '') + Number(L.r_net || 0).toFixed(2) + 'R</span></div>';
-    if (cmp.trail_last) {
-      const T = cmp.trail_last;
-      html += '<div class="cmp-sub">Last B: ' + (T.result || '') + ' ' +
-        ((T.r_net || 0) >= 0 ? '+' : '') + Number(T.r_net || 0).toFixed(2) + 'R</div>';
-    }
-  } else {
-    html = '<div class="cmp-sub">No open Mort compression trade. Scanner checks every 15 min (:01/:16/:31/:46 CT).</div>';
+  if (histDiv) {
+    const hasHistory = d && d.compression && (d.compression.open || d.compression.last || (d.trade_log && d.trade_log.length));
+    histDiv.style.display = hasHistory ? 'block' : 'none';
   }
 
-  html += bookCHtml(cmp.book_c, live);
-  dirEl.textContent = dir; dirEl.className = 'scan-direction cmp-dir ' + dcls;
+  // Build bias badges from status.json
+  const entries = Array.isArray(mortStatus) ? mortStatus : [];
+  const lastEntry = entries[entries.length - 1];
+  const b1d = lastEntry ? (lastEntry.bias_1d || '') : '';
+  const b4h = lastEntry ? (lastEntry.bias_4h || '') : '';
+  const live = (typeof btcPrice === 'number' && btcPrice > 0) ? btcPrice : null;
+
+  let dir = 'FLAT', dcls = 'neutral', cls = '', trigTxt = 'no signal', extra = [];
+  if (b1d || b4h) {
+    dcls = b1d === 'bullish' ? 'long' : (b1d === 'bearish' ? 'short' : 'neutral');
+    cls = dcls;
+    dir = (b1d || '') + ' / ' + (b4h || '');
+    const ts = lastEntry ? (lastEntry.ts || '') : '';
+    trigTxt = ts ? ('scan ' + ts) : 'pipeline';
+  }
+
+  dirEl.textContent = dir || 'FLAT';
+  dirEl.className = 'scan-direction cmp-dir ' + dcls;
   card.className = 'card scan-card cmp-card' + (cls ? ' ' + cls : '');
   trig.textContent = trigTxt;
-  body.innerHTML = html;
-  extra.push('Source: Mort paper_trades.json · dual books on same entry/stop');
-  if (d.account) extra.push('Paper $: each book starts ' + usd0(d.account.start) + ' · ' + d.account.sizing);
-  extra.push(cmp.books || 'A: full 3R · B: half at measured-move TP1 → BE → 4H 21 −0.5%');
-  if (cmp.scanner_runs) extra.push(cmp.scanner_runs);
-  info.innerHTML = extra.join('<br>');
-  st.textContent = 'PAPER · Mort · ' + (d.generated ? ('log ' + d.generated) : 'updated ' + new Date().toLocaleTimeString());
-  st.className = 'scan-status' + (o ? ' firing' : '');
 
-  // Chart overlays: shaded box, entry, stop, Book A 3R. Book B TP1 only if not yet hit. Hidden when flat.
+  body.innerHTML = bookCHtml(mortStatus, live);
+
+  if (lastEntry && lastEntry.context) {
+    extra.push(bookCEsc(lastEntry.context));
+  }
+  if (d && d.account) extra.push('Paper log · ' + (d.generated ? ('updated ' + d.generated) : ''));
+  extra.push('Source: Mort status.json · paper_trades.json');
+  info.innerHTML = extra.join('<br>');
+  st.textContent = 'MORT · ' + (lastEntry && lastEntry.ts ? ('scan ' + lastEntry.ts) : 'loading');
+
   syncTradeOverlays();
 }
 // <<< CMP
@@ -1043,11 +983,23 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTV(); }
 // ─── Boot ────────────────────────────────────────────────────────────────
 // Paper trades card: Mort's real PAPER log, exported hourly to paper_trades.json by mort/paper_log/publish_dashboard.sh
 let paperData = null;
+let mortStatus = null;
+async function loadMortStatus() {
+  try {
+    const r = await fetch('status.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    mortStatus = await r.json();
+  } catch (e) {
+    console.warn('Mort status:', e.message);
+    mortStatus = null;
+  }
+}
 async function loadPaper() {
   try {
     const r = await fetch('paper_trades.json?t=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     paperData = await r.json();
+    await loadMortStatus();
     renderPaper();
     renderMortCompression();
     renderSwing();
