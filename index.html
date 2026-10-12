@@ -212,6 +212,17 @@
   .mort-open-label { font-size: 0.55rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
   .mort-open-trade { color: var(--green); }
   .mort-open-trade.bearish { color: var(--red); }
+  .trade-banner { border-radius: 6px; padding: 9px 12px; margin: 8px 0; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .trade-banner.long { background: rgba(0,255,136,0.10); border: 1px solid rgba(0,255,136,0.45); color: var(--green); }
+  .trade-banner.short { background: rgba(255,51,102,0.10); border: 1px solid rgba(255,51,102,0.45); color: var(--red); }
+  .trade-banner.none { background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); color: var(--text-dim); font-size: 0.62rem; font-weight: 400; padding: 6px 10px; }
+  .trade-banner .tb-side { font-weight: 700; letter-spacing: 1px; }
+  .trade-banner .tb-pip { color: rgba(255,255,255,0.35); }
+  .mort-prior-wrap { margin-top: 6px; }
+  .mort-prior-toggle { font-size: 0.58rem; color: var(--text-dim); cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px; display: inline-block; }
+  .mort-prior-toggle:hover { color: var(--cyan); }
+  .mort-prior-wrap .mort-prior { display: none; }
+  .mort-prior-wrap.open .mort-prior { display: block; }
   @keyframes bookc-blink { 50% { opacity: 0; } }
   .heatmap-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--card-border); font-size: 0.72rem; color: var(--text-dim); }
   .heatmap-row .card-title { margin: 0; }
@@ -836,15 +847,22 @@ function bookCHtml(s, live) {
       (r == null ? '' : (' ' + sR(r) + ' R')) +
       '</div></div>';
   }
+  // prior entries collapsed behind toggle
+  let priorBlock = '';
+  if (prior.length) {
+    priorBlock = '<div class="mort-prior-wrap" id="mort-prior-wrap">' +
+      '<span class="mort-prior-toggle" onclick="this.parentElement.classList.toggle(\'open\');this.style.display=\'none\'">&#9656; prior ' + prior.length + ' read' + (prior.length > 1 ? 's' : '') + '</span>' +
+      '<pre class="mort-prior">' + prior.map(bookCEsc).join('\n') + '</pre></div>';
+  }
   let opinionBlock = '';
   if (lastEntry && lastEntry.opinion) {
     const lines = lastEntry.opinion.split('\n').filter(l => l.trim());
     const short = lines.slice(1).join('\n').trim();
     if (short) opinionBlock = '<pre style="color:#5d8a6a;font-size:0.62rem;margin:8px 0 0;border-top:1px solid rgba(0,255,136,0.12);padding-top:6px;white-space:pre-wrap;line-height:1.5">' + bookCEsc(short) + '</pre>';
   }
-  return '<div class="mort-term">' +
+  return '<div class="mort-term" id="mort-term">' +
     openBlock +
-    (prior.length ? '<pre class="mort-prior">' + prior.map(bookCEsc).join('\n') + '</pre>' : '') +
+    priorBlock +
     '<pre id="mort-line" class="mort-line">' + bookCEsc(active ? bookCShown : text) + '</pre>' +
     '<div class="mort-cursor">_</div>' + opinionBlock + '</div>';
 }
@@ -886,7 +904,26 @@ function renderMortCompression() {
   card.className = 'card scan-card cmp-card' + (cls ? ' ' + cls : '');
   trig.textContent = trigTxt;
 
-  body.innerHTML = bookCHtml(mortStatus, live);
+  // Trade banner: goes directly under the bias line (card header already shows bias)
+  const op = d && d.compression && d.compression.open;
+  let tradeBanner = '<div class="trade-banner none">No trade open</div>';
+  if (op && op.entry != null && op.stop != null) {
+    const s = String(op.side || '').toLowerCase();
+    const s2 = (s === 'short') ? -1 : 1;
+    const risk = Math.abs(Number(op.entry) - Number(op.stop));
+    const r = (live != null && risk) ? (live - Number(op.entry)) * s2 / risk : null;
+    const cls2 = s === 'short' ? 'short' : 'long';
+    const tp = op.target != null ? ('<span class="tb-pip"> · </span>TP ' + Math.round(op.target).toLocaleString('en-US')) : '';
+    const rStr = r != null ? ('<span class="tb-pip"> · </span>' + sR(r) + ' R') : '';
+    tradeBanner = '<div class="trade-banner ' + cls2 + '">' +
+      '<span class="tb-side">' + s.toUpperCase() + '</span>' +
+      '<span class="tb-pip">@</span>' + Math.round(op.entry).toLocaleString('en-US') +
+      '<span class="tb-pip">·</span>stop ' + Math.round(op.stop).toLocaleString('en-US') +
+      tp + rStr +
+      '</div>';
+  }
+
+  body.innerHTML = tradeBanner + bookCHtml(mortStatus, live);
 
   if (lastEntry && lastEntry.context) {
     extra.push(bookCEsc(lastEntry.context));
