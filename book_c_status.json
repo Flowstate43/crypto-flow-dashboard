@@ -30,5 +30,19 @@
     "bb_rank_4h": null,
     "context": "BTC $83,059 | 1H ATR 385\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\n1D BB width n/a | rank n/a | bias unknown\n1D SMA21 SMA21 n/a | SMA50 n/a | SMA200 n/a\n1D price in 82k\u201386k range: 2650% from bottom\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width n/a | rank n/a | bias unknown\n4H SMA21 SMA21 n/a | SMA50 n/a | SMA200 n/a\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 79% | range 2.30\u00d7 \u2192 wide\n1H OI -0.5%\n1H volume 0.44\u00d7 avg 20h | RSI 14 49\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nOI 4H vs prior 4H n/a\nRSI divs 1H/4H/1D: 1H bearish\nSwing high +0.0 ATR | swing low -0.3 ATR",
     "opinion": "Daily compression, 4H compression, 1H ATR squeeze at extremes. No setup fires because BB width is 2.30\u00d7 with volume at 0.44\u00d7 average\u2014the range is wide but participation is anemic, leavingRSI divergence unconfirmed and price without conviction to commit either direction.\n\nStructure is coiling for a rangedexplosive move, likely a false break of 82k\u201386k toward liquidity sweeps before reversal; macro flow remains constructive but positioning needs to be reset before a clean entry forms."
+  },
+  {
+    "ts": "2026-10-12 16:35",
+    "at": 1791840947987,
+    "bb_rank_1h": 0.7861,
+    "range_x_1h": 2.3036,
+    "oi_1h": -0.503,
+    "bias_1d": "unknown",
+    "bias_4h": "unknown",
+    "comp_1h": "wide",
+    "bb_rank_1d": null,
+    "bb_rank_4h": null,
+    "context": "BTC $83,059 | 1H ATR 385\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\n1D BB width n/a | rank n/a | bias unknown\n1D SMA21 SMA21 n/a | SMA50 n/a | SMA200 n/a\n1D price in 82k\u201386k range: 2650% from bottom\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width n/a | rank n/a | bias unknown\n4H SMA21 SMA21 n/a | SMA50 n/a | SMA200 n/a\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 79% | range 2.30\u00d7 \u2192 wide\n1H OI -0.5%\n1H volume 0.44\u00d7 avg 20h | RSI 14 49\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nOI 4H vs prior 4H n/a\nRSI divs 1H/4H/1D: 1H bearish\nSwing high +0.0 ATR | swing low -0.3 ATR",
+    "opinion": "Daily neutral, 4H neutral, 1H compressing at range highs. No setups firing because 1H BB rank 79% at swing high with bearish RSI div means price is stuck in a distribution zone\u2014bulls can't commit with volume at 0.44\u00d7 avg and OI dropping, bears can't press with RSI 49 neutral and no clean breakdown. The second opinion: this is a classic compression-before-expansion at structural resistance; watch for a v-top reversal if 1H closes below $82.3k with volume, or a breakout above $86k to confirm the range expansion thesis."
   }
 ]
