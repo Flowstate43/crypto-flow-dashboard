@@ -320,5 +320,19 @@
     "range_x_1h": 2.3524,
     "context": "BTC $83,393 | 1H ATR 507\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.81% | rank 5% | bias bullish\n1D SMA21 84,106 (-0.85%) | SMA50 81,008 | SMA200 72,049\n1D price in 82k\u201386k range: 35% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.19% | rank 27% | bias bullish\n4H SMA21 83,178 (+0.26%) | SMA50 83,531 | SMA200 82,160\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 85% | range 2.35\u00d7 \u2192 wide/narrowing\n1H RSI 14: 70\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 83,410 (-0.02%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0035% / 8h | ~3.8% annualized\nOI $7.88B (+0.1% vs prior 4H)\nRSI divs: 4H bearish\nSwing high +0.9 ATR | swing low -0.9 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
     "opinion": "**Verification:**\n\n1. **RSI divergences (4H bearish):** AGREE \u2014 4H RSI made lower highs (58\u219255\u219251) while price repeatedly tapped ~83.8\u201384K, a clear bearish divergence.\n2. **Compression/coil:** DISAGREE \u2014 1H BB rank 85% is wide, not coiled; 4H BB rank 27% is tight but price is grinding, not compressing into a coil; neither TF shows true compression.\n3. **Bias bullish:** DISAGREE \u2014 1D price is stuck mid-range with RSI dropping from 74\u219247 over five days; 4H RSI also declining; the bullish case is weakening.\n\n**Actual view:** BTC is grinding sideways in a ~$2K 4H range with decaying RSI momentum and no clear directional bias."
+  },
+  {
+    "ts": "2026-10-13 12:05",
+    "at": 1791911101478,
+    "bias_1d": "bullish",
+    "bias_4h": "bullish",
+    "oi_val": 7865279654.0,
+    "oi_chg": -0.03,
+    "funding": 0.003455,
+    "funding_ann": 3.78,
+    "bb_rank_1h": 0.85,
+    "range_x_1h": 2.3524,
+    "context": "BTC $83,344 | 1H ATR 474\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.81% | rank 5% | bias bullish\n1D SMA21 84,106 (-0.91%) | SMA50 81,008 | SMA200 72,049\n1D price in 82k\u201386k range: 34% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.19% | rank 27% | bias bullish\n4H SMA21 83,178 (+0.20%) | SMA50 83,531 | SMA200 82,160\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 85% | range 2.35\u00d7 \u2192 wide/narrowing\n1H RSI 14: 61\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 83,402 (-0.07%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0035% / 8h | ~3.8% annualized\nOI $7.87B (-0.0% vs prior 4H)\nRSI divs: 4H bearish\nSwing high +1.0 ATR | swing low -0.8 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
+    "opinion": "1. RSI divs (4H bearish): DISAGREE \u2014 price and RSI are broadly falling together, no clean higher-high/lower-RSIdivergence visible in the 4H sequence.\n2. Compression/coil: AGREE \u2014 1H BB rank 85% with range contracting (2.35\u00d7 ATR) and price coiling between 83,100\u201383,500.\n3. Bias (bullish): AGREE \u2014 price above SMA21 on daily and 4H, holding the upper part of the 82k\u201386k daily band.\n\nShort sentence: BTC is grinding in a tight coil between 83,100\u201383,500 after the 81k bounce, RSI flat in the 50s with no clear divergence, awaiting a breakout."
   }
 ]
