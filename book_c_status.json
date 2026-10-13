@@ -282,5 +282,33 @@
     "range_x_1h": 0.3416,
     "context": "BTC $83,647 | 1H ATR 582\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.81% | rank 5% | bias bullish\n1D SMA21 84,106 (-0.55%) | SMA50 81,008 | SMA200 72,049\n1D price in 82k\u201386k range: 59% from top of 82k\u201386k band\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.22% | rank 17% | bias bullish\n4H SMA21 83,030 (+0.74%) | SMA50 83,695 | SMA200 82,081\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 1% | range 0.34\u00d7 \u2192 COILED\n1H RSI 14: 60\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 82,927 (+0.87%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0067% / period | ~354.3% annualized\nOI $7.81B (change n/a)\nRSI divs: 1H bearish, 4H bearish, 1D bearish\nSwing high +0.4 ATR | swing low -0.3 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
     "opinion": "Daily: bullish structure intact but 1D RSI divs and BB rank at 5% signal compression | 4H: bullish, tight at 17% | 1H: range 0.34\u00d7 ATR, rank 1%, and RSI 14 coiled\u2014micro structure is wound tight with all three TF RSI divs bearish.\n\nNo setup because the coil on 1H is too aggressive for a clean entry; price needs to digest or break the 82k\u201386k range cleanly before a directional setup qualifies.\n\nSecond opinion: the simultaneous bullish macro bias on Daily/4H against triple-timeframe RSI divs suggests a distribution phase or stealth accumulator building\u2014this kind of compression usually resolves with a violent directional move, and with funding still moderate at 0.0067%, it could besmart money unwinding positions before a liquidity grab."
+  },
+  {
+    "ts": "2026-10-13 01:15",
+    "at": 1791872124571,
+    "bias_1d": "bullish",
+    "bias_4h": "bullish",
+    "oi_val": 7805284332.0,
+    "oi_chg": null,
+    "funding": 0.006741,
+    "funding_ann": 3.54,
+    "bb_rank_1h": 0.0067,
+    "range_x_1h": 0.3416,
+    "context": "BTC $83,647 | 1H ATR 582\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.81% | rank 5% | bias bullish\n1D SMA21 84,106 (-0.55%) | SMA50 81,008 | SMA200 72,049\n1D price in 82k\u201386k range: 59% from top of 82k\u201386k band\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.22% | rank 17% | bias bullish\n4H SMA21 83,030 (+0.74%) | SMA50 83,695 | SMA200 82,081\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 1% | range 0.34\u00d7 \u2192 COILED\n1H RSI 14: 60\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 83,032 (+0.74%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0067% / period | ~3.5% annualized\nOI $7.81B (change n/a)\nRSI divs: 1H bearish, 4H bearish, 1D bearish\nSwing high +0.4 ATR | swing low -0.3 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
+    "opinion": "Daily: bullish | 4H: bullish | 1H: coiling at BB rank 1%, range 0.34\u00d7 \u2192 no setup because all timeframes are compressed and coiled, with tight BBs across the board and bearish RSI divs on 1H/4H/1D suggesting upward momentum is stalling despite the bullish label.\n\nSecond opinion: the simultaneous tightening across all timeframes (1D BB width rank 5%, 4H 17%, 1H 1%) is setting up a violent volatility expansion \u2014 likely a directional move within the 82k\u201386k range, and the multi-timeframe bearish RSI divs could be warning of a false break higher before any real directional impulse develops."
+  },
+  {
+    "ts": "2026-10-13 01:16",
+    "at": 1791872165781,
+    "bias_1d": "bullish",
+    "bias_4h": "bullish",
+    "oi_val": 7808154967.0,
+    "oi_chg": 8449614.31,
+    "funding": 0.006741,
+    "funding_ann": 3.54,
+    "bb_rank_1h": 0.0067,
+    "range_x_1h": 0.3416,
+    "context": "BTC $83,647 | 1H ATR 582\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.81% | rank 5% | bias bullish\n1D SMA21 84,106 (-0.55%) | SMA50 81,008 | SMA200 72,049\n1D price in 82k\u201386k range: 59% from top of 82k\u201386k band\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.22% | rank 17% | bias bullish\n4H SMA21 83,030 (+0.74%) | SMA50 83,695 | SMA200 82,081\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 1% | range 0.34\u00d7 \u2192 COILED\n1H RSI 14: 60\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 83,032 (+0.74%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0067% / period | ~3.5% annualized\nOI $7.81B (+8449614.3% vs prior 4H)\nRSI divs: 1H bearish, 4H bearish, 1D bearish\nSwing high +0.4 ATR | swing low -0.3 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
+    "opinion": "**Daily**: bullish, 1D BB width rank 5% signals low-vol compression historically preceding expansion. Price holding 59% into the 82k\u201386k range, above all SMAs, still room before range top.\n\n**4H**: bullish alignment\u2014price above SMA21/50/200, BB width rank 17%. Coiled but less extremely than 1H.\n\n**1H/15m**: coiled to max. 1H BB rank 1%, range just 0.34\u00d7 ATR. RSI 60 on 1H with bearish divs across all timeframes creates a mixed picture\u2014momentum fading while price grinds.\n\n**No setup fires** because 1H compression at rank 1% offers poor risk/reward entry; a move in either direction could be 1\u20132 ATR, and bearish RSI divs warn that upward breaks may lack follow-through.\n\n**Second opinion**: OI surging to $7.81B (+8449% vs prior 4H) with only modest funding suggests fresh positions being built but without extreme leverage bias\u2014this is a coiled spring waiting for a catalyst. If 1HBB finally expands, the move could be violent; watch whether OI continues climbing or plateaus as the initial expansion wave plays out."
   }
 ]
