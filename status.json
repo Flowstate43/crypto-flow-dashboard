@@ -334,5 +334,19 @@
     "range_x_1h": 2.3524,
     "context": "BTC $83,344 | 1H ATR 474\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.81% | rank 5% | bias bullish\n1D SMA21 84,106 (-0.91%) | SMA50 81,008 | SMA200 72,049\n1D price in 82k\u201386k range: 34% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.19% | rank 27% | bias bullish\n4H SMA21 83,178 (+0.20%) | SMA50 83,531 | SMA200 82,160\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 85% | range 2.35\u00d7 \u2192 wide/narrowing\n1H RSI 14: 61\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 83,402 (-0.07%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0035% / 8h | ~3.8% annualized\nOI $7.87B (-0.0% vs prior 4H)\nRSI divs: 4H bearish\nSwing high +1.0 ATR | swing low -0.8 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
     "opinion": "1. RSI divs (4H bearish): DISAGREE \u2014 price and RSI are broadly falling together, no clean higher-high/lower-RSIdivergence visible in the 4H sequence.\n2. Compression/coil: AGREE \u2014 1H BB rank 85% with range contracting (2.35\u00d7 ATR) and price coiling between 83,100\u201383,500.\n3. Bias (bullish): AGREE \u2014 price above SMA21 on daily and 4H, holding the upper part of the 82k\u201386k daily band.\n\nShort sentence: BTC is grinding in a tight coil between 83,100\u201383,500 after the 81k bounce, RSI flat in the 50s with no clear divergence, awaiting a breakout."
+  },
+  {
+    "ts": "2026-10-13 12:18",
+    "at": 1791911927660,
+    "bias_1d": "bullish",
+    "bias_4h": "bullish",
+    "oi_val": 7848745446.0,
+    "oi_chg": -0.24,
+    "funding": 0.003455,
+    "funding_ann": 3.78,
+    "bb_rank_1h": 0.85,
+    "range_x_1h": 2.3524,
+    "context": "BTC $83,344 | 1H ATR 474\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.81% | rank 5% | bias bullish\n1D SMA21 84,106 (-0.91%) | SMA50 81,008 | SMA200 72,049\n1D price in 82k\u201386k range: 34% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.19% | rank 27% | bias bullish\n4H SMA21 83,178 (+0.20%) | SMA50 83,531 | SMA200 82,160\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 85% | range 2.35\u00d7 \u2192 wide/narrowing\n1H RSI 14: 61\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 83,394 (-0.06%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0035% / 8h | ~3.8% annualized\nOI $7.85B (-0.2% vs prior 4H)\nRSI divs: 4H bearish\nSwing high +1.0 ATR | swing low -0.8 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
+    "opinion": "**RSI Divergence:** 1H shows swing high at bar 22 (h=84134, rsi=57) vs bar 21 (h=84025, rsi=61) \u2014 price made higher high, RSI made lower high = **bearish div**. Price dropped 790 pts from 84134 to 83344, exceeding 1 ATR (474). Divergence is LIVE and has resolved lower. **AGREE** with scanner's 4H bearish div signal.\n\n**Compression:** 1H range last 5 bars: 83,344\u201383,576 = **232 pts (0.49\u00d7 ATR)**. This is genuinely tight vs the prior 10-bar range of ~1,564 pts. **AGREE** \u2014 coil is real.\n\n**Bias:** Computed SMA21: 1H=83,423, 4H=83,037, 1D=83,311. Current price 83,344 is **below 1H SMA21, above 4H SMA21, below 1D SMA21**. Slight bearish on short-term, neutral mid-term. Scanner claims bullish bias \u2014 **DISAGREE on 1H/1D, but 4H is close enough to call neutral/bullish transition.**"
   }
 ]
