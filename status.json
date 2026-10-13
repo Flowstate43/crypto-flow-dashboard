@@ -180,5 +180,19 @@
     "range_x_1h": 2.3174,
     "context": "BTC $83,325 | 1H ATR 586\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.81% | rank 5% | bias bullish\n1D SMA21 84,106 (-0.93%) | SMA50 81,008 | SMA200 72,049\n1D price in 82k\u201386k range: 33% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.21% | rank 23% | bias bullish\n4H SMA21 83,139 (+0.22%) | SMA50 83,587 | SMA200 82,133\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 90% | range 2.32\u00d7 \u2192 wide/narrowing\n1H RSI 14: 59\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 83,583 (-0.31%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0083% / 8h | ~9.1% annualized\nOI $7.81B (+0.1% vs prior 4H)\nRSI divs: 1H bearish, 4H bearish, 1D bearish\nSwing high +0.9 ATR | swing low -0.6 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
     "opinion": "Daily: compressed vol (BB rank 5%) with price stuck in lower 33% of the 82k\u201386k range \u2014 no setup fires here because the squeeze hasn't resolved directionally.\n\n4H: still tight (BB rank 23%) with RSI divergences on all three timeframes creating a wall of overhead resistance; the bullish bias contradicts the momentum setup, keeping me on the sidelines.\n\nSecond opinion: with daily vol at a 5% percentile, a range expansion is overdue \u2014 if BTC reclaims 84k\u201385k with volume, the long side becomes viable, but chasing here into bearish divs across multiple timeframes is low-odds. Watch funding and OI for a squeeze signal rather than entering pre-emptively."
+  },
+  {
+    "ts": "2026-10-13 07:35",
+    "at": 1791894901575,
+    "bias_1d": "bullish",
+    "bias_4h": "bullish",
+    "oi_val": 7860933123.0,
+    "oi_chg": 0.74,
+    "funding": 0.008349,
+    "funding_ann": 9.14,
+    "bb_rank_1h": 0.9,
+    "range_x_1h": 2.3174,
+    "context": "BTC $83,325 | 1H ATR 586\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.81% | rank 5% | bias bullish\n1D SMA21 84,106 (-0.93%) | SMA50 81,008 | SMA200 72,049\n1D price in 82k\u201386k range: 33% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.21% | rank 23% | bias bullish\n4H SMA21 83,139 (+0.22%) | SMA50 83,587 | SMA200 82,133\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 90% | range 2.32\u00d7 \u2192 wide/narrowing\n1H RSI 14: 59\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 83,543 (-0.26%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0083% / 8h | ~9.1% annualized\nOI $7.86B (+0.7% vs prior 4H)\nRSI divs: 1H bearish, 4H bearish, 1D bearish\nSwing high +0.9 ATR | swing low -0.6 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
+    "opinion": "Daily: bullish | 4H: bullish, 1H wide at BB rank 90%. No setup because 1H RSI div + multiple TF bearish divergences warn of a mean reversion pull from the 1H upper band, and price is only 33% into the 82k\u201386k range\u2014leaving too much room below for stops to breathe before confirming a directional move.\n\nSecond opinion: The elevated funding (~9.1% annualized) and rising OI near the top of the daily range suggest longs are being crowded, and if sellers appear, a quick flush to fill the 82k\u201386k vacuum could follow."
   }
 ]
