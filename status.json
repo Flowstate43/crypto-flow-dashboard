@@ -440,5 +440,58 @@
       "DISAGREE compression: ai=yes scan=no"
     ],
     "model": "ollama-cloud/deepseek-v4-pro:0813"
+  },
+  {
+    "ts": "2026-10-13 13:05",
+    "at": 1791914701355,
+    "bias_1d": "bullish",
+    "bias_4h": "bullish",
+    "oi_val": 7832846020.0,
+    "oi_chg": -0.44,
+    "funding": 0.003455,
+    "funding_ann": 3.78,
+    "bb_rank_1h": 0.85,
+    "range_x_1h": 2.3524,
+    "context": "BTC $83,063 | 1H ATR 445\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.81% | rank 5% | bias bullish\n1D SMA21 84,106 (-1.24%) | SMA50 81,008 | SMA200 72,049\n1D price in 82k\u201386k range: 27% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.19% | rank 27% | bias bullish\n4H SMA21 83,178 (-0.14%) | SMA50 83,531 | SMA200 82,160\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 85% | range 2.35\u00d7 \u2192 wide/narrowing\n1H RSI 14: 44\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 83,376 (-0.37%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0035% / 8h | ~3.8% annualized\nOI $7.83B (-0.4% vs prior 4H)\nRSI divs: none\nSwing high +0.0 ATR | swing low -0.2 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
+    "opinion": "AI (blind): Higher timeframe bullish but 1H bearish with tight compression; watch 81698 support for breakdown or reclaim 83509. | S [81698, 80987] R [84134, 84336]\nAGREE bias_1d: ai=bull scan=bull\nAGREE bias_4h: ai=bull scan=bull\nAGREE bias_1h: ai=bear scan=bear\nAGREE div_1d: ai=none scan=none\nAGREE div_4h: ai=none scan=none\nAGREE div_1h: ai=none (bullish, played out) scan=none\nDISAGREE compression: ai=yes scan=no",
+    "blind": {
+      "bias_1d": "bull",
+      "bias_4h": "bull",
+      "bias_1h": "bear",
+      "div_1d": {
+        "type": "none",
+        "played_out": false
+      },
+      "div_4h": {
+        "type": "none",
+        "played_out": false
+      },
+      "div_1h": {
+        "type": "bullish",
+        "played_out": true
+      },
+      "compression": "yes",
+      "levels": {
+        "support": [
+          81698,
+          80987
+        ],
+        "resistance": [
+          84134,
+          84336
+        ]
+      },
+      "read": "Higher timeframe bullish but 1H bearish with tight compression; watch 81698 support for breakdown or reclaim 83509."
+    },
+    "compare": [
+      "AGREE bias_1d: ai=bull scan=bull",
+      "AGREE bias_4h: ai=bull scan=bull",
+      "AGREE bias_1h: ai=bear scan=bear",
+      "AGREE div_1d: ai=none scan=none",
+      "AGREE div_4h: ai=none scan=none",
+      "AGREE div_1h: ai=none (bullish, played out) scan=none",
+      "DISAGREE compression: ai=yes scan=no"
+    ],
+    "model": "ollama-cloud/deepseek-v4-pro:0813"
   }
 ]
