@@ -147,6 +147,13 @@
   .cmp-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
   .cmp-trig { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text); }
   .scan-direction.cmp-dir { font-size: 1.9rem; margin: 10px 0 12px; }
+  .bias-badges { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .bias-label { font-family: var(--font-header); font-size: 0.55rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; }
+  .bias-badge { font-family: var(--font-header); font-size: 0.6rem; font-weight: 700; letter-spacing: 1.5px; border-radius: 4px; padding: 3px 9px; text-transform: uppercase; }
+  .bias-badge.bullish { background: rgba(0,255,136,0.12); border: 1px solid rgba(0,255,136,0.5); color: var(--green); }
+  .bias-badge.bearish { background: rgba(255,51,102,0.12); border: 1px solid rgba(255,51,102,0.5); color: var(--red); }
+  .bias-badge.neutral { background: rgba(255,224,102,0.08); border: 1px solid rgba(255,224,102,0.35); color: var(--yellow); }
+  .bias-badge.none { background: transparent; border: 1px solid var(--card-border); color: var(--text-dim); }
   .cmp-r { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 600; margin-bottom: 12px; }
   .cmp-r small { font-size: 0.72rem; color: var(--text-dim); font-weight: 400; margin-left: 8px; }
   .cmp-levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -309,7 +316,7 @@
       <div class="card-title" style="margin:0">Mort &middot; BTC pipeline <span class="cmp-tag">Paper</span></div>
       <div class="cmp-trig" id="cmp-trig"></div>
     </div>
-    <div class="scan-direction neutral cmp-dir" id="cmp-dir">CALCULATING</div>
+    <div class="bias-badges" id="cmp-dir"><span class="bias-label">BIAS</span><span class="bias-badge" id="bias-1d">—</span><span class="bias-badge" id="bias-4h">—</span></div>
     <div id="cmp-body"><div class="cmp-sub">Loading pipeline status&hellip;</div></div>
     <details class="cmp-details"><summary>AI reads &amp; prior entries</summary>
       <div class="cmp-info" id="cmp-info"></div>
@@ -899,8 +906,14 @@ function renderMortCompression() {
     trigTxt = ts ? ('scan ' + ts) : 'pipeline';
   }
 
-  dirEl.textContent = dir || 'FLAT';
-  dirEl.className = 'scan-direction cmp-dir ' + dcls;
+  // Render two labeled bias badges
+  const b1dCls = b1d === 'bullish' ? 'bullish' : b1d === 'bearish' ? 'bearish' : b1d ? 'neutral' : 'none';
+  const b4hCls = b4h === 'bullish' ? 'bullish' : b4h === 'bearish' ? 'bearish' : b4h ? 'neutral' : 'none';
+  if (dirEl) {
+    dirEl.innerHTML = '<span class="bias-label">BIAS</span>' +
+      '<span class="bias-badge ' + b1dCls + '" id="bias-1d">' + (b1d ? b1d.toUpperCase() : '—') + '</span>' +
+      '<span class="bias-badge ' + b4hCls + '" id="bias-4h">' + (b4h ? b4h.toUpperCase() : '—') + '</span>';
+  }
   card.className = 'card scan-card cmp-card' + (cls ? ' ' + cls : '');
   trig.textContent = trigTxt;
 
