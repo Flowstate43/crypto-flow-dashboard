@@ -917,5 +917,58 @@
       "DISAGREE compression: ai=yes scan=no"
     ],
     "model": "ollama-cloud/deepseek-v4-pro:0813"
+  },
+  {
+    "ts": "2026-10-13 22:05",
+    "at": 1791947101466,
+    "bias_1d": "bullish",
+    "bias_4h": "bullish",
+    "oi_val": 7720877040.0,
+    "oi_chg": 0.42,
+    "funding": -0.001022,
+    "funding_ann": -1.12,
+    "bb_rank_1h": 0.2833,
+    "range_x_1h": 1.648,
+    "context": "BTC $83,608 | 1H ATR 375\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.84% | rank 5% | bias bullish\n1D SMA21 83,961 (-0.42%) | SMA50 81,091 | SMA200 72,133\n1D price in 82k\u201386k range: 40% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.17% | rank 27% | bias bullish\n4H SMA21 83,216 (+0.47%) | SMA50 83,431 | SMA200 82,217\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 28% | range 1.65\u00d7 \u2192 wide/narrowing\n1H RSI 14: 56\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 83,349 (+0.31%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: -0.0010% / 8h | ~-1.1% annualized\nOI $7.72B (+0.4% vs prior 4H)\nRSI divs: none\nSwing high +0.6 ATR | swing low -0.3 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
+    "opinion": "AI (blind): 1D/4H bullish above SMA200, 1H bearish below SMA200; tight 1H range near 83100-83600, watch 84134 resistance. | S [80987, 81698] R [84134, 84336]\nAGREE bias_1d: ai=bull scan=bull\nAGREE bias_4h: ai=bull scan=bull\nDISAGREE bias_1h: ai=bear scan=bull\nAGREE div_1d: ai=none scan=none\nAGREE div_4h: ai=none scan=none\nAGREE div_1h: ai=none scan=none\nDISAGREE compression: ai=yes scan=no",
+    "blind": {
+      "bias_1d": "bull",
+      "bias_4h": "bull",
+      "bias_1h": "bear",
+      "div_1d": {
+        "type": "none",
+        "played_out": true
+      },
+      "div_4h": {
+        "type": "none",
+        "played_out": true
+      },
+      "div_1h": {
+        "type": "none",
+        "played_out": true
+      },
+      "compression": "yes",
+      "levels": {
+        "support": [
+          80987,
+          81698
+        ],
+        "resistance": [
+          84134,
+          84336
+        ]
+      },
+      "read": "1D/4H bullish above SMA200, 1H bearish below SMA200; tight 1H range near 83100-83600, watch 84134 resistance."
+    },
+    "compare": [
+      "AGREE bias_1d: ai=bull scan=bull",
+      "AGREE bias_4h: ai=bull scan=bull",
+      "DISAGREE bias_1h: ai=bear scan=bull",
+      "AGREE div_1d: ai=none scan=none",
+      "AGREE div_4h: ai=none scan=none",
+      "AGREE div_1h: ai=none scan=none",
+      "DISAGREE compression: ai=yes scan=no"
+    ],
+    "model": "ollama-cloud/deepseek-v4-pro:0813"
   }
 ]
