@@ -1,19 +1,5 @@
 [
   {
-    "ts": "2026-10-13 02:05",
-    "at": 1791875101126,
-    "bias_1d": "bullish",
-    "bias_4h": "bullish",
-    "oi_val": 7825427875.0,
-    "oi_chg": 1.66,
-    "funding": 0.006741,
-    "funding_ann": 7.38,
-    "bb_rank_1h": 0.775,
-    "range_x_1h": 2.1049,
-    "context": "BTC $83,732 | 1H ATR 564\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.81% | rank 5% | bias bullish\n1D SMA21 84,106 (-0.44%) | SMA50 81,008 | SMA200 72,049\n1D price in 82k\u201386k range: 43% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.22% | rank 17% | bias bullish\n4H SMA21 83,030 (+0.84%) | SMA50 83,695 | SMA200 82,081\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 78% | range 2.10\u00d7 \u2192 wide/narrowing\n1H RSI 14: 63\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 83,266 (+0.56%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0067% / 8h | ~7.4% annualized\nOI $7.83B (+1.7% vs prior 4H)\nRSI divs: 1H bearish, 4H bearish, 1D bearish\nSwing high +0.2 ATR | swing low -0.4 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
-    "opinion": "Daily: Compression at BB rank 5% (1D) and 17% (4H) \u2014 volatility is near historically tight levels, and price is mid-range in the 82k\u201386k band with no clear directional bias from the range position itself.\n\n4H: Still compressed, SMA cluster tight (21/50/200 within ~$1.6k), and price sitting neutral between them \u2014 no trending structure to trade.\n\n1H/15m: 1H BB rank 78% (wide but narrowing) and RSI divergence on 1H/4H/1D all bearish, suggesting upside momentum is fading even in a compressing market \u2014 this kills momentum-long setups.\n\nSecond opinion: The simultaneous compression across all timeframes is suspicious. When 1D BB width ranks at 5% and 4H at 17%, the market is coiled extremely tight. The persistent bearish RSI divergences across TF suggest the next move may be down rather than up despite the \"bullish\" label bias \u2014 funding remains elevated at 7.4% annualized, which usually precedes a flush rather than a\u6cf5 rally. I'd watch for a break below 82k (swing low -0.4 ATR) for a mean reversion short rather than chasing any upside."
-  },
-  {
     "ts": "2026-10-13 02:35",
     "at": 1791876901953,
     "bias_1d": "bullish",
@@ -1673,6 +1659,59 @@
         ]
       },
       "read": "Daily still bullish above SMA200, but 4H/1H bearish after sharp drop; watch 81500 support."
+    },
+    "compare": [
+      "AGREE bias_1d: ai=bull scan=bull",
+      "AGREE bias_4h: ai=bear scan=bear",
+      "AGREE bias_1h: ai=bear scan=bear",
+      "AGREE div_1d: ai=none scan=none",
+      "AGREE div_4h: ai=none scan=none",
+      "AGREE div_1h: ai=none scan=none",
+      "AGREE compression: ai=no scan=no"
+    ],
+    "model": "ollama-cloud/deepseek-v4-pro:0813"
+  },
+  {
+    "ts": "2026-10-14 13:05",
+    "at": 1792001102814,
+    "bias_1d": "bullish",
+    "bias_4h": "bearish",
+    "oi_val": 7566047725.0,
+    "oi_chg": 0.08,
+    "funding": -0.001788,
+    "funding_ann": -1.96,
+    "bb_rank_1h": 0.8917,
+    "range_x_1h": 0.7763,
+    "context": "BTC $81,556 | 1H ATR 537\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.84% | rank 5% | bias bullish\n1D SMA21 83,961 (-2.86%) | SMA50 81,091 | SMA200 72,133\n1D price in 82k\u201386k range: -11% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.46% | rank 37% | bias bearish\n4H SMA21 83,238 (-2.02%) | SMA50 83,227 | SMA200 82,339\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 89% | range 0.78\u00d7 \u2192 wide/narrowing\n1H RSI 14: 21\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 81,994 (-0.53%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: -0.0018% / 8h | ~-2.0% annualized\nOI $7.57B (+0.1% vs prior 4H)\nRSI divs: none\nSwing high +2.8 ATR | swing low -0.3 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
+    "opinion": "AI (blind): Daily holds above SMA200 but 4H/1H flip bearish after sharp drop; watch 81534 support. | S [81534, 80987] R [83926, 84114]\nAGREE bias_1d: ai=bull scan=bull\nAGREE bias_4h: ai=bear scan=bear\nAGREE bias_1h: ai=bear scan=bear\nAGREE div_1d: ai=none scan=none\nAGREE div_4h: ai=none scan=none\nAGREE div_1h: ai=none scan=none\nAGREE compression: ai=no scan=no",
+    "blind": {
+      "bias_1d": "bull",
+      "bias_4h": "bear",
+      "bias_1h": "bear",
+      "div_1d": {
+        "type": "none",
+        "played_out": true
+      },
+      "div_4h": {
+        "type": "none",
+        "played_out": true
+      },
+      "div_1h": {
+        "type": "none",
+        "played_out": true
+      },
+      "compression": "no",
+      "levels": {
+        "support": [
+          81534,
+          80987
+        ],
+        "resistance": [
+          83926,
+          84114
+        ]
+      },
+      "read": "Daily holds above SMA200 but 4H/1H flip bearish after sharp drop; watch 81534 support."
     },
     "compare": [
       "AGREE bias_1d: ai=bull scan=bull",
