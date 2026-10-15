@@ -288,12 +288,19 @@
     .header { flex-direction: column; gap: 12px; }
   }
   #view-swing, #view-trend, #view-all { display: none !important; } /* paused agents */
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .back-home { color: var(--text-dim); font-family: var(--font-header); letter-spacing: 1px; text-decoration: none; font-size: 13px; font-weight: 600; padding: 4px 10px; border: 1px solid #333; border-radius: 8px; white-space: nowrap; }
+  .back-home:hover, .back-home:focus { color: var(--cyan); border-color: var(--cyan); }
+  @media (max-width: 768px) { .header-left { width: 100%; justify-content: space-between; } }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="logo">Flow<span>BOT</span></div>
+  <div class="header-left">
+    <a class="back-home" href="https://flowstate43.github.io/Flowstate/">&larr; Flowstate</a>
+    <div class="logo">Flow<span>BOT</span></div>
+  </div>
   <div class="agent-nav" id="agent-nav" role="tablist" aria-label="Agent">
     <button type="button" data-agent="mort" class="active" role="tab" aria-selected="true">Mort · compression</button>
   </div>
