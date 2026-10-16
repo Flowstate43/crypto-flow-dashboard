@@ -731,9 +731,9 @@ function syncTradeOverlays() {
       const end = candleData[candleData.length - 1].time;
       const start = snapCandleTime(end - 24 * 3600);
       const lo = Number(ls.box_lo), hi = Number(ls.box_hi);
-      boxPrimitive.setBox(end > start ? { start, end, low: lo, high: hi } : null);
-      cmpLines.push(candleSeries.createPriceLine({ price: hi, color: '#ffe066', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'Box hi' }));
-      cmpLines.push(candleSeries.createPriceLine({ price: lo, color: '#ffe066', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'Box lo' }));
+      const w = end > start ? { start, end } : null;
+      boxPrimitive.setBox(w ? { start, end, low: lo, high: hi } : null);
+      if (w) frameOpenTrade(w);
     } else if (boxPrimitive) boxPrimitive.setBox(null);
     return;
   }
