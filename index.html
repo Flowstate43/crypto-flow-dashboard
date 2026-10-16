@@ -710,12 +710,12 @@ function snapCandleTime(sec) {
   if (!prev) return cand.time;
   return Math.abs(prev.time - sec) <= Math.abs(cand.time - sec) ? prev.time : cand.time;
 }
-// Mort's published time is the breakout candle CLOSE. The box is the 36 1H bars before that candle.
+// Mort's published time is the breakout candle CLOSE. The box is the 24 1H bars before that candle.
 function boxWindow(iso) {
   const closeMs = Date.parse(iso);
   if (!isFinite(closeMs)) return null;
   const breakoutOpen = Math.floor(closeMs / 1000) - 3600;
-  const start = snapCandleTime(breakoutOpen - 36 * 3600);
+  const start = snapCandleTime(breakoutOpen - 24 * 3600);
   const end = snapCandleTime(breakoutOpen);
   if (!(end > start)) return null;
   return { start, end };
@@ -726,7 +726,15 @@ function syncTradeOverlays() {
   cmpLines = [];
   const o = paperData && paperData.compression && paperData.compression.open;
   if (!o) {
-    if (boxPrimitive) boxPrimitive.setBox(null);
+    const ls = latestScan;
+    if (boxPrimitive && ls && ls.box_lo != null && ls.box_hi != null && candleData.length) {
+      const end = candleData[candleData.length - 1].time;
+      const start = snapCandleTime(end - 24 * 3600);
+      const lo = Number(ls.box_lo), hi = Number(ls.box_hi);
+      boxPrimitive.setBox(end > start ? { start, end, low: lo, high: hi } : null);
+      cmpLines.push(candleSeries.createPriceLine({ price: hi, color: '#ffe066', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'Box hi' }));
+      cmpLines.push(candleSeries.createPriceLine({ price: lo, color: '#ffe066', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'Box lo' }));
+    } else if (boxPrimitive) boxPrimitive.setBox(null);
     return;
   }
   const px = v => '$' + Math.round(v).toLocaleString('en-US');
@@ -920,6 +928,18 @@ function renderMortCompression() {
     dirEl.innerHTML = '<span class="bias-label">BIAS</span>' +
       '<span class="bias-badge ' + b1dCls + '" id="bias-1d">' + (b1d ? b1d.toUpperCase() : '—') + '</span>' +
       '<span class="bias-badge ' + b4hCls + '" id="bias-4h">' + (b4h ? b4h.toUpperCase() : '—') + '</span>';
+    const ls = latestScan;
+    if (ls && ls.box_lo != null && ls.box_hi != null) {
+      const f0 = v => Math.round(Number(v)).toLocaleString('en-US');
+      const rx = ls.range_x != null ? Number(ls.range_x) : null;
+      const bb = ls.bb_rank != null ? Number(ls.bb_rank) * 100 : null;
+      const ok = (v, good) => '<span style="color:' + (good ? 'var(--green)' : 'var(--yellow)') + '">' + v + '</span>';
+      dirEl.innerHTML += '<div class="cmp-box-line" style="width:100%;font-size:0.68rem;color:var(--text-dim);margin-top:4px">' +
+        'BOX <b style="color:#d5dbe3">' + f0(ls.box_lo) + ' – ' + f0(ls.box_hi) + '</b>' +
+        (rx != null ? ' · range ' + ok(rx.toFixed(2) + '×', rx <= 0.65) + ' prior (need ≤0.65)' : '') +
+        (bb != null ? ' · BB ' + ok(bb.toFixed(0) + '%', bb <= 30) + ' (need ≤30%)' : '') +
+        (ls.compressed ? ' · ' + ok('COMPRESSED', true) : '') + '</div>';
+    }
   }
   card.className = 'card scan-card cmp-card' + (cls ? ' ' + cls : '');
   trig.textContent = trigTxt;
@@ -1038,6 +1058,18 @@ function closeTV() { document.getElementById('tv-modal').classList.remove('open'
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTV(); });
 
 // ─── Boot ────────────────────────────────────────────────────────────────
+// Latest scan (box_lo/box_hi/range_x/bb_rank) from Mort scans.jsonl, exported by publish_dashboard.sh
+let latestScan = null;
+async function loadLatestScan() {
+  try {
+    const r = await fetch('latest_scan.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    latestScan = await r.json();
+    try { renderMortCompression(); } catch (e) {}
+  } catch (e) {}
+}
+loadLatestScan();
+setInterval(loadLatestScan, 60000);
 // Paper trades card: Mort's real PAPER log, exported hourly to paper_trades.json by mort/paper_log/publish_dashboard.sh
 let paperData = null;
 let mortStatus = null;
