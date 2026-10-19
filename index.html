@@ -813,7 +813,7 @@ function bookCRowText(entry) {
   if (entry.context || entry.opinion) {
     const gates = [];
     if (entry.bb_rank_1h != null) gates.push('BB ' + (Number(entry.bb_rank_1h) * 100).toFixed(1) + '%');
-    if (entry.range_x_1h != null) gates.push('rng ' + Number(entry.range_x_1h).toFixed(2) + 'x');
+    if (entry.box_pct != null) gates.push('box ' + Number(entry.box_pct).toFixed(2) + '%');
     const gateStr = gates.length ? ' · gates ' + gates.join(' · ') : '';
     const call = entry.opinion ? entry.opinion.split('\n')[0].trim() : '';
     return [entry.ts || '', gateStr, call].filter(Boolean).join(' | ');
@@ -830,7 +830,7 @@ function bookCIdle(s) {
   if (b1d) bits.push('1D ' + b1d);
   if (b4h) bits.push('4H ' + b4h);
   if (s.bb_rank_1h != null) bits.push('BB ' + (Number(s.bb_rank_1h) * 100).toFixed(0) + '%');
-  if (s.range_x_1h != null) bits.push('rng ' + Number(s.range_x_1h).toFixed(2) + 'x');
+  if (s.box_pct != null) bits.push('box ' + Number(s.box_pct).toFixed(2) + '%');
   return 'MORT | ' + (s.ts || '') + ' | ' + (bits.length ? bits.join(' · ') : 'no signal');
 }
 function bookCType(text) {
@@ -931,13 +931,15 @@ function renderMortCompression() {
     const ls = latestScan;
     if (ls && ls.box_lo != null && ls.box_hi != null) {
       const f0 = v => Math.round(Number(v)).toLocaleString('en-US');
-      const rx = ls.range_x != null ? Number(ls.range_x) : null;
+      const bp = ls.box_pct != null ? Number(ls.box_pct) : null;
+      const s4 = ls.sma21_4h != null ? Number(ls.sma21_4h) : null;
       const bb = ls.bb_rank != null ? Number(ls.bb_rank) * 100 : null;
       const ok = (v, good) => '<span style="color:' + (good ? 'var(--green)' : 'var(--yellow)') + '">' + v + '</span>';
       dirEl.innerHTML += '<div class="cmp-box-line" style="width:100%;font-size:0.68rem;color:var(--text-dim);margin-top:4px">' +
         'BOX <b style="color:#d5dbe3">' + f0(ls.box_lo) + ' – ' + f0(ls.box_hi) + '</b>' +
-        (rx != null ? ' · range ' + ok(rx.toFixed(2) + '×', rx <= 0.65) + ' prior (need ≤0.65)' : '') +
-        (bb != null ? ' · BB ' + ok(bb.toFixed(0) + '%', bb <= 30) + ' (need ≤30%)' : '') +
+        (bp != null ? ' · box ' + ok(bp.toFixed(2) + '%', bp <= 2.5) + ' of price (need ≤2.5%)' : '') +
+        (bb != null ? ' · BB ' + ok(bb.toFixed(0) + '%', bb <= 70) + ' (need ≤70%)' : '') +
+        (s4 != null ? ' · line 4H SMA21 <b style="color:#d5dbe3">' + f0(s4) + '</b>' : '') +
         (ls.compressed ? ' · ' + ok('COMPRESSED', true) : '') + '</div>';
     }
   }
