@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -728,11 +729,17 @@ function syncTradeOverlays() {
   if (!o) {
     const ls = latestScan;
     if (boxPrimitive && ls && ls.box_lo != null && ls.box_hi != null && candleData.length) {
-      const end = candleData[candleData.length - 1].time;
-      const start = snapCandleTime(end - 24 * 3600);
+      // Scanner box = the 24 closed 1H bars before the last closed 1H bar at scan time (ls.at, ms).
+      const scanMs = Number(ls.at) || Date.now();
+      const lastClosedOpen = Math.floor(scanMs / 3600000) * 3600 - 3600;   // open time (s) of last closed 1H bar
+      const start = snapCandleTime(lastClosedOpen - 24 * 3600);
+      const end = snapCandleTime(lastClosedOpen);
       const lo = Number(ls.box_lo), hi = Number(ls.box_hi);
       const w = end > start ? { start, end } : null;
       boxPrimitive.setBox(w ? { start, end, low: lo, high: hi } : null);
+      const pxb = v => '$' + Math.round(v).toLocaleString('en-US');
+      cmpLines.push(candleSeries.createPriceLine({ price: hi, color: 'rgba(0,255,229,0.9)', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'Box hi ' + pxb(hi) }));
+      cmpLines.push(candleSeries.createPriceLine({ price: lo, color: 'rgba(0,255,229,0.9)', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'Box lo ' + pxb(lo) }));
       if (w) frameOpenTrade(w);
     } else if (boxPrimitive) boxPrimitive.setBox(null);
     return;
@@ -1068,6 +1075,7 @@ async function loadLatestScan() {
     if (!r.ok) return;
     latestScan = await r.json();
     try { renderMortCompression(); } catch (e) {}
+    try { syncTradeOverlays(); } catch (e) {}
   } catch (e) {}
 }
 loadLatestScan();
