@@ -1,58 +1,5 @@
 [
   {
-    "ts": "2026-10-17 09:05",
-    "at": 1792245901280,
-    "bias_1d": "bullish",
-    "bias_4h": "bearish",
-    "oi_val": 7696007220.0,
-    "oi_chg": 0.02,
-    "funding": 0.00371,
-    "funding_ann": 4.06,
-    "bb_rank_1h": 0.0167,
-    "range_x_1h": 0.5312,
-    "context": "BTC $81,460 | 1H ATR 144\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 3.35% | rank 14% | bias bullish\n1D SMA21 83,610 (-2.57%) | SMA50 81,245 | SMA200 72,364\n1D price in 82k\u201386k range: -14% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.67% | rank 53% | bias bearish\n4H SMA21 82,003 (-0.66%) | SMA50 82,626 | SMA200 82,727\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 2% | range 0.53\u00d7 \u2192 COILED\n1H RSI 14: 42\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 81,558 (-0.12%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0037% / 8h | ~4.1% annualized\nOI $7.70B (+0.0% vs prior 4H)\nRSI divs: none\nSwing high +1.6 ATR | swing low -0.1 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
-    "opinion": "AI (blind): Daily bull above SMA200, but 4H/1H bear with tight compression near 81500; watch 80780 support. | S [80780, 79738] R [82900, 84134]\nAGREE bias_1d: ai=bull scan=bull\nAGREE bias_4h: ai=bear scan=bear\nAGREE bias_1h: ai=bear scan=bear\nAGREE div_1d: ai=none scan=none\nAGREE div_4h: ai=none scan=none\nAGREE div_1h: ai=none scan=none\nAGREE compression: ai=yes scan=yes",
-    "blind": {
-      "bias_1d": "bull",
-      "bias_4h": "bear",
-      "bias_1h": "bear",
-      "div_1d": {
-        "type": "none",
-        "played_out": true
-      },
-      "div_4h": {
-        "type": "none",
-        "played_out": true
-      },
-      "div_1h": {
-        "type": "none",
-        "played_out": true
-      },
-      "compression": "yes",
-      "levels": {
-        "support": [
-          80780,
-          79738
-        ],
-        "resistance": [
-          82900,
-          84134
-        ]
-      },
-      "read": "Daily bull above SMA200, but 4H/1H bear with tight compression near 81500; watch 80780 support."
-    },
-    "compare": [
-      "AGREE bias_1d: ai=bull scan=bull",
-      "AGREE bias_4h: ai=bear scan=bear",
-      "AGREE bias_1h: ai=bear scan=bear",
-      "AGREE div_1d: ai=none scan=none",
-      "AGREE div_4h: ai=none scan=none",
-      "AGREE div_1h: ai=none scan=none",
-      "AGREE compression: ai=yes scan=yes"
-    ],
-    "model": "ollama-cloud/deepseek-v4-pro:0813"
-  },
-  {
     "ts": "2026-10-17 10:05",
     "at": 1792249501990,
     "bias_1d": "bullish",
@@ -2605,6 +2552,64 @@
       "AGREE div_4h: ai=none scan=none",
       "AGREE div_1h: ai=none scan=none",
       "DISAGREE compression: ai=yes scan=no"
+    ],
+    "model": "ollama-cloud/deepseek-v4-pro:0813"
+  },
+  {
+    "ts": "2026-10-19 21:05",
+    "at": 1792461907706,
+    "bias_1d": "bullish",
+    "bias_4h": "bearish",
+    "oi_val": 7753698816.0,
+    "oi_chg": -0.38,
+    "funding": 0.009208,
+    "funding_ann": 10.08,
+    "bb_rank_1h": 0.4833,
+    "range_x_1h": 0.9257,
+    "box_lo": 81389.9,
+    "box_hi": 83142.3,
+    "compressed": true,
+    "box_pct": 2.145,
+    "sma21_4h": 81733.5,
+    "context": "BTC $81,768 | 1H ATR 424\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 3.64% | rank 16% | bias bullish\n1D SMA21 83,284 (-1.82%) | SMA50 81,481 | SMA200 72,575\n1D price in 82k\u201386k range: -6% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.06% | rank 10% | bias bearish\n4H SMA21 81,734 (+0.04%) | SMA50 82,301 | SMA200 83,091\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H box 81,390\u201383,142 (2.14% of price, need \u22642.5%) | BB rank 48% (need \u226470%) | breakout line 4H SMA21 81,734 \u2192 COILED\n1H RSI 14: 36\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 81,864 (-0.12%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0092% / 8h | ~10.1% annualized\nOI $7.75B (-0.4% vs prior 4H)\nRSI divs: none\nSwing high +0.4 ATR | swing low -0.3 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
+    "opinion": "AI (blind): Choppy compression under 4H/1H SMA200, 1D still bull but momentum fading. | S [81151, 80623] R [82240, 83142]\nAGREE bias_1d: ai=bull scan=bull\nAGREE bias_4h: ai=bear scan=bear\nAGREE bias_1h: ai=bear scan=bear\nAGREE div_1d: ai=none scan=none\nAGREE div_4h: ai=none scan=none\nAGREE div_1h: ai=none scan=none\nAGREE compression: ai=yes scan=yes",
+    "blind": {
+      "bias_1d": "bull",
+      "bias_4h": "bear",
+      "bias_1h": "bear",
+      "div_1d": {
+        "type": "none",
+        "played_out": true
+      },
+      "div_4h": {
+        "type": "none",
+        "played_out": true
+      },
+      "div_1h": {
+        "type": "none",
+        "played_out": true
+      },
+      "compression": "yes",
+      "levels": {
+        "support": [
+          81151,
+          80623
+        ],
+        "resistance": [
+          82240,
+          83142
+        ]
+      },
+      "read": "Choppy compression under 4H/1H SMA200, 1D still bull but momentum fading."
+    },
+    "compare": [
+      "AGREE bias_1d: ai=bull scan=bull",
+      "AGREE bias_4h: ai=bear scan=bear",
+      "AGREE bias_1h: ai=bear scan=bear",
+      "AGREE div_1d: ai=none scan=none",
+      "AGREE div_4h: ai=none scan=none",
+      "AGREE div_1h: ai=none scan=none",
+      "AGREE compression: ai=yes scan=yes"
     ],
     "model": "ollama-cloud/deepseek-v4-pro:0813"
   }
