@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-12T16:50-05:00",
+ "generated": "2026-10-20T21:15-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -26,26 +26,26 @@
     "key": "A",
     "label": "Compression A · 3R",
     "start": 1000.0,
-    "equity": 988.97,
-    "realized_usd": -11.03,
-    "ret_pct": -1.1,
-    "closed": 1,
+    "equity": 1000.0,
+    "realized_usd": 0.0,
+    "ret_pct": 0.0,
+    "closed": 0,
     "wins": 0,
     "win_rate": 0.0,
-    "total_r": -1.1,
+    "total_r": 0,
     "open": null
    },
    {
     "key": "B",
     "label": "Compression B · MM",
     "start": 1000.0,
-    "equity": 1002.09,
-    "realized_usd": 2.09,
-    "ret_pct": 0.21,
-    "closed": 1,
-    "wins": 1,
-    "win_rate": 100.0,
-    "total_r": 0.21,
+    "equity": 1000.0,
+    "realized_usd": 0.0,
+    "ret_pct": 0.0,
+    "closed": 0,
+    "wins": 0,
+    "win_rate": 0.0,
+    "total_r": 0,
     "open": null
    },
    {
@@ -62,7 +62,7 @@
     "open": null
    }
   ],
-  "equity_total": 3991.06
+  "equity_total": 4000.0
  },
  "scanners": [
   {
@@ -81,136 +81,20 @@
    "emoji": "🗜️",
    "label": "Compression",
    "paused": false,
-   "closed": 1,
+   "closed": 0,
    "wins": 0,
    "win_rate": 0.0,
-   "total_r": -1.1,
+   "total_r": 0,
    "open": 0
   }
  ],
  "open": [],
- "closed": [
-  {
-   "scanner": "compression",
-   "book": "A",
-   "book_label": "A · 3R",
-   "side": "long",
-   "armed_time": "2026-10-04T16:00-05:00",
-   "exit_time": "2026-10-06T21:00-05:00",
-   "entry": 85791.1,
-   "stop": 84455.6,
-   "exit_price": 84455.6,
-   "result": "stop",
-   "r_net": -1.1,
-   "r_gross": -1.0,
-   "pnl_usd": -11.03,
-   "gross_usd": -10.0,
-   "cost_usd": 1.03,
-   "risk_usd": 10.0,
-   "notional": 642.39,
-   "margin": 32.12,
-   "qty": 0.007488,
-   "lev": 0.64,
-   "capped": false,
-   "equity_after": 988.97
-  },
-  {
-   "scanner": "compression",
-   "book": "B",
-   "book_label": "B · MM",
-   "side": "long",
-   "armed_time": "2026-10-04T16:00-05:00",
-   "exit_time": "2026-10-05T16:00-05:00",
-   "entry": 85791.1,
-   "stop": 84455.6,
-   "exit_price": 86207.9,
-   "result": "tp1_be",
-   "r_net": 0.21,
-   "r_gross": 0.31,
-   "pnl_usd": 2.09,
-   "gross_usd": 3.12,
-   "cost_usd": 1.03,
-   "risk_usd": 10.0,
-   "notional": 642.39,
-   "margin": 32.12,
-   "qty": 0.007488,
-   "lev": 0.64,
-   "capped": false,
-   "equity_after": 1002.09
-  }
- ],
- "trade_log": [
-  {
-   "scanner": "compression",
-   "book": "A",
-   "book_label": "A · 3R",
-   "side": "long",
-   "armed_time": "2026-10-04T16:00-05:00",
-   "exit_time": "2026-10-06T21:00-05:00",
-   "entry": 85791.1,
-   "stop": 84455.6,
-   "exit_price": 84455.6,
-   "result": "stop",
-   "r_net": -1.1,
-   "r_gross": -1.0,
-   "pnl_usd": -11.03,
-   "gross_usd": -10.0,
-   "cost_usd": 1.03,
-   "risk_usd": 10.0,
-   "notional": 642.39,
-   "margin": 32.12,
-   "qty": 0.007488,
-   "lev": 0.64,
-   "capped": false,
-   "equity_after": 988.97
-  },
-  {
-   "scanner": "compression",
-   "book": "B",
-   "book_label": "B · MM",
-   "side": "long",
-   "armed_time": "2026-10-04T16:00-05:00",
-   "exit_time": "2026-10-05T16:00-05:00",
-   "entry": 85791.1,
-   "stop": 84455.6,
-   "exit_price": 86207.9,
-   "result": "tp1_be",
-   "r_net": 0.21,
-   "r_gross": 0.31,
-   "pnl_usd": 2.09,
-   "gross_usd": 3.12,
-   "cost_usd": 1.03,
-   "risk_usd": 10.0,
-   "notional": 642.39,
-   "margin": 32.12,
-   "qty": 0.007488,
-   "lev": 0.64,
-   "capped": false,
-   "equity_after": 1002.09
-  }
- ],
+ "closed": [],
+ "trade_log": [],
  "compression": {
   "open": null,
-  "last": {
-   "side": "long",
-   "time": "2026-10-04T16:00-05:00",
-   "exit_time": "2026-10-06T21:00-05:00",
-   "result": "stop",
-   "entry": 85791.1,
-   "exit_price": 84455.6,
-   "r_net": -1.1
-  },
-  "trail_last": {
-   "side": "long",
-   "result": "tp1_be",
-   "entry": 85791.1,
-   "stop": 85791.1,
-   "exit_price": 86207.9,
-   "r_net": 0.20931638119103446,
-   "paper_id": "compression-2026-10-04T16:00-05:00",
-   "tp1": 86624.7,
-   "label": "book B"
-  },
+  "last": null,
+  "trail_last": null,
   "scanner_runs": "checks :01/:16/:31/:46 CT (entries on closed 1H only; fills intrabar); publish every 5 min",
   "source": "compression_scanner/state.json + signals.csv",
   "books": "A: full 3R · B: half at measured-move TP1 → BE → 4H 21 −0.5% (no 3R on B) · C: agent, full 3R",
@@ -238,8 +122,8 @@
  },
  "swing": null,
  "totals": {
-  "closed": 1,
+  "closed": 0,
   "wins": 0,
-  "total_r": -1.1
+  "total_r": 0
  }
 }
