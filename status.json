@@ -1,65 +1,5 @@
 [
   {
-    "ts": "2026-10-24 08:05",
-    "at": 1792847101546,
-    "bias_1d": "bullish",
-    "bias_4h": "bearish",
-    "oi_val": 7624197652.0,
-    "oi_chg": 0.31,
-    "funding": 0.003431,
-    "funding_ann": 3.76,
-    "bb_rank_1h": 0.4167,
-    "range_x_1h": 1.4173,
-    "box_lo": 80511.0,
-    "box_hi": 82035.2,
-    "compressed": true,
-    "frozen": true,
-    "frozen_ts": "2026-10-23 7:00 PM",
-    "box_pct": 1.887,
-    "sma21_4h": 82139.7,
-    "context": "BTC $80,745 | 1H ATR 289\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 3.63% | rank 16% | bias bullish\n1D SMA21 82,953 (-2.66%) | SMA50 81,783 | SMA200 72,863\n1D price in 82k\u201386k range: -31% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 2.88% | rank 100% | bias bearish\n4H SMA21 82,140 (-1.70%) | SMA50 81,988 | SMA200 83,479\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H box (24 bars) 80,511\u201382,035 (1.89% of price, tight \u22642.5%) | FROZEN since 2026-10-23 7:00 PM (14/48 bars) \u2014 coil held, signal = 1H close crossing 4H SMA21 | BB rank 42% (need \u226470%) | breakout line 4H SMA21 82,140\n1H RSI 14: 49\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 80,631 (+0.14%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0034% / 8h | ~3.8% annualized\nOI $7.62B (+0.3% vs prior 4H)\nRSI divs: none\nSwing high +4.1 ATR | swing low -0.5 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
-    "opinion": "AI (blind): 1D bull above 200, lower TFs bearish with played-out RSI div | S [80400, 79800] R [82000, 83100]\nAGREE bias_1d: ai=bull scan=bull\nAGREE bias_4h: ai=bear scan=bear\nAGREE bias_1h: ai=bear scan=bear\nAGREE div_1d: ai=none scan=none\nAGREE div_4h: ai=none (bearish, played out) scan=none\nAGREE div_1h: ai=none (bearish, played out) scan=none\nAGREE compression: ai=yes scan=yes",
-    "blind": {
-      "bias_1d": "bull",
-      "bias_4h": "bear",
-      "bias_1h": "bear",
-      "div_1d": {
-        "type": "none",
-        "played_out": false
-      },
-      "div_4h": {
-        "type": "bearish",
-        "played_out": true
-      },
-      "div_1h": {
-        "type": "bearish",
-        "played_out": true
-      },
-      "compression": "yes",
-      "levels": {
-        "support": [
-          80400,
-          79800
-        ],
-        "resistance": [
-          82000,
-          83100
-        ]
-      },
-      "read": "1D bull above 200, lower TFs bearish with played-out RSI div"
-    },
-    "compare": [
-      "AGREE bias_1d: ai=bull scan=bull",
-      "AGREE bias_4h: ai=bear scan=bear",
-      "AGREE bias_1h: ai=bear scan=bear",
-      "AGREE div_1d: ai=none scan=none",
-      "AGREE div_4h: ai=none (bearish, played out) scan=none",
-      "AGREE div_1h: ai=none (bearish, played out) scan=none",
-      "AGREE compression: ai=yes scan=yes"
-    ],
-    "model": "xai/grok-4.20-0309-non-reasoning"
-  },
-  {
     "ts": "2026-10-24 10:05",
     "at": 1792854302008,
     "bias_1d": "bullish",
@@ -1433,6 +1373,66 @@
       "AGREE bias_4h: ai=bear scan=bear",
       "AGREE bias_1h: ai=bear scan=bear",
       "AGREE div_1d: ai=none (bearish, played out) scan=none",
+      "AGREE div_4h: ai=none (bearish, played out) scan=none",
+      "AGREE div_1h: ai=none scan=none",
+      "AGREE compression: ai=yes scan=yes"
+    ],
+    "model": "xai/grok-4.20-0309-non-reasoning"
+  },
+  {
+    "ts": "2026-10-26 08:05",
+    "at": 1793019901888,
+    "bias_1d": "bullish",
+    "bias_4h": "bearish",
+    "oi_val": 7550407811.0,
+    "oi_chg": 0.27,
+    "funding": 0.007945,
+    "funding_ann": 8.7,
+    "bb_rank_1h": 0.5417,
+    "range_x_1h": 0.877,
+    "box_lo": 79179.0,
+    "box_hi": 81190.6,
+    "compressed": true,
+    "frozen": true,
+    "frozen_ts": "2026-10-24 7:00 PM",
+    "box_pct": 2.497,
+    "sma21_4h": 80744.6,
+    "context": "BTC $80,300 | 1H ATR 454\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.95% | rank 11% | bias bullish\n1D SMA21 82,466 (-2.63%) | SMA50 81,814 | SMA200 72,953\n1D price in 82k\u201386k range: -42% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.41% | rank 60% | bias bearish\n4H SMA21 80,745 (-0.55%) | SMA50 81,667 | SMA200 83,162\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H box (24 bars) 79,179\u201381,191 (2.50% of price, tight \u22642.5%) | FROZEN since 2026-10-24 7:00 PM (38/48 bars) \u2014 coil held, signal = 1H close crossing 4H SMA21 | BB rank 54% (need \u226470%) | breakout line 4H SMA21 80,745\n1H RSI 14: 48\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 80,304 (-0.00%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0079% / 8h | ~8.7% annualized\nOI $7.55B (+0.3% vs prior 4H)\nRSI divs: none\nSwing high +1.0 ATR | swing low -0.1 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
+    "opinion": "AI (blind): 1D bull above 200sma, 4H/1H bear. 4H bear div played. Tight 1H compression. | S [79500, 79000] R [81000, 81600]\nAGREE bias_1d: ai=bull scan=bull\nAGREE bias_4h: ai=bear scan=bear\nAGREE bias_1h: ai=bear scan=bear\nAGREE div_1d: ai=none scan=none\nAGREE div_4h: ai=none (bearish, played out) scan=none\nAGREE div_1h: ai=none scan=none\nAGREE compression: ai=yes scan=yes",
+    "blind": {
+      "bias_1d": "bull",
+      "bias_4h": "bear",
+      "bias_1h": "bear",
+      "div_1d": {
+        "type": "none",
+        "played_out": false
+      },
+      "div_4h": {
+        "type": "bearish",
+        "played_out": true
+      },
+      "div_1h": {
+        "type": "none",
+        "played_out": false
+      },
+      "compression": "yes",
+      "levels": {
+        "support": [
+          79500,
+          79000
+        ],
+        "resistance": [
+          81000,
+          81600
+        ]
+      },
+      "read": "1D bull above 200sma, 4H/1H bear. 4H bear div played. Tight 1H compression."
+    },
+    "compare": [
+      "AGREE bias_1d: ai=bull scan=bull",
+      "AGREE bias_4h: ai=bear scan=bear",
+      "AGREE bias_1h: ai=bear scan=bear",
+      "AGREE div_1d: ai=none scan=none",
       "AGREE div_4h: ai=none (bearish, played out) scan=none",
       "AGREE div_1h: ai=none scan=none",
       "AGREE compression: ai=yes scan=yes"
