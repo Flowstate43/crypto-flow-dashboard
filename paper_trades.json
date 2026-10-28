@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-28T17:05-05:00",
+ "generated": "2026-10-28T18:05-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -160,7 +160,7 @@
    "oi_chg_pct": null,
    "oi_src": null,
    "risk_pct": null,
-   "bars": 33,
+   "bars": 34,
    "risk": 912.0,
    "trail_B": {
     "status": "trailing",
