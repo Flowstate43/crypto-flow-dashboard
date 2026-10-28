@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-28T03:05-05:00",
+ "generated": "2026-10-28T04:05-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -72,8 +72,8 @@
      "max_lev": 20.0,
      "capped": false,
      "cost_usd": 1.41,
-     "open_frac": 1.0,
-     "banked_usd": 0.0
+     "open_frac": 0.5,
+     "banked_usd": 7.5
     }
    },
    {
@@ -160,17 +160,17 @@
    "oi_chg_pct": null,
    "oi_src": null,
    "risk_pct": null,
-   "bars": 19,
+   "bars": 20,
    "risk": 912.0,
    "trail_B": {
-    "status": "watching",
-    "stop": 79283.8,
-    "tp1": null,
-    "tp1_hit": false,
+    "status": "trailing",
+    "stop": 80195.8,
+    "tp1": 81563.8,
+    "tp1_hit": true,
     "banked": 0.0,
-    "activated_be": false,
+    "activated_be": true,
     "sma21_4h": null,
-    "label": "box→TP1 mm",
+    "label": "4H 21 −0.5%",
     "equity_at_entry": 1000.0,
     "risk_usd": 10.0,
     "risk_pct": 1.0,
@@ -182,18 +182,18 @@
     "max_lev": 20.0,
     "capped": false,
     "cost_usd": 1.41,
-    "open_frac": 1.0,
-    "banked_usd": 0.0
+    "open_frac": 0.5,
+    "banked_usd": 7.5
    },
    "book_b": {
-    "status": "watching",
-    "stop": 79283.8,
-    "tp1": null,
-    "tp1_hit": false,
+    "status": "trailing",
+    "stop": 80195.8,
+    "tp1": 81563.8,
+    "tp1_hit": true,
     "banked": 0.0,
-    "activated_be": false,
+    "activated_be": true,
     "sma21_4h": null,
-    "label": "box→TP1 mm",
+    "label": "4H 21 −0.5%",
     "equity_at_entry": 1000.0,
     "risk_usd": 10.0,
     "risk_pct": 1.0,
@@ -205,8 +205,8 @@
     "max_lev": 20.0,
     "capped": false,
     "cost_usd": 1.41,
-    "open_frac": 1.0,
-    "banked_usd": 0.0
+    "open_frac": 0.5,
+    "banked_usd": 7.5
    },
    "book_a": {
     "label": "3R full",
