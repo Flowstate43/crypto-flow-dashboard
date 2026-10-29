@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-28T21:05-05:00",
+ "generated": "2026-10-28T22:39-05:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -26,12 +26,12 @@
     "key": "A",
     "label": "Compression A · 3R",
     "start": 1000.0,
-    "equity": 998.59,
-    "realized_usd": -1.41,
-    "ret_pct": -0.14,
+    "equity": 1006.09,
+    "realized_usd": 6.09,
+    "ret_pct": 0.61,
     "closed": 1,
-    "wins": 0,
-    "win_rate": 0.0,
+    "wins": 1,
+    "win_rate": 100.0,
     "total_r": 0.61,
     "open": null
    },
@@ -39,13 +39,13 @@
     "key": "B",
     "label": "Compression B · MM",
     "start": 1000.0,
-    "equity": 998.59,
-    "realized_usd": -1.41,
-    "ret_pct": -0.14,
+    "equity": 1006.09,
+    "realized_usd": 6.09,
+    "ret_pct": 0.61,
     "closed": 1,
-    "wins": 0,
-    "win_rate": 0.0,
-    "total_r": 0.0,
+    "wins": 1,
+    "win_rate": 100.0,
+    "total_r": 0.61,
     "open": null
    },
    {
@@ -62,7 +62,7 @@
     "open": null
    }
   ],
-  "equity_total": 3997.18
+  "equity_total": 4012.18
  },
  "scanners": [
   {
@@ -103,8 +103,8 @@
    "result": "tp1_trail",
    "r_net": 0.61,
    "r_gross": 0.75,
-   "pnl_usd": -1.41,
-   "gross_usd": 0.0,
+   "pnl_usd": 6.09,
+   "gross_usd": 7.5,
    "cost_usd": 1.41,
    "risk_usd": 10.0,
    "notional": 879.34,
@@ -112,7 +112,7 @@
    "qty": 0.010965,
    "lev": 0.88,
    "capped": false,
-   "equity_after": 998.59
+   "equity_after": 1006.09
   },
   {
    "scanner": "compression",
@@ -120,15 +120,15 @@
    "book_label": "B · MM",
    "side": "long",
    "armed_time": "2026-10-27T08:46-05:00",
-   "exit_time": null,
+   "exit_time": "2026-10-28T21:01-05:00",
    "entry": 80195.8,
    "stop": 79283.8,
    "exit_price": 80195.8,
    "result": "tp1_trail",
-   "r_net": 0.0,
+   "r_net": 0.61,
    "r_gross": 0.75,
-   "pnl_usd": -1.41,
-   "gross_usd": 0.0,
+   "pnl_usd": 6.09,
+   "gross_usd": 7.5,
    "cost_usd": 1.41,
    "risk_usd": 10.0,
    "notional": 879.34,
@@ -136,7 +136,7 @@
    "qty": 0.010965,
    "lev": 0.88,
    "capped": false,
-   "equity_after": 998.59
+   "equity_after": 1006.09
   }
  ],
  "trade_log": [
@@ -153,8 +153,8 @@
    "result": "tp1_trail",
    "r_net": 0.61,
    "r_gross": 0.75,
-   "pnl_usd": -1.41,
-   "gross_usd": 0.0,
+   "pnl_usd": 6.09,
+   "gross_usd": 7.5,
    "cost_usd": 1.41,
    "risk_usd": 10.0,
    "notional": 879.34,
@@ -162,7 +162,7 @@
    "qty": 0.010965,
    "lev": 0.88,
    "capped": false,
-   "equity_after": 998.59
+   "equity_after": 1006.09
   },
   {
    "scanner": "compression",
@@ -170,15 +170,15 @@
    "book_label": "B · MM",
    "side": "long",
    "armed_time": "2026-10-27T08:46-05:00",
-   "exit_time": null,
+   "exit_time": "2026-10-28T21:01-05:00",
    "entry": 80195.8,
    "stop": 79283.8,
    "exit_price": 80195.8,
    "result": "tp1_trail",
-   "r_net": 0.0,
+   "r_net": 0.61,
    "r_gross": 0.75,
-   "pnl_usd": -1.41,
-   "gross_usd": 0.0,
+   "pnl_usd": 6.09,
+   "gross_usd": 7.5,
    "cost_usd": 1.41,
    "risk_usd": 10.0,
    "notional": 879.34,
@@ -186,7 +186,7 @@
    "qty": 0.010965,
    "lev": 0.88,
    "capped": false,
-   "equity_after": 998.59
+   "equity_after": 1006.09
   }
  ],
  "compression": {
