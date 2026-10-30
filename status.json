@@ -1,65 +1,5 @@
 [
   {
-    "ts": "2026-10-28 06:05",
-    "at": 1793185501933,
-    "bias_1d": "bullish",
-    "bias_4h": "bearish",
-    "oi_val": 7859870092.0,
-    "oi_chg": 0.78,
-    "funding": 0.00789,
-    "funding_ann": 8.64,
-    "bb_rank_1h": 0.5,
-    "range_x_1h": 1.6762,
-    "box_lo": 79468.4,
-    "box_hi": 81798.7,
-    "compressed": false,
-    "frozen": false,
-    "frozen_ts": null,
-    "box_pct": 2.859,
-    "sma21_4h": 80396.9,
-    "context": "BTC $81,460 | 1H ATR 299\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 2.56% | rank 5% | bias bullish\n1D SMA21 81,978 (-0.63%) | SMA50 81,846 | SMA200 73,035\n1D price in 82k\u201386k range: -14% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.09% | rank 30% | bias bearish\n4H SMA21 80,397 (+1.32%) | SMA50 81,334 | SMA200 82,936\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H box (24 bars) 79,468\u201381,799 (2.86% of price, tight \u22642.5%) | not tight | BB rank 50% (need \u226470%) | breakout line 4H SMA21 80,397\n1H RSI 14: 71\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 81,229 (+0.28%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0079% / 8h | ~8.6% annualized\nOI $7.86B (+0.8% vs prior 4H)\nRSI divs: none\nSwing high +-1.9 ATR | swing low -2.5 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nOPEN: LONG entry 80195.8 stop 79283.8 target 82931.8 | 22/96 bars",
-    "opinion": "AI (blind): 1D bull above 200, 4H bear + played bull div, tight 1H compression | S [80800, 80000] R [81500, 82000]\nAGREE bias_1d: ai=bull scan=bull\nAGREE bias_4h: ai=bear scan=bear\nDISAGREE bias_1h: ai=bear scan=bull\nAGREE div_1d: ai=none scan=none\nAGREE div_4h: ai=none (bullish, played out) scan=none\nAGREE div_1h: ai=none scan=none\nDISAGREE compression: ai=yes scan=no",
-    "blind": {
-      "bias_1d": "bull",
-      "bias_4h": "bear",
-      "bias_1h": "bear",
-      "div_1d": {
-        "type": "none",
-        "played_out": false
-      },
-      "div_4h": {
-        "type": "bullish",
-        "played_out": true
-      },
-      "div_1h": {
-        "type": "none",
-        "played_out": false
-      },
-      "compression": "yes",
-      "levels": {
-        "support": [
-          80800,
-          80000
-        ],
-        "resistance": [
-          81500,
-          82000
-        ]
-      },
-      "read": "1D bull above 200, 4H bear + played bull div, tight 1H compression"
-    },
-    "compare": [
-      "AGREE bias_1d: ai=bull scan=bull",
-      "AGREE bias_4h: ai=bear scan=bear",
-      "DISAGREE bias_1h: ai=bear scan=bull",
-      "AGREE div_1d: ai=none scan=none",
-      "AGREE div_4h: ai=none (bullish, played out) scan=none",
-      "AGREE div_1h: ai=none scan=none",
-      "DISAGREE compression: ai=yes scan=no"
-    ],
-    "model": "xai/grok-4.20-0309-non-reasoning"
-  },
-  {
     "ts": "2026-10-28 08:05",
     "at": 1793192701763,
     "bias_1d": "bullish",
@@ -1434,6 +1374,66 @@
       "AGREE bias_1h: ai=bear scan=bear",
       "AGREE div_1d: ai=none (bearish, played out) scan=none",
       "AGREE div_4h: ai=none (bearish, played out) scan=none",
+      "AGREE div_1h: ai=none scan=none",
+      "DISAGREE compression: ai=yes scan=no"
+    ],
+    "model": "xai/grok-4.20-0309-non-reasoning"
+  },
+  {
+    "ts": "2026-10-30 14:05",
+    "at": 1793387102081,
+    "bias_1d": "bullish",
+    "bias_4h": "bearish",
+    "oi_val": 7330637877.0,
+    "oi_chg": -0.93,
+    "funding": 0.01,
+    "funding_ann": 10.95,
+    "bb_rank_1h": 0.775,
+    "range_x_1h": 1.9561,
+    "box_lo": 76448.1,
+    "box_hi": 80917.0,
+    "compressed": false,
+    "frozen": false,
+    "frozen_ts": null,
+    "box_pct": 5.792,
+    "sma21_4h": 80009.7,
+    "context": "BTC $76,615 | 1H ATR 575\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 3.30% | rank 14% | bias bullish\n1D SMA21 81,706 (-6.23%) | SMA50 81,898 | SMA200 73,113\n1D price in 82k\u201386k range: -135% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 3.43% | rank 93% | bias bearish\n4H SMA21 80,010 (-4.24%) | SMA50 80,447 | SMA200 82,626\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H box (24 bars) 76,448\u201380,917 (5.79% of price, tight \u22642.5%) | not tight | BB rank 78% (need \u226470%) | breakout line 4H SMA21 80,010\n1H RSI 14: 28\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 77,210 (-0.77%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0100% / 8h | ~10.9% annualized\nOI $7.33B (-0.9% vs prior 4H)\nRSI divs: none\nSwing high +3.5 ATR | swing low --0.3 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
+    "opinion": "AI (blind): Strong 1D bear bias post breakdown, RSI bear div played out. | S [76600, 77874] R [80810, 81745]\nDISAGREE bias_1d: ai=bear scan=bull\nAGREE bias_4h: ai=bear scan=bear\nAGREE bias_1h: ai=bear scan=bear\nAGREE div_1d: ai=none (bearish, played out) scan=none\nAGREE div_4h: ai=none scan=none\nAGREE div_1h: ai=none scan=none\nDISAGREE compression: ai=yes scan=no",
+    "blind": {
+      "bias_1d": "bear",
+      "bias_4h": "bear",
+      "bias_1h": "bear",
+      "div_1d": {
+        "type": "bearish",
+        "played_out": true
+      },
+      "div_4h": {
+        "type": "none",
+        "played_out": false
+      },
+      "div_1h": {
+        "type": "none",
+        "played_out": false
+      },
+      "compression": "yes",
+      "levels": {
+        "support": [
+          76600,
+          77874
+        ],
+        "resistance": [
+          80810,
+          81745
+        ]
+      },
+      "read": "Strong 1D bear bias post breakdown, RSI bear div played out."
+    },
+    "compare": [
+      "DISAGREE bias_1d: ai=bear scan=bull",
+      "AGREE bias_4h: ai=bear scan=bear",
+      "AGREE bias_1h: ai=bear scan=bear",
+      "AGREE div_1d: ai=none (bearish, played out) scan=none",
+      "AGREE div_4h: ai=none scan=none",
       "AGREE div_1h: ai=none scan=none",
       "DISAGREE compression: ai=yes scan=no"
     ],
