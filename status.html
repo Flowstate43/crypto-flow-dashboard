@@ -38,7 +38,6 @@
   .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), transparent); opacity: 0.3; }
   .card-title { font-family: var(--font-header); font-size: 0.65rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
 
-  /* Status light */
   .light { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
   .light.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
   .light.red { background: var(--red); box-shadow: 0 0 8px var(--red); }
@@ -49,22 +48,33 @@
   .gauge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
   .gauge { background: #111; border-radius: 8px; padding: 14px; }
   .gauge-label { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-  .gauge-value { font-family: var(--font-mono); font-size: 1.6rem; font-weight: 600; color: var(--text); }
+  .gauge-value { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 600; color: var(--text); }
   .gauge-value small { font-size: 0.7rem; color: var(--text-dim); font-weight: 400; }
+  .gauge-human { font-size: 0.72rem; color: var(--text-dim); margin-top: 6px; line-height: 1.4; }
   .gauge-bar-wrap { margin-top: 10px; height: 8px; background: #1a1a1a; border-radius: 4px; overflow: hidden; }
   .gauge-bar { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
   .gauge-bar.ok { background: var(--green); }
   .gauge-bar.warn { background: var(--yellow); }
   .gauge-bar.crit { background: var(--red); }
 
-  /* Agents */
-  .agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-  .agent-chip { display: flex; align-items: center; gap: 8px; background: #111; border-radius: 6px; padding: 10px 12px; font-family: var(--font-mono); font-size: 0.72rem; }
-  .agent-chip .name { color: var(--text); }
-
-  /* Active work */
-  .work-list { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-dim); line-height: 1.7; }
-  .work-list .empty { color: #555; }
+  /* Agent sprites */
+  .agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .agent { background: #111; border-radius: 8px; padding: 12px 10px; text-align: center; position: relative; overflow: hidden; }
+  .agent .stage { height: 44px; position: relative; margin-bottom: 8px; }
+  .sprite { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-size: 1.6rem; line-height: 1; }
+  .sprite.run { animation: run 1.6s ease-in-out infinite alternate; }
+  .sprite.idle { opacity: 0.35; filter: grayscale(1); }
+  .agent .name { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text); }
+  .agent .state { font-size: 0.55rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+  .agent .state.on { color: var(--green); }
+  .agent .state.off { color: #555; }
+  @keyframes run {
+    0% { left: 12%; transform: translateX(-50%) scaleX(1); }
+    49% { transform: translateX(-50%) scaleX(1); }
+    50% { left: 88%; transform: translateX(-50%) scaleX(-1); }
+    99% { transform: translateX(-50%) scaleX(-1); }
+    100% { left: 12%; transform: translateX(-50%) scaleX(1); }
+  }
 
   .status-row { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.72rem; }
   .status-row .label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-size: 0.58rem; }
@@ -90,42 +100,46 @@
 
 <div class="wrap">
 
-  <!-- System health lights -->
+  <!-- System health -->
   <div class="card">
-    <div class="card-title">System Health</div>
+    <div class="card-title">How the machine is doing</div>
     <div class="gauge-grid">
       <div class="gauge">
-        <div class="gauge-label">RAM</div>
+        <div class="gauge-label">Memory (RAM)</div>
         <div class="gauge-value" id="ram-val">&mdash;</div>
+        <div class="gauge-human" id="ram-human">&mdash;</div>
         <div class="gauge-bar-wrap"><div class="gauge-bar" id="ram-bar" style="width:0%"></div></div>
       </div>
       <div class="gauge">
-        <div class="gauge-label">Disk</div>
+        <div class="gauge-label">Storage</div>
         <div class="gauge-value" id="disk-val">&mdash;</div>
+        <div class="gauge-human" id="disk-human">&mdash;</div>
         <div class="gauge-bar-wrap"><div class="gauge-bar" id="disk-bar" style="width:0%"></div></div>
       </div>
       <div class="gauge">
-        <div class="gauge-label">CPU Load</div>
+        <div class="gauge-label">CPU</div>
         <div class="gauge-value" id="cpu-val">&mdash;</div>
+        <div class="gauge-human" id="cpu-human">&mdash;</div>
         <div class="gauge-bar-wrap"><div class="gauge-bar" id="cpu-bar" style="width:0%"></div></div>
       </div>
       <div class="gauge">
         <div class="gauge-label">Uptime</div>
         <div class="gauge-value" id="uptime-val">&mdash;</div>
-        <div class="status-row" style="margin-top:10px"><span class="light gray" id="uptime-light"></span><span class="label">running</span></div>
+        <div class="gauge-human" id="uptime-human">&mdash;</div>
+        <div class="status-row" style="margin-top:10px"><span class="light green" id="uptime-light"></span><span class="label">running</span></div>
       </div>
     </div>
   </div>
 
   <!-- Agents -->
   <div class="card">
-    <div class="card-title">Agents</div>
-    <div class="agent-grid" id="agent-grid"><div class="work-list empty">Loading&hellip;</div></div>
+    <div class="card-title">The crew</div>
+    <div class="agent-grid" id="agent-grid"><div class="gauge-human">Loading&hellip;</div></div>
   </div>
 
   <!-- Memory -->
   <div class="card">
-    <div class="card-title">Memory Index</div>
+    <div class="card-title">Memory</div>
     <div class="status-row" id="memory-row"><span class="light gray"></span><span class="label">checking&hellip;</span></div>
   </div>
 
@@ -136,15 +150,37 @@
 </div>
 
 <script>
+// Emoji sprite per agent (fallback to a generic bot)
+const SPRITES = {
+  coordinator: '🧭', mort: '📈', steve: '🌙', writer: '✍️', researcher: '🔍',
+  reviewer: '🔎', trainer: '🎓', chat: '💬', codey: '💻', openclaw: '🤖'
+};
+
 function lightClass(pct) {
   if (pct >= 85) return 'crit';
   if (pct >= 65) return 'warn';
   return 'ok';
 }
-function lightDot(pct) {
-  if (pct >= 85) return 'red';
-  if (pct >= 65) return 'yellow';
-  return 'green';
+function humanRam(pct) {
+  if (pct >= 85) return 'Running low — close to full.';
+  if (pct >= 65) return 'Getting busy, but still fine.';
+  return 'Plenty of room to think.';
+}
+function humanDisk(pct) {
+  if (pct >= 85) return 'Almost full — time to clean up.';
+  if (pct >= 65) return 'Filling up, but okay.';
+  return 'Tons of space left.';
+}
+function humanCpu(loadPct) {
+  if (loadPct >= 85) return 'Working hard right now.';
+  if (loadPct >= 40) return 'Busy, but keeping up.';
+  return 'Relaxed — barely breaking a sweat.';
+}
+function humanUptime(h) {
+  if (h < 1) return 'Just woke up.';
+  if (h < 24) return 'Been up a few hours.';
+  const d = Math.floor(h / 24);
+  return 'Up for ' + d + ' day' + (d === 1 ? '' : 's') + ' straight.';
 }
 
 async function load() {
@@ -157,49 +193,57 @@ async function load() {
 
     // RAM
     const ram = d.ram || {};
-    document.getElementById('ram-val').innerHTML = ram.used_gb + '<small> / ' + ram.total_gb + ' GB</small>';
+    document.getElementById('ram-val').innerHTML = ram.used_gb + '<small> of ' + ram.total_gb + ' GB</small>';
+    document.getElementById('ram-human').textContent = humanRam(ram.used_pct || 0);
     const ramBar = document.getElementById('ram-bar');
     ramBar.style.width = (ram.used_pct || 0) + '%';
     ramBar.className = 'gauge-bar ' + lightClass(ram.used_pct || 0);
 
     // Disk
     const disk = d.disk || {};
-    document.getElementById('disk-val').innerHTML = disk.used_gb + '<small> / ' + disk.total_gb + ' GB</small>';
+    document.getElementById('disk-val').innerHTML = disk.used_gb + '<small> of ' + disk.total_gb + ' GB</small>';
+    document.getElementById('disk-human').textContent = humanDisk(disk.used_pct || 0);
     const diskBar = document.getElementById('disk-bar');
     diskBar.style.width = (disk.used_pct || 0) + '%';
     diskBar.className = 'gauge-bar ' + lightClass(disk.used_pct || 0);
 
     // CPU
     const cpu = d.cpu || {};
-    document.getElementById('cpu-val').innerHTML = cpu.load1 + '<small> / ' + cpu.nproc + ' cores</small>';
+    document.getElementById('cpu-val').innerHTML = cpu.load1 + '<small> load</small>';
+    document.getElementById('cpu-human').textContent = humanCpu(cpu.load_pct || 0);
     const cpuBar = document.getElementById('cpu-bar');
     cpuBar.style.width = Math.min(100, cpu.load_pct || 0) + '%';
     cpuBar.className = 'gauge-bar ' + lightClass(cpu.load_pct || 0);
 
     // Uptime
     document.getElementById('uptime-val').innerHTML = (d.uptime_h || 0) + '<small> hrs</small>';
-    document.getElementById('uptime-light').className = 'light green';
+    document.getElementById('uptime-human').textContent = humanUptime(d.uptime_h || 0);
 
     // Agents
     const agents = d.agents || [];
     const ag = document.getElementById('agent-grid');
     if (agents.length) {
-      ag.innerHTML = agents.map(a =>
-        '<div class="agent-chip"><span class="light ' + (a.active ? 'green' : 'gray') + '"></span><span class="name">' + a.name + '</span></div>'
-      ).join('');
+      ag.innerHTML = agents.map(a => {
+        const sprite = SPRITES[a.name] || '🤖';
+        const cls = a.active ? 'run' : 'idle';
+        const state = a.active ? 'on duty' : 'offline';
+        const stateCls = a.active ? 'on' : 'off';
+        return '<div class="agent"><div class="stage"><span class="sprite ' + cls + '">' + sprite + '</span></div>' +
+               '<div class="name">' + a.name + '</div>' +
+               '<div class="state ' + stateCls + '">' + state + '</div></div>';
+      }).join('');
     } else {
-      ag.innerHTML = '<div class="work-list empty">No agents found</div>';
+      ag.innerHTML = '<div class="gauge-human">No agents found</div>';
     }
 
     // Memory
     const mem = d.memory || {};
     const memRow = document.getElementById('memory-row');
     if (mem.db_exists) {
-      memRow.innerHTML = '<span class="light green"></span><span class="label">index online &middot; ' + mem.db_size_mb + ' MB</span>';
+      memRow.innerHTML = '<span class="light green"></span><span class="label">memory online &middot; ' + mem.db_size_mb + ' MB of notes</span>';
     } else {
-      memRow.innerHTML = '<span class="light red"></span><span class="label">index offline</span>';
+      memRow.innerHTML = '<span class="light red"></span><span class="label">memory offline</span>';
     }
-
   } catch (e) {
     document.getElementById('updated-at').textContent = 'Error: ' + e.message;
   }
