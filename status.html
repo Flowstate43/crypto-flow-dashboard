@@ -129,12 +129,6 @@
     <div class="status-row" id="memory-row"><span class="light gray"></span><span class="label">checking&hellip;</span></div>
   </div>
 
-  <!-- Active work -->
-  <div class="card">
-    <div class="card-title">Active Work</div>
-    <div class="work-list" id="work-list"><div class="empty">Loading&hellip;</div></div>
-  </div>
-
 </div>
 
 <div class="footer">
@@ -206,14 +200,6 @@ async function load() {
       memRow.innerHTML = '<span class="light red"></span><span class="label">index offline</span>';
     }
 
-    // Active work
-    const work = d.active_work || [];
-    const wl = document.getElementById('work-list');
-    if (work.length) {
-      wl.innerHTML = work.map(w => '<div>' + w.replace(/</g, '&lt;') + '</div>').join('');
-    } else {
-      wl.innerHTML = '<div class="empty">No active processes</div>';
-    }
   } catch (e) {
     document.getElementById('updated-at').textContent = 'Error: ' + e.message;
   }
