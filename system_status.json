@@ -1,24 +1,24 @@
 {
-  "ts": "2026-10-31 18:20:02",
-  "at": 1793488802986,
+  "ts": "2026-10-31 18:25:02",
+  "at": 1793489102688,
   "ram": {
     "total_gb": 9.6,
-    "used_gb": 4.5,
-    "avail_gb": 5.1,
-    "used_pct": 46.5
+    "used_gb": 5.2,
+    "avail_gb": 4.4,
+    "used_pct": 54.2
   },
   "disk": {
     "total_gb": 1006.9,
-    "used_gb": 11.0,
+    "used_gb": 11.1,
     "avail_gb": 944.6,
     "used_pct": 1.1
   },
   "cpu": {
     "nproc": 16,
-    "load1": 0.98,
-    "load_pct": 6.1
+    "load1": 0.42,
+    "load_pct": 2.6
   },
-  "uptime_h": 49.3,
+  "uptime_h": 49.4,
   "agents": [
     {
       "name": "chat",
@@ -63,7 +63,7 @@
   ],
   "memory": {
     "db_exists": true,
-    "db_size_mb": 231.0
+    "db_size_mb": 231.9
   },
   "active_work": [
     "2282 /usr/bin/python3 /home/flow/.openclaw/workspace/mort/dashboard/server.py",
@@ -84,7 +84,7 @@
     "29113 /opt/google/chrome/chrome --type=renderer --crashpad-handler-pid=29018 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/home/flow/.openclaw/browser/openclaw/user-data --subproc-heap-profiling --change-stack-guard-on-fork=enable --disable-dev-shm-usage --remote-debugging-port=18800 --ozone-platform=headless --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=6 --launch-time-ticks=99998005255 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,17197388188360754667,17229735330752614733,262144 --disable-features=MediaRouter,PaintHolding,Translate --variations-seed-version --pseudonymization-salt-handle=7,i,14581143878407709278,11435422134463794603,4 --trace-process-track-uuid=3190708991934122588",
     "29229 /opt/google/chrome/chrome --type=utility --utility-sub-type=audio.mojom.AudioService --lang=en-US --service-sandbox-type=none --disable-dev-shm-usage --use-angle=swiftshader-webgl --crashpad-handler-pid=29018 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/home/flow/.openclaw/browser/openclaw/user-data --subproc-heap-profiling --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,17197388188360754667,17229735330752614733,262144 --disable-features=MediaRouter,PaintHolding,Translate --variations-seed-version --pseudonymization-salt-handle=7,i,14581143878407709278,11435422134463794603,4 --trace-process-track-uuid=3190708999430457380",
     "30357 /usr/bin/node /home/flow/.npm-global/lib/node_modules/openclaw/dist/infra/sqlite-readonly-location.worker.js --openclaw-sqlite-readonly-child session",
-    "40442 /opt/google/chrome/chrome --type=renderer --crashpad-handler-pid=29018 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/home/flow/.openclaw/browser/openclaw/user-data --subproc-heap-profiling --change-stack-guard-on-fork=enable --disable-dev-shm-usage --remote-debugging-port=18800 --ozone-platform=headless --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=29 --launch-time-ticks=148826764881 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,17197388188360754667,17229735330752614733,262144 --disable-features=MediaRouter,PaintHolding,Translate --variations-seed-version --pseudonymization-salt-handle=7,i,14581143878407709278,11435422134463794603,4 --trace-process-track-uuid=3190709013486085115",
-    "48944 /usr/bin/node /home/flow/.npm-global/lib/node_modules/openclaw/dist/extensions/memory-core/memory-search-knn.child.js"
+    "48944 /usr/bin/node /home/flow/.npm-global/lib/node_modules/openclaw/dist/extensions/memory-core/memory-search-knn.child.js",
+    "50049 /opt/google/chrome/chrome --type=renderer --crashpad-handler-pid=29018 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/home/flow/.openclaw/browser/openclaw/user-data --subproc-heap-profiling --change-stack-guard-on-fork=enable --disable-dev-shm-usage --remote-debugging-port=18800 --ozone-platform=headless --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=37 --launch-time-ticks=177607340123 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,17197388188360754667,17229735330752614733,262144 --disable-features=MediaRouter,PaintHolding,Translate --variations-seed-version --pseudonymization-salt-handle=7,i,14581143878407709278,11435422134463794603,4 --trace-process-track-uuid=3190709020982419907"
   ]
 }
