@@ -1,24 +1,24 @@
 {
-  "ts": "2026-11-01 15:00:02",
-  "at": 1793566802429,
+  "ts": "2026-11-01 15:05:02",
+  "at": 1793567102964,
   "ram": {
     "total_gb": 9.6,
-    "used_gb": 4.1,
-    "avail_gb": 5.4,
-    "used_pct": 43.3
+    "used_gb": 4.7,
+    "avail_gb": 4.8,
+    "used_pct": 49.4
   },
   "disk": {
     "total_gb": 1006.9,
-    "used_gb": 11.1,
+    "used_gb": 11.2,
     "avail_gb": 944.5,
     "used_pct": 1.1
   },
   "cpu": {
     "nproc": 16,
-    "load1": 0.06,
-    "load_pct": 0.4
+    "load1": 0.09,
+    "load_pct": 0.6
   },
-  "uptime_h": 71.0,
+  "uptime_h": 71.1,
   "agents": [
     {
       "name": "chat",
@@ -63,7 +63,7 @@
   ],
   "memory": {
     "db_exists": true,
-    "db_size_mb": 256.5
+    "db_size_mb": 256.6
   },
   "active_work": [
     "2282 /usr/bin/python3 /home/flow/.openclaw/workspace/mort/dashboard/server.py",
