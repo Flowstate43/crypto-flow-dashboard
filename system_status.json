@@ -1,11 +1,11 @@
 {
-  "ts": "2026-11-01 10:05:02",
-  "at": 1793549102541,
+  "ts": "2026-11-01 10:10:02",
+  "at": 1793549402049,
   "ram": {
     "total_gb": 9.6,
-    "used_gb": 3.9,
-    "avail_gb": 5.7,
-    "used_pct": 40.7
+    "used_gb": 4.0,
+    "avail_gb": 5.6,
+    "used_pct": 41.7
   },
   "disk": {
     "total_gb": 1006.9,
@@ -15,10 +15,10 @@
   },
   "cpu": {
     "nproc": 16,
-    "load1": 0.31,
-    "load_pct": 1.9
+    "load1": 0.35,
+    "load_pct": 2.2
   },
-  "uptime_h": 66.1,
+  "uptime_h": 66.2,
   "agents": [
     {
       "name": "chat",
@@ -63,7 +63,7 @@
   ],
   "memory": {
     "db_exists": true,
-    "db_size_mb": 254.2
+    "db_size_mb": 255.4
   },
   "active_work": [
     "2282 /usr/bin/python3 /home/flow/.openclaw/workspace/mort/dashboard/server.py",
@@ -71,16 +71,10 @@
     "67355 /usr/bin/node /home/flow/.npm-global/lib/node_modules/openclaw/dist/process/spawn-broker/worker.js",
     "67365 /usr/bin/node /home/flow/.npm-global/lib/node_modules/openclaw/dist/infra/sqlite-readonly-location.worker.js --openclaw-sqlite-readonly-child session",
     "67483 /usr/bin/node /home/flow/.npm-global/lib/node_modules/openclaw/dist/infra/sqlite-readonly-location.worker.js --openclaw-sqlite-readonly-child session",
-    "70907 /bin/sh -c /usr/bin/python3 /home/flow/.openclaw/workspace/mort/compression_scanner/weex_snapshot.py >> /home/flow/.openclaw/workspace/mort/weex_dashboard/snapshot.log 2>&1; /home/flow/.openclaw/workspace/mort/weex_dashboard/serve.sh",
-    "70908 /bin/sh -c /home/flow/.openclaw/workspace/mort/paper_log/publish_dashboard.sh >> /home/flow/.openclaw/workspace/mort/paper_log/dashboard_export.log 2>&1",
-    "70909 /bin/sh -c /home/flow/.openclaw/workspace/mort/compression_scanner/scan_status.sh",
-    "70910 /bin/sh -c /home/flow/.openclaw/workspace/mort/compression_scanner/scan_hourly.sh",
-    "70911 /bin/sh /home/flow/.openclaw/workspace/mort/compression_scanner/scan_hourly.sh",
-    "70912 /bin/sh /home/flow/.openclaw/workspace/mort/compression_scanner/scan_status.sh",
-    "70913 /bin/bash /home/flow/.openclaw/workspace/mort/paper_log/publish_dashboard.sh",
-    "70914 /usr/bin/python3 /home/flow/.openclaw/workspace/mort/compression_scanner/weex_snapshot.py",
-    "70924 node /home/flow/.npm-global/bin/openclaw message send --channel telegram --target -5355097647 --json -m \ud83d\udcca BTC Hourly \u00b7 10:05 AM CST 1D bias: bullish | 4H bias: bearish 1H compression: BB rank 0% (need \u226470%) | range 0.30\u00d7 \ud83d\udfe2 OPEN: LONG entry 77,872 stop 77,138 | 0/96 bars AI: AI blind read unavailable (llm rc=1 our account for subscription or usage limits, then try again. | 402 [openclaw] Debug",
-    "70939 openclaw",
-    "70959 python3 /home/flow/.openclaw/workspace/coordinator/status_dashboard/collect_status.py"
+    "71788 /bin/sh -c /home/flow/.openclaw/workspace/mort/paper_log/publish_dashboard.sh >> /home/flow/.openclaw/workspace/mort/paper_log/dashboard_export.log 2>&1",
+    "71789 /bin/sh -c /usr/bin/python3 /home/flow/.openclaw/workspace/mort/compression_scanner/weex_snapshot.py >> /home/flow/.openclaw/workspace/mort/weex_dashboard/snapshot.log 2>&1; /home/flow/.openclaw/workspace/mort/weex_dashboard/serve.sh",
+    "71790 /usr/bin/python3 /home/flow/.openclaw/workspace/mort/compression_scanner/weex_snapshot.py",
+    "71791 /bin/bash /home/flow/.openclaw/workspace/mort/paper_log/publish_dashboard.sh",
+    "71806 python3 /home/flow/.openclaw/workspace/coordinator/status_dashboard/collect_status.py"
   ]
 }
