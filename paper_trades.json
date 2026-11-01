@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-28T22:39-05:00",
+ "generated": "2026-11-01T07:50-06:00",
  "source": "mort/paper_log/trades.csv",
  "costs": "0.16% round trip; win = net R > 0",
  "account": {
@@ -46,7 +46,21 @@
     "wins": 1,
     "win_rate": 100.0,
     "total_r": 0.61,
-    "open": null
+    "open": {
+     "equity_at_entry": 1000.0,
+     "risk_usd": 10.0,
+     "risk_pct": 1.0,
+     "stop_pct": 0.942,
+     "notional": 1061.69,
+     "qty": 0.013634,
+     "margin": 53.08,
+     "lev": 1.06,
+     "max_lev": 20.0,
+     "capped": false,
+     "cost_usd": 1.7,
+     "open_frac": 1.0,
+     "banked_usd": 0.0
+    }
    },
    {
     "key": "C",
@@ -190,7 +204,76 @@
   }
  ],
  "compression": {
-  "open": null,
+  "open": {
+   "paper_id": "corpus-2026-11-01T01:16-06:00",
+   "side": "long",
+   "time": "2026-11-01T01:16-06:00",
+   "entry": 77871.7,
+   "stop": 77138.2,
+   "target": 80072.1,
+   "max_bars": 96,
+   "box_high": null,
+   "box_low": null,
+   "box_ratio": null,
+   "bbw_pct": null,
+   "oi_chg_pct": null,
+   "oi_src": null,
+   "risk_pct": null,
+   "bars": 0,
+   "risk": 733.5,
+   "trail_B": {
+    "status": "watching",
+    "stop": 77138.2,
+    "tp1": null,
+    "tp1_hit": false,
+    "banked": 0.0,
+    "activated_be": false,
+    "sma21_4h": null,
+    "label": "box→TP1 mm",
+    "equity_at_entry": 1000.0,
+    "risk_usd": 10.0,
+    "risk_pct": 1.0,
+    "stop_pct": 0.942,
+    "notional": 1061.69,
+    "qty": 0.013634,
+    "margin": 53.08,
+    "lev": 1.06,
+    "max_lev": 20.0,
+    "capped": false,
+    "cost_usd": 1.7,
+    "open_frac": 1.0,
+    "banked_usd": 0.0
+   },
+   "book_b": {
+    "status": "watching",
+    "stop": 77138.2,
+    "tp1": null,
+    "tp1_hit": false,
+    "banked": 0.0,
+    "activated_be": false,
+    "sma21_4h": null,
+    "label": "box→TP1 mm",
+    "equity_at_entry": 1000.0,
+    "risk_usd": 10.0,
+    "risk_pct": 1.0,
+    "stop_pct": 0.942,
+    "notional": 1061.69,
+    "qty": 0.013634,
+    "margin": 53.08,
+    "lev": 1.06,
+    "max_lev": 20.0,
+    "capped": false,
+    "cost_usd": 1.7,
+    "open_frac": 1.0,
+    "banked_usd": 0.0
+   },
+   "book_a": {
+    "label": "3R full",
+    "target": 80072.1,
+    "stop": 77138.2,
+    "status": "open"
+   }
+  },
   "last": {
    "side": "long",
    "time": "2026-10-27T08:46-05:00",
