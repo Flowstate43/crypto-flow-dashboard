@@ -1,11 +1,11 @@
 {
-  "ts": "2026-11-01 19:50:03",
-  "at": 1793584203039,
+  "ts": "2026-11-01 19:55:02",
+  "at": 1793584502785,
   "ram": {
     "total_gb": 9.6,
-    "used_gb": 4.5,
-    "avail_gb": 5.1,
-    "used_pct": 46.9
+    "used_gb": 4.6,
+    "avail_gb": 4.9,
+    "used_pct": 48.4
   },
   "disk": {
     "total_gb": 1006.9,
@@ -18,7 +18,7 @@
     "load1": 0.08,
     "load_pct": 0.5
   },
-  "uptime_h": 75.8,
+  "uptime_h": 75.9,
   "agents": [
     {
       "name": "chat",
