@@ -1,65 +1,5 @@
 [
   {
-    "ts": "2026-10-30 18:05",
-    "at": 1793401501948,
-    "bias_1d": "bullish",
-    "bias_4h": "bearish",
-    "oi_val": 7430317257.0,
-    "oi_chg": 0.73,
-    "funding": 0.01,
-    "funding_ann": 10.95,
-    "bb_rank_1h": 0.8083,
-    "range_x_1h": 0.7944,
-    "box_lo": 76270.0,
-    "box_hi": 79241.9,
-    "compressed": false,
-    "frozen": false,
-    "frozen_ts": null,
-    "box_pct": 3.876,
-    "sma21_4h": 79872.5,
-    "context": "BTC $76,916 | 1H ATR 570\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 3.30% | rank 14% | bias bullish\n1D SMA21 81,706 (-5.86%) | SMA50 81,898 | SMA200 73,113\n1D price in 82k\u201386k range: -127% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 3.84% | rank 90% | bias bearish\n4H SMA21 79,872 (-3.70%) | SMA50 80,350 | SMA200 82,586\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H box (24 bars) 76,270\u201379,242 (3.88% of price, tight \u22642.5%) | not tight | BB rank 81% (need \u226470%) | breakout line 4H SMA21 79,872\n1H RSI 14: 34\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 76,826 (+0.12%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0100% / 8h | ~10.9% annualized\nOI $7.43B (+0.7% vs prior 4H)\nRSI divs: none\nSwing high +3.0 ATR | swing low -0.2 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nNo open trade or pending signal.",
-    "opinion": "AI (blind): Strong 1D bear bias. Lower low + RSI div played out. Compression on 1H. | S [76000, 77800] R [79000, 80800]\nDISAGREE bias_1d: ai=bear scan=bull\nAGREE bias_4h: ai=bear scan=bear\nAGREE bias_1h: ai=bear scan=bear\nAGREE div_1d: ai=none (bearish, played out) scan=none\nAGREE div_4h: ai=none (bearish, played out) scan=none\nAGREE div_1h: ai=none scan=none\nDISAGREE compression: ai=yes scan=no",
-    "blind": {
-      "bias_1d": "bear",
-      "bias_4h": "bear",
-      "bias_1h": "bear",
-      "div_1d": {
-        "type": "bearish",
-        "played_out": true
-      },
-      "div_4h": {
-        "type": "bearish",
-        "played_out": true
-      },
-      "div_1h": {
-        "type": "none",
-        "played_out": false
-      },
-      "compression": "yes",
-      "levels": {
-        "support": [
-          76000,
-          77800
-        ],
-        "resistance": [
-          79000,
-          80800
-        ]
-      },
-      "read": "Strong 1D bear bias. Lower low + RSI div played out. Compression on 1H."
-    },
-    "compare": [
-      "DISAGREE bias_1d: ai=bear scan=bull",
-      "AGREE bias_4h: ai=bear scan=bear",
-      "AGREE bias_1h: ai=bear scan=bear",
-      "AGREE div_1d: ai=none (bearish, played out) scan=none",
-      "AGREE div_4h: ai=none (bearish, played out) scan=none",
-      "AGREE div_1h: ai=none scan=none",
-      "DISAGREE compression: ai=yes scan=no"
-    ],
-    "model": "xai/grok-4.20-0309-non-reasoning"
-  },
-  {
     "ts": "2026-10-30 20:05",
     "at": 1793408701423,
     "bias_1d": "bullish",
@@ -894,6 +834,30 @@
     "box_pct": null,
     "sma21_4h": null,
     "context": "BTC $77,855 | 1H ATR 212\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 4.25% | rank 22% | bias bullish\n1D SMA21 81,197 (-4.12%) | SMA50 81,920 | SMA200 73,144\n1D price in 82k\u201386k range: -104% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 2.95% | rank 50% | bias bearish\n4H SMA21 78,099 (-0.31%) | SMA50 79,459 | SMA200 82,221\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 0% \u2192 compression n/a (scanner detect unavailable)\n1H RSI 14: 48\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 77,891 (-0.05%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0100% / 8h | ~10.9% annualized\nOI $7.46B (-0.1% vs prior 4H)\nRSI divs: none\nSwing high +1.2 ATR | swing low -1.7 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nOPEN: LONG entry 77871.7 stop 77138.2 target 80072.1 | 0/96 bars",
+    "opinion": "AI blind read unavailable (llm rc=1 our account for subscription or usage limits, then try again. | 402\n[openclaw] Debug: set OPENCLAW_DEBUG=1 to include the stack trace.\n[openclaw] Try: openclaw doctor\n[openclaw] Help: opencla)",
+    "blind": null,
+    "compare": [],
+    "model": "xai/grok-4.20-0309-non-reasoning"
+  },
+  {
+    "ts": "2026-11-01 18:05",
+    "at": 1793577901590,
+    "bias_1d": "bullish",
+    "bias_4h": "bearish",
+    "oi_val": 7459181154.0,
+    "oi_chg": -0.0,
+    "funding": 0.01,
+    "funding_ann": 10.95,
+    "bb_rank_1h": 0.0018,
+    "range_x_1h": 0.216,
+    "box_lo": null,
+    "box_hi": null,
+    "compressed": null,
+    "frozen": null,
+    "frozen_ts": null,
+    "box_pct": null,
+    "sma21_4h": null,
+    "context": "BTC $78,313 | 1H ATR 229\n\u2500\u2500\u2500 1D \u2500\u2500\u2500\nDaily BB width 4.49% | rank 25% | bias bullish\n1D SMA21 80,940 (-3.25%) | SMA50 81,941 | SMA200 73,162\n1D price in 82k\u201386k range: -92% of 82k\u201386k band (0=low,100=high)\n\u2500\u2500\u2500 4H \u2500\u2500\u2500\n4H BB width 1.98% | rank 10% | bias bearish\n4H SMA21 78,013 (+0.39%) | SMA50 79,430 | SMA200 82,198\n\u2500\u2500\u2500 1H \u2500\u2500\u2500\n1H BB rank 0% \u2192 compression n/a (scanner detect unavailable)\n1H RSI 14: 57\n\u2500\u2500\u2500 15m \u2500\u2500\u2500\n15m SMA21 77,877 (+0.56%)\n\u2500\u2500\u2500 CROSS-TF \u2500\u2500\u2500\nFunding: 0.0100% / 8h | ~10.9% annualized\nOI $7.46B (-0.0% vs prior 4H)\nRSI divs: none\nSwing high +1.3 ATR | swing low -2.0 ATR\n\u2500\u2500\u2500 TRADE STATUS \u2500\u2500\u2500\nOPEN: LONG entry 77871.7 stop 77138.2 target 80072.1 | 0/96 bars",
     "opinion": "AI blind read unavailable (llm rc=1 our account for subscription or usage limits, then try again. | 402\n[openclaw] Debug: set OPENCLAW_DEBUG=1 to include the stack trace.\n[openclaw] Try: openclaw doctor\n[openclaw] Help: opencla)",
     "blind": null,
     "compare": [],
