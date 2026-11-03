@@ -1,24 +1,24 @@
 {
-  "ts": "2026-11-03 14:50:02",
-  "at": 1793739002031,
+  "ts": "2026-11-03 14:55:02",
+  "at": 1793739302703,
   "ram": {
     "total_gb": 9.6,
     "used_gb": 4.7,
     "avail_gb": 4.9,
-    "used_pct": 48.9
+    "used_pct": 49.2
   },
   "disk": {
     "total_gb": 1006.9,
-    "used_gb": 11.2,
+    "used_gb": 11.1,
     "avail_gb": 944.5,
     "used_pct": 1.1
   },
   "cpu": {
     "nproc": 16,
-    "load1": 0.01,
-    "load_pct": 0.1
+    "load1": 0.03,
+    "load_pct": 0.2
   },
-  "uptime_h": 118.8,
+  "uptime_h": 118.9,
   "agents": [
     {
       "name": "chat",
@@ -85,6 +85,6 @@
     "75601 /opt/google/chrome/chrome --type=renderer --crashpad-handler-pid=75469 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/home/flow/.openclaw/browser/openclaw/user-data --change-stack-guard-on-fork=enable --disable-dev-shm-usage --remote-debugging-port=18800 --ozone-platform=headless --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=8 --launch-time-ticks=250248946827 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,10947686711932621884,13530358759474749540,262144 --disable-features=MediaRouter,PaintHolding,Translate --variations-seed-version --pseudonymization-salt-handle=7,i,6444064849300377294,17202859186158467562,4 --trace-process-track-uuid=3190708993808206286",
     "75684 /opt/google/chrome/chrome --type=utility --utility-sub-type=audio.mojom.AudioService --lang=en-US --service-sandbox-type=none --disable-dev-shm-usage --use-angle=swiftshader-webgl --crashpad-handler-pid=75469 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/home/flow/.openclaw/browser/openclaw/user-data --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,10947686711932621884,13530358759474749540,262144 --disable-features=MediaRouter,PaintHolding,Translate --variations-seed-version --pseudonymization-salt-handle=7,i,6444064849300377294,17202859186158467562,4 --trace-process-track-uuid=3190708999430457380",
     "96881 /opt/google/chrome/chrome --type=renderer --crashpad-handler-pid=75469 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/home/flow/.openclaw/browser/openclaw/user-data --change-stack-guard-on-fork=enable --disable-dev-shm-usage --remote-debugging-port=18800 --ozone-platform=headless --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=37 --launch-time-ticks=327488443389 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,10947686711932621884,13530358759474749540,262144 --disable-features=MediaRouter,PaintHolding,Translate --variations-seed-version --pseudonymization-salt-handle=7,i,6444064849300377294,17202859186158467562,4 --trace-process-track-uuid=3190709020982419907",
-    "135663 /bin/sh -c /usr/bin/python3 /home/flow/.openclaw/workspace/mort/compression_scanner/weex_snapshot.py >> /home/flow/.openclaw/workspace/mort/weex_dashboard/snapshot.log 2>&1; /home/flow/.openclaw/workspace/mort/weex_dashboard/serve.sh"
+    "135712 /bin/sh -c /home/flow/.openclaw/workspace/mort/paper_log/publish_dashboard.sh >> /home/flow/.openclaw/workspace/mort/paper_log/dashboard_export.log 2>&1"
   ]
 }
