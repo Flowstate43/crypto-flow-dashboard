@@ -1,11 +1,11 @@
 {
-  "ts": "2026-11-13 03:00:01",
-  "at": 1794560401783,
+  "ts": "2026-11-13 03:05:02",
+  "at": 1794560702574,
   "ram": {
     "total_gb": 9.6,
     "used_gb": 2.7,
     "avail_gb": 6.9,
-    "used_pct": 27.9
+    "used_pct": 27.7
   },
   "disk": {
     "total_gb": 1006.9,
@@ -15,10 +15,10 @@
   },
   "cpu": {
     "nproc": 16,
-    "load1": 0.0,
-    "load_pct": 0.0
+    "load1": 0.14,
+    "load_pct": 0.9
   },
-  "uptime_h": 48.2,
+  "uptime_h": 48.3,
   "agents": [
     {
       "name": "chat",
@@ -71,10 +71,10 @@
     "1079 /usr/bin/node /home/flow/.npm-global/lib/node_modules/openclaw/dist/process/spawn-broker/worker.js",
     "1086 /usr/bin/node /home/flow/.npm-global/lib/node_modules/openclaw/dist/infra/sqlite-readonly-location.worker.js --openclaw-sqlite-readonly-child session",
     "1407 /usr/bin/node /home/flow/.npm-global/lib/node_modules/openclaw/dist/infra/sqlite-readonly-location.worker.js --openclaw-sqlite-readonly-child session",
-    "62182 /bin/sh -c /usr/bin/python3 /home/flow/.openclaw/workspace/mort/compression_scanner/weex_snapshot.py >> /home/flow/.openclaw/workspace/mort/weex_dashboard/snapshot.log 2>&1; /home/flow/.openclaw/workspace/mort/weex_dashboard/serve.sh",
-    "62183 /bin/sh -c /home/flow/.openclaw/workspace/mort/paper_log/publish_dashboard.sh >> /home/flow/.openclaw/workspace/mort/paper_log/dashboard_export.log 2>&1",
-    "62184 /bin/bash /home/flow/.openclaw/workspace/mort/paper_log/publish_dashboard.sh",
-    "62185 /usr/bin/python3 /home/flow/.openclaw/workspace/mort/compression_scanner/weex_snapshot.py",
-    "62200 python3 /home/flow/.openclaw/workspace/coordinator/status_dashboard/collect_status.py"
+    "62382 /bin/sh -c /usr/bin/python3 /home/flow/.openclaw/workspace/mort/compression_scanner/weex_snapshot.py >> /home/flow/.openclaw/workspace/mort/weex_dashboard/snapshot.log 2>&1; /home/flow/.openclaw/workspace/mort/weex_dashboard/serve.sh",
+    "62383 /bin/sh -c /home/flow/.openclaw/workspace/mort/paper_log/publish_dashboard.sh >> /home/flow/.openclaw/workspace/mort/paper_log/dashboard_export.log 2>&1",
+    "62384 /bin/bash /home/flow/.openclaw/workspace/mort/paper_log/publish_dashboard.sh",
+    "62385 /usr/bin/python3 /home/flow/.openclaw/workspace/mort/compression_scanner/weex_snapshot.py",
+    "62400 python3 /home/flow/.openclaw/workspace/coordinator/status_dashboard/collect_status.py"
   ]
 }
